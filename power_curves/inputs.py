@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import pi, cos
+from numpy import pi
 
 #AIRCRAFT PARAMETERS
 W	= 1569.6
@@ -9,6 +9,7 @@ psi_rad	= psi_deg * 180 / pi
 SFC = 0.5 #Given in ppt heli design
 C_T_sig = 0.11 #Check this value later heli design ppt 18
 k = 1.1
+eff_prop = 0.7 #PLACEHOLDER
 
 
 #ENVIRONMENTAL PARAMETERS

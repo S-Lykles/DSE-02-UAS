@@ -8,35 +8,41 @@ DL = 200
 N = 1
 A_eq = 0.09
 
+#TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
 t_start_rot = 5
 t_end_rot   = 60
 
 t_start_ac  = 30
 t_end_ac    = 100
 
-step        = 0.01
+step        = 1
 
 
-#R, D_v, omega, T_level, sig_max = rotor_sizing_tool(DL, N)
-#Preq_rotor, v_rot = generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start_rot, t_end_rot, step)
+rotor_calc = True
+ac_calc = False
+Plot = True
 
-Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, t_start_ac, t_end_ac, step)
 
-Plot_rotor = False
-Plot_ac = True
+if rotor_calc == True:
 
-if Plot_rotor == True:
-    plt.figure(dpi=600)
-    plt.plot(v_rot, Preq_rotor)
-    plt.title('Preq vs V rotorcraft forward flight')
-    plt.grid()
-    #plt.legend()
-    plt.show()
+    R, D_v, omega, T_level, sig_max = rotor_sizing_tool(DL, N)
+    Preq_rotor, v_rot = generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start_rot, t_end_rot, step)
 
-if Plot_ac == True:
-    plt.figure(dpi=600)
-    plt.plot(v_ac, Preq_ac)
-    plt.title('Preq vs V fixed wing forward flight')
-    plt.grid()
-    #plt.legend()
-    plt.show()
+    if Plot == True:
+        plt.figure(dpi=600)
+        plt.plot(v_rot, Preq_rotor)
+        plt.title('Preq vs V rotorcraft forward flight')
+        plt.grid()
+        #plt.legend()
+        plt.show()
+
+if ac_calc == True:
+
+    Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
+    if Plot == True:
+        plt.figure(dpi=600)
+        plt.plot(v_ac, Preq_ac)
+        plt.title('Preq vs V fixed wing forward flight')
+        plt.grid()
+        #plt.legend()
+        plt.show()

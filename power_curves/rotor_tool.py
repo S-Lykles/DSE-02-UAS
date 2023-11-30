@@ -21,7 +21,7 @@ def rotor_sizing_tool(DL, N):
     sig_level       = C_T_level/C_T_sig
 
     #turning flight
-    n_z             = 1 / cos(psi_rad)
+    n_z             = 1 / np.cos(psi_rad)
     T_turn          = W * k_dl * n_z
     C_T_turn        = T_turn / (rho * pi * R**2 * (omega*R)**2)
     sig_turn        = C_T_turn / C_T_sig
