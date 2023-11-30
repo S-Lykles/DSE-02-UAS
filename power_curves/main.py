@@ -1,6 +1,7 @@
 from inputs import *
 from rotor_tool import generate_Preq_rotor, rotor_sizing_tool
 from wong_tool import generate_Preq_ac
+from wong_tool import find_optimum_range_and_endurance_speed
 import matplotlib.pyplot as plt
 
 #ROTOR DESIGN PARAMETERS
@@ -18,8 +19,8 @@ t_end_ac    = 100
 step        = 1
 
 
-rotor_calc = True
-ac_calc = False
+rotor_calc = False
+ac_calc = True
 Plot = True
 
 
@@ -37,8 +38,9 @@ if rotor_calc == True:
         plt.show()
 
 if ac_calc == True:
-
     Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
+    speeds = find_optimum_range_and_endurance_speed(Preq_ac, v_ac)
+    print(speeds)
     if Plot == True:
         plt.figure(dpi=600)
         plt.plot(v_ac, Preq_ac)
