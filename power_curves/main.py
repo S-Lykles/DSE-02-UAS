@@ -10,9 +10,9 @@ A_eq = 0.09
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
 t_start_rot = 5
-t_end_rot   = 60
+t_end_rot   = 40
 
-t_start_ac  = 30
+t_start_ac  = 10
 t_end_ac    = 100
 
 step        = 1

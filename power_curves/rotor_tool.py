@@ -39,47 +39,36 @@ def rotor_sizing_tool(DL, N):
 def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, step):
     v = np.arange(t_start, t_end, step)
 
-    P_profile_drag_lst = []
-    P_induced_1_lst = []
-    P_parasite_lst = []
-    P_loss_lst = []
-    P_tot_req_level_lst = []
+    #Profile drag
+    advanced_ratio = v / (omega*R)
 
-    for i in v:
-        #Profile drag
-        advanced_ratio = i / (omega*R)
+    C_t = W / (rho * np.pi * R**2 * (omega*R)**2)
+    Cl_bar = 6.6*(C_t / sig_max)
+    alpha_m =Cl_bar / Cl_alpha_rot
 
-        C_t = W / (rho * np.pi * R**2 * (omega*R)**2)
-        Cl_bar = 6.6*(C_t / sig_max)
-        alpha_m =Cl_bar / Cl_alpha_rot
+    CD_p1 = 0.0087 - 0.0216*alpha_m + (0.4 * alpha_m **2)
+    CD_p2 = 0.011 + 0.4*(alpha_m**2)
+    CD_p3 = 0.009 + 0.73*(alpha_m**2)
+    C_D_p = (CD_p1 + CD_p3 + CD_p2) / 3
 
-        CD_p1 = 0.0087 - 0.0216*alpha_m + (0.4 * alpha_m **2)
-        CD_p2 = 0.011 + 0.4*(alpha_m**2)
-        CD_p3 = 0.009 + 0.73*(alpha_m**2)
-        C_D_p = (CD_p1 + CD_p3 + CD_p2) / 3
+    P_hov = (1/8)*sig_max*C_D_p*rho*(omega*R)**3*np.pi*(R**2)
 
-        P_hov = (1/8)*sig_max*C_D_p*rho*(omega*R)**3*np.pi*(R**2)
+    P_profile_drag_arr = P_hov * (1 + 4.65*(advanced_ratio**2))
 
-        P_profile_drag = P_hov * (1 + 4.65*(advanced_ratio**2))
-        P_profile_drag_lst.append(P_profile_drag)
+    #induced drag power
+    v_ih = np.sqrt(W / (2*rho*np.pi*R**2))
+    v_ibar = 1 / v
+    v_i = v_ibar * v_ih
+    P_induced_1_arr = k * T_level * v_i
 
-        #induced drag power
-        v_ih = np.sqrt(W / (2*rho*np.pi*R**2))
-        v_ibar = 1 / i
-        v_i = v_ibar * v_ih
-        P_induced_1 = k * T_level * v_i
-        P_induced_1_lst.append(P_induced_1)
+    #parsite power
+    P_parasite_arr = 0.5 * rho * A_eq * (v**3)
 
-        #parsite power
-        P_parasite = 0.5 * rho * A_eq * (i**3)
-        P_parasite_lst.append(P_parasite)
+    #power loss
+    P_loss_arr = 0.04*(P_profile_drag_arr + P_induced_1_arr + P_parasite_arr)
 
-        #power loss
-        P_loss = 0.04*(P_profile_drag + P_induced_1 + P_parasite)
-        P_loss_lst.append(P_loss)
+    #total power
+    P_tot_req_level_arr = P_profile_drag_arr + P_induced_1_arr + P_parasite_arr + P_loss_arr
 
-        #total power
-        P_tot_req_level = P_profile_drag + P_induced_1 + P_parasite + P_loss
-        P_tot_req_level_lst.append(P_tot_req_level)
-    return P_tot_req_level_lst, v
+    return P_tot_req_level_arr, v
 
