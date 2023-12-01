@@ -34,7 +34,7 @@ if rotor_calc:
 
 if ac_calc:
     # Ensure W, rho, S, AR, e, Cd0, eff_prop are defined before calling generate_Preq_ac
-    Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
+    Preq_ac, v_ac = generate_Preq_ac(W, S, rho, CD, CL, eff_prop)
 
     if Plot:
         plt.plot(v_ac, Preq_ac, label='Fixed Wing')

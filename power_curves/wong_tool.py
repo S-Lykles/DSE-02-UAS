@@ -1,8 +1,7 @@
 from inputs import *
 import numpy as np
 from numpy import pi
-
-
+'''
 def generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start, t_end, step):
     v = np.linspace(t_start, t_end, step)
 
@@ -11,7 +10,16 @@ def generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start, t_end, step):
     Preq_lst = Preq_shaft
 
     return Preq_lst, v
+'''
 
+def generate_Preq_ac(W, S, rho, CD, CL, eff_prop):
+    v = np.sqrt(2*W / (rho*S*CL))
+    D = W * (CD/ CL)
+    Preq_tot = D * v
+    Preq_shaft = Preq_tot / eff_prop
+    Preq_lst = Preq_shaft
+
+    return Preq_lst, v
 
 def find_optimum_range_and_endurance_speed(Preq_array, v_array):
     # Find for endurance
