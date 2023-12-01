@@ -5,8 +5,6 @@ MTOW = 160 #kg
 payload_com = 20 #kg
 payload_sup = 50 #kg
 
-# m_fuel =
-
 
 # Dual phase based on the FD180P(most similar specs in database with comparable main conf)
 # Cessna method used for this particular main configuration
@@ -26,7 +24,7 @@ range = 500 #km
 V_cruise = 110 #km/h
 V_max = 130 #km/h
 h_max = 5000 #m
-n_ult =
+n_ult = 1.5
 
 
 # Propulsion system parameters
