@@ -16,12 +16,13 @@ t_end_rot   = 40
 t_start_ac  = 10
 t_end_ac    = 100
 
-step        = 100
+step        = 1000
 
 
 rotor_calc = True
 ac_calc = True
 Plot = True
+
 
 if rotor_calc:
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(DL, N)

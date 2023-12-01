@@ -8,8 +8,8 @@ Dv = 0.04 * W
 
 T_hover = (1 + D_v/W) * W
 
-HP_sea = (T_hover * np.sqrt(DL / 2*rho)) / 550
+HP = (T_hover * np.sqrt(DL / 2*rho)) / 550
 
 print(T_hover)
-print(HP_sea*745.699872)
+print(HP * HPtoWatt)
 

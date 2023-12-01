@@ -23,3 +23,6 @@ AR = 8 #PLACEHOLDER
 e = 0.8 #PLACEHOLDER
 Cd0 = 0.01 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
+
+#conversion factors
+HPtoWatt = 745.699872
