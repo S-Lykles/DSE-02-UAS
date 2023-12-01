@@ -2,12 +2,7 @@ from inputs import *
 from rotor_tool import generate_Preq_rotor, rotor_sizing_tool
 from wong_tool import generate_Preq_ac
 import matplotlib.pyplot as plt
-
-
-#ROTOR DESIGN PARAMETERS
-DL = 236
-N = 4
-A_eq = 1 * 0.0929
+from Hover_Climb_Power import *
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
 t_start_rot = 5
@@ -18,11 +13,16 @@ t_end_ac    = 100
 
 step        = 1000
 
-
 rotor_calc = True
 ac_calc = True
 Plot = True
 
+single_point_v = 0
+single_point_hover = HP  # Replace with the actual value for rotorcraft at single_point_v
+single_point_hoverclimb = Clim_P    # Replace with the actual value for fixed-wing at single_point_v
+
+# Initialize variables outside of if blocks
+Preq_rotor = v_rot = Preq_ac = v_ac = None
 
 if rotor_calc:
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(DL, N)
@@ -33,10 +33,15 @@ if rotor_calc:
         plt.plot(v_rot, Preq_rotor, label='Rotorcraft')
 
 if ac_calc:
+    # Ensure W, rho, S, AR, e, Cd0, eff_prop are defined before calling generate_Preq_ac
     Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
 
     if Plot:
         plt.plot(v_ac, Preq_ac, label='Fixed Wing')
+
+# Plot a single data point
+plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
+plt.scatter(single_point_v, single_point_hoverclimb, color='blue', marker='x', label='Hover climb power')
 
 if Plot:
     plt.title('Preq vs V Comparison')
@@ -46,5 +51,6 @@ if Plot:
     plt.grid()
     plt.show()
 
-    print("Minimum Rotor Power Requirement:", Preq_rotor.min())
-    print("Minimum Fixed Wing Power Requirement:", Preq_ac.min())
+# Now, you can access these variables outside the if blocks
+print("Minimum Rotor Power Requirement:", Preq_rotor.min() if Preq_rotor is not None else "N/A")
+print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not None else "N/A")

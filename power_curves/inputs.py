@@ -1,6 +1,11 @@
 import numpy as np
 from numpy import pi
 
+#Rotor design parameters
+DL = 236
+N = 4
+A_eq = 1 * 0.0929
+
 #AIRCRAFT PARAMETERS
 W	= 1569.6
 V_max =	60 #Minimun required cruise speed * 1.3
@@ -10,6 +15,7 @@ SFC = 0.5 #Given in ppt heli design
 C_T_sig = 0.11 #Check this value later heli design ppt 18
 k = 1.1
 eff_prop = 0.7 #PLACEHOLDER
+vc = 2
 
 
 #ENVIRONMENTAL PARAMETERS
