@@ -32,8 +32,6 @@ def rotor_sizing_tool(DL, N):
     return R, D_v, omega, T_level, sig_max
 
 
-
-
 def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, step):
     v = np.linspace(t_start, t_end, step)
 
@@ -69,4 +67,3 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     P_tot_req_level_arr = P_profile_drag_arr + P_induced_1_arr + P_parasite_arr + P_loss_arr
 
     return P_tot_req_level_arr, v
-

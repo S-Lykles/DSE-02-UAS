@@ -1,15 +1,15 @@
 from inputs import *
 from rotor_tool import generate_Preq_rotor, rotor_sizing_tool
-from wong_tool import generate_Preq_ac
+from wong_tool import *
 import matplotlib.pyplot as plt
 from Hover_Climb_Power import *
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
-t_start_rot = 5
+t_start_rot = 3
 t_end_rot   = 40
 
 t_start_ac  = 10
-t_end_ac    = 100
+t_end_ac    = 80
 
 step        = 1000
 
@@ -47,6 +47,8 @@ if Plot:
     plt.title('Preq vs V Comparison')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Power Requirement (W)')
+    plt.xlim(0)
+    plt.ylim(0)
     plt.legend()
     plt.grid()
     plt.show()
@@ -54,3 +56,6 @@ if Plot:
 # Now, you can access these variables outside the if blocks
 print("Minimum Rotor Power Requirement:", Preq_rotor.min() if Preq_rotor is not None else "N/A")
 print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not None else "N/A")
+
+print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
+print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
