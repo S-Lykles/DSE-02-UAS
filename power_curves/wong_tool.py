@@ -21,6 +21,7 @@ def generate_Preq_ac(W, S, rho, CD, CL, eff_prop):
 
     return Preq_lst, v
 
+
 def find_optimum_range_and_endurance_speed(Preq_array, v_array):
     # Find for endurance
     index_Preq_min = np.argmin(Preq_array)

@@ -27,9 +27,9 @@ V_g	= 9.2 #Given in req's
 #AERODYNAMIC PARAMETERS
 S = 3.7 #PLACEHOLDER
 b = 6
-#AR = S**2 / b #PLACEHOLDER
-#e = 0.77 #PLACEHOLDER
-#Cd0 = 0.02345 #PLACEHOLDER
+AR = S**2 / b #PLACEHOLDER
+e = 0.77 #PLACEHOLDER
+Cd0 = 0.02345 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
 
 CL, CD, _ = dragpolar(b, S)
