@@ -37,14 +37,14 @@ def rotor_sizing_tool(DL, N):
 
 
 def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, step):
-    v = np.arange(t_start, t_end, step)
+    v = np.linspace(t_start, t_end, step)
 
     #Profile drag
     advanced_ratio = v / (omega*R)
 
     C_t = W / (rho * np.pi * R**2 * (omega*R)**2)
     Cl_bar = 6.6*(C_t / sig_max)
-    alpha_m =Cl_bar / Cl_alpha_rot
+    alpha_m = Cl_bar / Cl_alpha_rot
 
     CD_p1 = 0.0087 - 0.0216*alpha_m + (0.4 * alpha_m **2)
     CD_p2 = 0.011 + 0.4*(alpha_m**2)

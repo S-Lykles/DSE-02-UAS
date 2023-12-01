@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 #ROTOR DESIGN PARAMETERS
 DL = 200
-N = 1
+N = 4
 A_eq = 0.09
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
@@ -15,12 +15,12 @@ t_end_rot   = 40
 t_start_ac  = 10
 t_end_ac    = 100
 
-step        = 1
+step        = 100
 
 
 rotor_calc = True
-ac_calc = False
-Plot = True
+ac_calc = True
+Plot = False
 
 
 if rotor_calc == True:
@@ -46,3 +46,9 @@ if ac_calc == True:
         plt.grid()
         #plt.legend()
         plt.show()
+
+plt.figure(dpi=600)
+plt.plot(np.linspace(t_start_rot, t_end_ac, step), Preq_rotor, label = 'Rotorcraft')
+plt.plot(np.linspace(t_start_rot, t_end_ac, step), Preq_ac, label = 'Fixed wing')
+plt.legend()
+plt.show()
