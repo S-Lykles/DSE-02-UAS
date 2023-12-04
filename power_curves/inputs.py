@@ -3,8 +3,8 @@ from numpy import pi
 from aero.cl_cd import *
 
 #Rotor design parameters
-DL = 230
-N = 4
+DL = 46
+N = 2
 A_eq = 5 * 0.0929
 
 #AIRCRAFT PARAMETERS
