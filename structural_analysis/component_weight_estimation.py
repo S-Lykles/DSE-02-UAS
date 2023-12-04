@@ -26,3 +26,12 @@ W_lg = 1.24 + W_m_lg + W_n_lg
 # Summation to generate a final estimation for the structural weight
 
 W_struc = W_wing + W_emp + W_f + W_nac + W_lg
+
+# Summation to generate estimation for the propulsion system
+W_prop = N_electric*(W_electro_motor + W_rotor) + N_gas*(W_gas_motor + W_rotor) + W_fuel_sys + W_battery + W_generator
+
+#Summaion to generate an estimation for the avionics system
+W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
+
+OEW = W_prop + W_struc + W_avionics + payload_sup
+MTOW = OEW + W_fuel
