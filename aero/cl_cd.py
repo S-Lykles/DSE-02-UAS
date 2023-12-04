@@ -37,8 +37,8 @@ def dragpolar(b,S):
     e = 1.78*(1-0.045*A**0.68)-0.64             # Preliminary Design Method and Prototype Testing of a Novel Rotors Retractable Hybrid VTOL UAV 
     cd0_wing = e * Sw/S * cf_e                     # Lit. from erwin
     cd0_fus,cf,Re,rho, T, p = cd0_fuselage(500,43)
-    cl = np.linspace(0,1.5,100)
-    cd = (cd0_wing + cl**2/(pi*A*e)) * (1/0.34) + cd0_fus     # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
+    cl = np.linspace(0.2,1.5,100)
+    cd = (cd0_wing * 2.5 + cl**2/(pi*A*e)) + cd0_fus     # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
     return cl,cd
 
 def plotdragpolar(b,S):
