@@ -159,26 +159,77 @@ def mass_frac_main(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Litera
     print(f'Mfrac_cruise_back: {Mfrac_cruise_back:.3f}')
 
 
-def mass_frac_power():
+def mass_frac_power(which = 'endurance'):
     """
     Mass fraction calculation assuming constant power required during each phase
     """
     # SFC = input.SFC * ..
     SFC = 300 / (1000 * 1000 * 3600)
-    P_aux = 800 + 1000  # [W] payload and auxillary power
-    W1 = inputs.W * 9.81  # [N]
+    VCRUISE = 45
+    if which == 'payload':
+        P_aux = 1000 + 400
+    else:
+        P_aux = 1000 + 800 # [W] payload and auxillary power
+
+    W1 = inputs.W  # [N]
 
     V1 = np.sqrt(2 * W1 / (rho * inputs.S * inputs.CL))
     D1 = W1 * (inputs.CD / inputs.CL)
     P1 = D1 * V1 + P_aux
+    T1 = 185e3 / V1
+    E1 = P1 * T1
 
     plt.plot(V1, P1)
+
+    # plt.gca().secondary_xaxis
+    # plt.plot(V1, E1/np.mean(E1)*np.mean(P1))
+    idx1 = np.argmin(E1)
+    idx2 = np.argmin(E1[np.where(V1>VCRUISE)])
+    plt.scatter(V1[np.argmin(E1)], P1[np.argmin(E1)], color='red')
+    plt.scatter(V1[idx2], P1[idx2], color='green')
     plt.show()
 
+    Mfuel1 = (P1*T1*SFC)[idx2]
+    print(f'Fuel used for 185 km: {Mfuel1:.3f} kg')
+    print(f'Additional fuel used to make cruise speed: {Mfuel1 - (P1*T1*SFC)[idx1]:.3f} kg')
 
-    # dw_dt = 
+    W2 = W1 - Mfuel1 * g0
+    V2 = np.sqrt(2 * W2 / (rho * inputs.S * inputs.CL))
+    D2 = W2 * (inputs.CD / inputs.CL)
+    P2 = D2 * V2 + P_aux
+
+    if which == 'endurance':
+        T2 = 10 * 3600
+    else:
+        T2 = 20 * 60
+    
+    # E2 = P2 * T2
+    idx = np.argmin(P2)
+    plt.plot(V2, P2)
+    plt.scatter(V2[idx], P2[idx], color='red')
+    plt.show()
+    Mfuel2 = (P2*T2*SFC)[idx]
+    print(f'Fuel used for loiter: {Mfuel2:.3f} kg')
+
+    W3 = W2 - Mfuel2 * g0
+    if which == 'payload':
+        W3 -= 50 * inputs.g0
+
+    V3 = np.sqrt(2 * W3 / (rho * inputs.S * inputs.CL))
+    D3 = W3 * (inputs.CD / inputs.CL)
+    P3 = D3 * V3 + P_aux
+    T3 = 185e3 / V3
+    E3 = P3 * T3
+    idx = np.argmin(E3)
+    plt.plot(V3, P3)
+    plt.scatter(V3[idx], P3[idx], color='red')
+    plt.show()
+
+    Mfuel3 = (P3*T3*SFC)[idx]
+    print(f'Fuel used for 185 km: {Mfuel3:.3f} kg')
 
 
+    
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from power_curves.inputs import *
@@ -191,8 +242,21 @@ if __name__ == '__main__':
     # CL, CD, _ = dragpolar(b, S)
     # plt.plot(CD, CL)
     # plt.show()
+    # plt.show()
     SFC = 300 # [g/kWh]
 
     # Mfrac_fuel = mass_frac_main(CL, CD, SFC, S)
-    mass_frac_power()
+    idx = np.argmax(CL/CD)
+
+    print(f'CL: {CL[idx]:.3f}')
+    print(f'CD: {CD[idx]:.3f}')
+    print(f'CL/CD: {CL[idx]/CD[idx]:.3f}')
+    print("For endurance mission")
+    print("-"*20)
+    mass_frac_power(which = 'endurance')
+
+    print("For payload mission")
+    print("-"*20)
+    mass_frac_power(which = 'payload')
+
 
