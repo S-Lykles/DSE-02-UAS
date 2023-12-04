@@ -1,8 +1,9 @@
-from inputs import *
-from rotor_tool import generate_Preq_rotor, rotor_sizing_tool
-from wong_tool import generate_Preq_ac
+from .inputs import *
+from .rotor_tool import generate_Preq_rotor, rotor_sizing_tool
+from .wong_tool import generate_Preq_ac
 import matplotlib.pyplot as plt
-from Hover_Climb_Power import *
+from .Hover_Climb_Power import *
+from aero.cl_cd import *
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
 t_start_rot = 5

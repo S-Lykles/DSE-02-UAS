@@ -1,6 +1,6 @@
 import numpy as np
-from inputs import *
-from rotor_tool import *
+from .inputs import *
+from .rotor_tool import *
 
 D_v = 0.04 * W
 

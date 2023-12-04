@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from inputs import *
+from .inputs import *
 
 def rotor_sizing_tool(DL, N):
     #rotor sizing

@@ -1,4 +1,4 @@
-from inputs import *
+from .inputs import *
 import numpy as np
 from numpy import pi
 

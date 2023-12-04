@@ -86,10 +86,13 @@ def Mfrac_loiter(E: float, SFC: float, eta, CD, CL, V1):
     return Mfrac
     
 def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Literal['payload', 'endurance']='payload'):
-    MTOW = 160 # [kg]
     rho = 1.225  # [kg/m^3]
     g0 = 9.81  # [m/s^2]
     eta = 0.8
+    MTOW = 160 # [kg]
+    W1 = MTOW * 9.81  # [N]
+    v1 = np.sqrt(W1 * 2 / (rho * S * CL))
+    vreq = 42 # [m/s]
 
     CLIMB_HEIGHT = 500  # [m]
     CRUISE_DIST = 185  # [km]
@@ -99,30 +102,50 @@ def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Liter
         LOITER_TIME = 10  # [hr]
 
     CL_CD = CL/CD
-    Mcruise = MTOW
     CL_cruise = CL[np.argmax(CL_CD)]
-    print(f'CL in cruise: {CL_cruise:.3f}')
     CD_cruise = CD[np.argmax(CL_CD)]
-    print(f'CL/CD max: {CL_cruise/CD_cruise:.3f}')
-    Vcruise = np.sqrt(Mcruise*g0 * 2 / (rho * S * CL_cruise))
-    print(f'Vcruise: {Vcruise:.3f} m/s')
-    Pcruise = Mcruise * g0 * CD_cruise / CL_cruise * Vcruise
-    print(f'Pcruise: {Pcruise:.3f} W')
+    v_cruise = v1[np.argmax(CL_CD)]
+    Pcruise = W1 * CD_cruise / CL_cruise * v_cruise
+    print('At maximum CL/CD:')
+    print(f'V: {v_cruise:.3f} m/s')
+    print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
+    print(f'CL: {CL_cruise:.3f}')
+    print(f'P (at MTOW): {Pcruise:.3f} W')
+
+    if v_cruise < vreq:
+        print(f'Warning: Cruise velocity is lower than required velocity of {vreq:.3f} m/s')
+        print(f'At maximum CL/CD satisfying vreq:')
+        i = np.argmax(CL_CD[np.where(v1 > vreq)])
+        CL_cruise = CL[i]
+        CD_cruise = CD[i]
+        v_cruise = v1[i]
+        Pcruise = W1 * CD_cruise / CL_cruise * v_cruise
+        print(f'V: {v_cruise:.3f} m/s')
+        print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
+        print(f'CL: {CL_cruise:.3f}')
+        print(f'P (at MTOW): {Pcruise:.3f} W')
 
     CL_CD = CL**3/CD**2
     CL_loiter = CL[np.argmax(CL_CD)]
     CD_loiter = CD[np.argmax(CL_CD)]
+    v_loiter = v1[np.argmax(CL_CD)]
+    Ploiter = W1 * CD_loiter / CL_loiter * v_loiter
+    print(f'V loiter: {v_loiter:.3f} m/s')
+    print(f'CL/CD loiter: {CL_loiter/CD_loiter:.3f}')
+    print(f'CL loiter: {CL_loiter:.3f}')
+    print(f'P loiter (at MTOW): {Ploiter:.3f} W')
+
 
     Mfrac_take_off = 0.99
     Mfrac_climb_1 = Mfrac_climb(CLIMB_HEIGHT, SFC)
     Mfrac_cruise_1 = Mfrac_cruise(SFC, CRUISE_DIST, CL_cruise, CD_cruise, eta)
     print(f'Mfrac_cruise_1: {Mfrac_cruise_1:.3f}')
     
-    W1 = MTOW * Mfrac_take_off * Mfrac_climb_1 * Mfrac_cruise_1 * g0
+    W_loiter_1 = MTOW * Mfrac_take_off * Mfrac_climb_1 * Mfrac_cruise_1 * g0
 
-    V1 = np.sqrt(W1 * 2 / (rho * S * CL_loiter))
-    print(f'V1: {V1:.3f} m/s') 
-    Mfrac_loiter_1 = Mfrac_loiter(LOITER_TIME, SFC, eta, CD_loiter, CL_loiter, V1)
+    v_loiter = np.sqrt(W_loiter_1 * 2 / (rho * S * CL_loiter))
+    print(f'v_loiter: {v_loiter:.3f} m/s') 
+    Mfrac_loiter_1 = Mfrac_loiter(LOITER_TIME, SFC, eta, CD_loiter, CL_loiter, v_loiter)
     print(f'Mfrac_loiter_1: {Mfrac_loiter_1:.3f}')
 
     # cruise back
@@ -139,9 +162,10 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     # from inputs import *
     from ..aero.cl_cd import *
+    
 
-    b = 6  # [m]
-    S = 3.763  # [m^2]
+    b = 4  # [m]
+    S = 1.5  # [m^2]
 
     CL, CD, _ = dragpolar(b, S)
     plt.plot(CD, CL)
