@@ -6,11 +6,11 @@ from .Hover_Climb_Power import *
 from aero.cl_cd import *
 
 #TIME SPAN OF SIMULATION FOR ROTOR AND FIXED WING CALCULATION
-t_start_rot = 5
+t_start_rot = 3
 t_end_rot   = 40
 
 t_start_ac  = 10
-t_end_ac    = 100
+t_end_ac    = 80
 
 step        = 1000
 
@@ -35,7 +35,8 @@ if rotor_calc:
 
 if ac_calc:
     # Ensure W, rho, S, AR, e, Cd0, eff_prop are defined before calling generate_Preq_ac
-    Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
+    Preq_ac, v_ac = generate_Preq_ac(W, S, rho, CD, CL, eff_prop)
+    #Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
 
     if Plot:
         plt.plot(v_ac, Preq_ac, label='Fixed Wing')
@@ -48,6 +49,8 @@ if Plot:
     plt.title('Preq vs V Comparison')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Power Requirement (W)')
+    plt.xlim(0)
+    plt.ylim(0)
     plt.legend()
     plt.grid()
     plt.show()
@@ -55,3 +58,6 @@ if Plot:
 # Now, you can access these variables outside the if blocks
 print("Minimum Rotor Power Requirement:", Preq_rotor.min() if Preq_rotor is not None else "N/A")
 print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not None else "N/A")
+
+print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
+print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))

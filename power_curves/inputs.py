@@ -1,10 +1,11 @@
 import numpy as np
 from numpy import pi
+from cl_cd import *
 
 #Rotor design parameters
-DL = 236
+DL = 230
 N = 4
-A_eq = 1 * 0.0929
+A_eq = 5 * 0.0929
 
 #AIRCRAFT PARAMETERS
 W	= 1569.6
@@ -24,11 +25,14 @@ V_g	= 9.2 #Given in req's
 
 
 #AERODYNAMIC PARAMETERS
-S = 2 #PLACEHOLDER
-AR = 8 #PLACEHOLDER
-e = 0.8 #PLACEHOLDER
-Cd0 = 0.01 #PLACEHOLDER
+S = 3.7 #PLACEHOLDER
+b = 6
+AR = S**2 / b #PLACEHOLDER
+e = 0.77 #PLACEHOLDER
+Cd0 = 0.02345 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
+
+CL, CD, _ = dragpolar(b, S)
 
 #conversion factors
 HPtoWatt = 745.699872
