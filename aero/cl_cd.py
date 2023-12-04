@@ -8,7 +8,7 @@ def dragpolar(b,S):
     e = 1.78*(1-0.045*A**0.68)-0.64                 #
     Sw = 0.262*160**0.745   # 
     cd0 = e * Sw/S * cf_e * 2
-    cl = np.linspace(-0.2,1.2,100)
+    cl = np.linspace(-0.2,1.2,101)
     cd = cd0 + cl**2/(3.14*A*e) 
     return cl,cd,e
 
