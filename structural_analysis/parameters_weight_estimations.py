@@ -13,7 +13,7 @@ W_L = MTOW - W_fuel - payload_sup #Landing mass
 
 # Dimensional parameters
 l = 3.35 #m
-d = #Diameter fuselage
+d = 0.4 #Diameter fuselage m
 l_sm =  #Shock strut length fro main gear
 l_sn = #Shock strut length for nose gear
 
@@ -23,13 +23,13 @@ S = 3.763 #Wing surface main wing in squared meters
 A = b**2/S #Aspect ratio main wing
 
 #Empennage parameters
-S_h = #Surface area horizontal tailwing
-A_h = #Aspect ratio horizontal tailwing
-S_v = #Surface area vertical tailwing
-A_v = #Aspect ratio vertical tailwing
-t_rh = #Maximum root thickness of the horizontal tailwing
-t_rv = #Maximum root thickness of the vertical tailwing
-chord_sweep_angle = #Sweep angle of the quarter chord vertical wing
+# S_h = #Surface area horizontal tailwing
+# A_h = #Aspect ratio horizontal tailwing
+# S_v = #Surface area vertical tailwing
+# A_v = #Aspect ratio vertical tailwing
+# t_rh = #Maximum root thickness of the horizontal tailwing
+# t_rv = #Maximum root thickness of the vertical tailwing
+# chord_sweep_angle = #Sweep angle of the quarter chord vertical wing
 
 
 # Specs
@@ -39,8 +39,8 @@ V_cruise = 110 #km/h
 V_max = 130 #km/h
 h_max = 5000 #m
 n_ult = 1.5
-P_hov_max = 30 #kW
-#P_cruise_max =  #kW Max power required during cruise
+P_hov_max = 35 #kW
+P_cruise_max = 15 #kW Max power required during cruise
 
 # Propulsion system parameters
 N_electric = 4 #number of rotors electrically driven in particular configuration
