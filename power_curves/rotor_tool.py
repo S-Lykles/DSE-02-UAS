@@ -67,3 +67,21 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     P_tot_req_level_arr = P_profile_drag_arr + P_induced_1_arr + P_parasite_arr + P_loss_arr
 
     return P_tot_req_level_arr, v
+
+
+def generate_number_of_blades(R, sigma):
+    print('R', R)
+    # We assume that we can integrate between 2-20 blades per rotor
+    possible_number_blades = np.arange(2, 20, 1)
+
+    # The chord formula follows from the slides from Marilena
+    chord_array = (sigma * np.pi * R)/ possible_number_blades
+    AR = (R**2) / (R * chord_array)  # The aspect ratio of the blades
+
+    # For a certain number of blades, the aspect ratio is found.
+    # This is constrained between 14<AR<20 as in de slides
+    AR_contrained = AR[(AR > 14) & (AR < 20)]
+    print('AR list', AR)
+    print('AR options', AR_contrained)
+
+
