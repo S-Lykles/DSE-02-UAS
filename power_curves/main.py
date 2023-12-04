@@ -26,7 +26,7 @@ single_point_hoverclimb = Clim_P    # Replace with the actual value for fixed-wi
 Preq_rotor = v_rot = Preq_ac = v_ac = None
 
 if rotor_calc:
-    R, D_v, omega, T_level, sig_max = rotor_sizing_tool(DL, N)
+    R, D_v, omega, T_level, sig_max, sig_min = rotor_sizing_tool(DL, N)
     Preq_rotor, v_rot = generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start_rot, t_end_rot, step)
 
     if Plot:
@@ -63,3 +63,5 @@ print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not N
 print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
 print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
 
+generate_number_of_blades(R, sig_max)
+generate_number_of_blades(R, sig_min)

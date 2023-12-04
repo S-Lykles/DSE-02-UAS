@@ -11,7 +11,7 @@ A_eq = 5 * 0.0929
 W	= 1569.6
 V_max =	60 #Minimun required cruise speed * 1.3
 psi_deg	= 20 #Arbitrarily chosen
-psi_rad	= psi_deg * 180 / pi
+psi_rad	= psi_deg * (np.pi / 180)
 SFC = 0.5 #Given in ppt heli design
 C_T_sig = 0.11 #Check this value later heli design ppt 18
 k = 1.1
@@ -32,7 +32,7 @@ e = 0.77 #PLACEHOLDER
 Cd0 = 0.02345 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
 
-CL, CD, _ = dragpolar(b, S)
+CL, CD = dragpolar(b, S)
 
 #conversion factors
 HPtoWatt = 745.699872

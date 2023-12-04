@@ -4,7 +4,7 @@ from .inputs import *
 
 def rotor_sizing_tool(DL, N):
     #rotor sizing
-    R               = np.sqrt(W/N/DL/pi)
+    R               = np.sqrt(W/(N * DL * np.pi))
     V_tip           = 150*(2*R)**0.171
     D_v             = 0.04*W
     k_dl            = 1 + D_v/W
@@ -28,8 +28,9 @@ def rotor_sizing_tool(DL, N):
     # C_T_gust = T_gust/ (Vne*pi*R**2*omega**2*R**2)
 
     sig_max = max(sig_level, sig_turn)
+    sig_min = min(sig_level, sig_turn)
 
-    return R, D_v, omega, T_level, sig_max
+    return R, D_v, omega, T_level, sig_max, sig_min
 
 
 def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, step):
@@ -70,18 +71,17 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
 
 
 def generate_number_of_blades(R, sigma):
-    print('R', R)
     # We assume that we can integrate between 2-20 blades per rotor
     possible_number_blades = np.arange(2, 20, 1)
 
     # The chord formula follows from the slides from Marilena
+    # This assumes a constant chord!
     chord_array = (sigma * np.pi * R)/ possible_number_blades
     AR = (R**2) / (R * chord_array)  # The aspect ratio of the blades
 
     # For a certain number of blades, the aspect ratio is found.
     # This is constrained between 14<AR<20 as in de slides
-    AR_contrained = AR[(AR > 14) & (AR < 20)]
-    print('AR list', AR)
-    print('AR options', AR_contrained)
-
-
+    AR_contrained = AR[(AR > 14) & (AR < 20)]  # The aspect ratio as based on the AR constraint
+    # The following connects the possible AR to the number of blades based on index
+    number_of_blades = possible_number_blades[np.in1d(AR, AR_contrained).nonzero()[0]]
+    print('Number of blades:', number_of_blades)
