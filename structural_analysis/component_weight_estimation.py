@@ -14,11 +14,11 @@ W_emp = W_h + W_v
 W_f = 14.86*MTOW**0.144 *(l/d)**0.778 *l**0.383
 
 # Weight estimation of the nacelle
-W_nac = 0.24 * P_max
+W_nac = 0.24 * P_cruise_max
 
 # Weight estimation of a non-retractable landing gear
 
-W_m_lg = 0.013*MTOW + 0.362*W_L**0.417 *n_ult_l**0.95 *l_sm**0.183
+W_m_lg = 0.013*MTOW + 0.362*W_L**0.417 *l_sm**0.183
 W_n_lg = 0.0013*MTOW + 0.007157*W_L**0.749 *n_ult_l *l_sn**0.788
 # Summation of both nose and main landing gear (decreased
 W_lg = 1.24 + W_m_lg + W_n_lg
