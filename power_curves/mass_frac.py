@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Literal
 from numpy.typing import NDArray
+from . import inputs
 
 # Take of phase
 def Mfrac_take_off():
@@ -69,7 +70,12 @@ def Mfrac_loiter(E: float, SFC: float, eta, CD, CL, V1):
         Propulsive efficiency
     CD : float
         Drag coefficient
-    CL : float
+    CL : flon of loiter phase
+    From "Elements of airplane performance", second edition equation 15.16
+    E = 2 * eta * CL / (SFC * CD * V1) * (sqrt(W1 / W2) - 1)
+    For optimum endurance, CL and CD should correspond to maximum of CL^3/CD^2
+
+    Parametersoat
         Lift coefficient
     V1 : float
         Velocity at starting phase of endurence [m/s]
@@ -85,12 +91,13 @@ def Mfrac_loiter(E: float, SFC: float, eta, CD, CL, V1):
     Mfrac = (E * SFC * CD * V1 / (2 * eta * CL) + 1)**2
     return Mfrac
     
-def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Literal['payload', 'endurance']='payload'):
+def mass_frac_main(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Literal['payload', 'endurance']='payload'):
     rho = 1.225  # [kg/m^3]
     g0 = 9.81  # [m/s^2]
     eta = 0.8
     MTOW = 160 # [kg]
     W1 = MTOW * 9.81  # [N]
+
     v1 = np.sqrt(W1 * 2 / (rho * S * CL))
     vreq = 42 # [m/s]
 
@@ -106,24 +113,24 @@ def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Liter
     CD_cruise = CD[np.argmax(CL_CD)]
     v_cruise = v1[np.argmax(CL_CD)]
     Pcruise = W1 * CD_cruise / CL_cruise * v_cruise
-    print('At maximum CL/CD:')
-    print(f'V: {v_cruise:.3f} m/s')
-    print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
-    print(f'CL: {CL_cruise:.3f}')
-    print(f'P (at MTOW): {Pcruise:.3f} W')
+    # print('At maximum CL/CD:')
+    # print(f'V: {v_cruise:.3f} m/s')
+    # print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
+    # print(f'CL: {CL_cruise:.3f}')
+    # print(f'P (at MTOW): {Pcruise:.3f} W')
 
     if v_cruise < vreq:
         print(f'Warning: Cruise velocity is lower than required velocity of {vreq:.3f} m/s')
-        print(f'At maximum CL/CD satisfying vreq:')
         i = np.argmax(CL_CD[np.where(v1 > vreq)])
         CL_cruise = CL[i]
         CD_cruise = CD[i]
         v_cruise = v1[i]
         Pcruise = W1 * CD_cruise / CL_cruise * v_cruise
-        print(f'V: {v_cruise:.3f} m/s')
-        print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
-        print(f'CL: {CL_cruise:.3f}')
-        print(f'P (at MTOW): {Pcruise:.3f} W')
+    print(f'At maximum CL/CD satisfying vreq:')
+    print(f'V: {v_cruise:.3f} m/s')
+    print(f'CL/CD: {CL_cruise/CD_cruise:.3f}')
+    print(f'CL: {CL_cruise:.3f}')
+    print(f'P (at MTOW): {Pcruise:.3f} W')
 
     CL_CD = CL**3/CD**2
     CL_loiter = CL[np.argmax(CL_CD)]
@@ -136,12 +143,11 @@ def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Liter
     print(f'P loiter (at MTOW): {Ploiter:.3f} W')
 
 
-    Mfrac_take_off = 0.99
     Mfrac_climb_1 = Mfrac_climb(CLIMB_HEIGHT, SFC)
     Mfrac_cruise_1 = Mfrac_cruise(SFC, CRUISE_DIST, CL_cruise, CD_cruise, eta)
     print(f'Mfrac_cruise_1: {Mfrac_cruise_1:.3f}')
     
-    W_loiter_1 = MTOW * Mfrac_take_off * Mfrac_climb_1 * Mfrac_cruise_1 * g0
+    W_loiter_1 = MTOW * Mfrac_climb_1 * Mfrac_cruise_1 * g0
 
     v_loiter = np.sqrt(W_loiter_1 * 2 / (rho * S * CL_loiter))
     print(f'v_loiter: {v_loiter:.3f} m/s') 
@@ -152,26 +158,41 @@ def total_mass_frac(CL: NDArray, CD: NDArray, SFC: float, S: float, which: Liter
     Mfrac_cruise_back = Mfrac_cruise(SFC, CRUISE_DIST, CL_cruise, CD_cruise, eta)
     print(f'Mfrac_cruise_back: {Mfrac_cruise_back:.3f}')
 
-    # land
-    Mfrac_land = 0.99
 
-    return Mfrac_take_off * Mfrac_climb_1 * Mfrac_cruise_1 * Mfrac_loiter_1 * Mfrac_cruise_back * Mfrac_land
+def mass_frac_power():
+    """
+    Mass fraction calculation assuming constant power required during each phase
+    """
+    # SFC = input.SFC * ..
+    SFC = 300 / (1000 * 1000 * 3600)
+    P_aux = 800 + 1000  # [W] payload and auxillary power
+    W1 = inputs.W * 9.81  # [N]
+
+    V1 = np.sqrt(2 * W1 / (rho * inputs.S * inputs.CL))
+    D1 = W1 * (inputs.CD / inputs.CL)
+    P1 = D1 * V1 + P_aux
+
+    plt.plot(V1, P1)
+    plt.show()
+
+
+    # dw_dt = 
 
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    # from inputs import *
-    from ..aero.cl_cd import *
+    from power_curves.inputs import *
+    from aero.cl_cd import *
     
 
-    b = 4  # [m]
-    S = 1.5  # [m^2]
+    # b = 4  # [m]
+    # S = 3.7  # [m^2]
 
-    CL, CD, _ = dragpolar(b, S)
-    plt.plot(CD, CL)
-    plt.show()
+    # CL, CD, _ = dragpolar(b, S)
+    # plt.plot(CD, CL)
+    # plt.show()
     SFC = 300 # [g/kWh]
 
-    Mfrac_fuel = total_mass_frac(CL, CD, SFC, S, which='payload')
-    print(f'Mass fraction for fuel: {Mfrac_fuel:.3f}')
+    # Mfrac_fuel = mass_frac_main(CL, CD, SFC, S)
+    mass_frac_power()
 
