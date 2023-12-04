@@ -30,7 +30,7 @@ if rotor_calc:
     Preq_rotor, v_rot = generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start_rot, t_end_rot, step)
 
     if Plot:
-        plt.figure(dpi=600)
+        plt.figure(dpi=200)
         plt.plot(v_rot, Preq_rotor, label='Rotorcraft')
 
 if ac_calc:
@@ -49,8 +49,8 @@ if Plot:
     plt.title('Preq vs V Comparison')
     plt.xlabel('Velocity (m/s)')
     plt.ylabel('Power Requirement (W)')
-    plt.xlim(0)
-    plt.ylim(0)
+    plt.xlim(left=0)
+    plt.ylim(bottom=0)
     plt.legend()
     plt.grid()
     plt.savefig('s=3.7b=6.png')
