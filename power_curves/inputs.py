@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import pi
-from cl_cd import *
+from aero.cl_cd import *
 
 #Rotor design parameters
 DL = 230
