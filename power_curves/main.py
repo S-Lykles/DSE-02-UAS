@@ -53,6 +53,7 @@ if Plot:
     plt.ylim(0)
     plt.legend()
     plt.grid()
+    plt.savefig('s=3.7b=6.png')
     plt.show()
 
 # Now, you can access these variables outside the if blocks
@@ -61,3 +62,4 @@ print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not N
 
 print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
 print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
+
