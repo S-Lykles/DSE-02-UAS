@@ -2,6 +2,9 @@ import numpy as np
 from numpy import pi
 from aero.cl_cd import *
 
+#CONSTANTS
+g0 = 9.81
+
 #Rotor design parameters
 DL = 46
 N = 2
@@ -25,7 +28,7 @@ V_g	= 9.2 #Given in req's
 
 
 #AERODYNAMIC PARAMETERS
-S = 3.7 #PLACEHOLDER
+S = 3.2 #PLACEHOLDER
 b = 6
 AR = S**2 / b #PLACEHOLDER
 e = 0.77 #PLACEHOLDER
