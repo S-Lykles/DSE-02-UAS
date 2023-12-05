@@ -39,7 +39,7 @@ V_cruise = 110 #km/h
 V_max = 130 #km/h
 h_max = 5000 #m
 n_ult = 1.5
-P_hov_max = 35 #kW
+P_hov_max = 35 #kW Max power required during hover/take-off phase
 P_cruise_max = 15 #kW Max power required during cruise
 
 # Propulsion system parameters
@@ -51,6 +51,7 @@ W_electro_motor = 0.1836*(P_hov_max/N_electric)+ 2.7076 #Dependent on power requ
 W_fuel_sys = W_fuel/9 #Literature research
 W_battery = 24 #kg, Dependent on propulsion configuration (battery weight for electric VTOL)
 #W_generator = #Dependent on configuration
+
 
 # Add up all the weights of the propulsion to find an estimation for the weight of this subsystem
 W_prop = N_electric*(W_electro_motor + W_rotor) + N_gas*(W_gas_motor + W_rotor) + W_fuel_sys + W_battery + W_generator
@@ -71,4 +72,10 @@ W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
 
 # Compound helicopter parameters\
 
-
+#rpm =  #expected rpm of the rotors
+#R = #radius main rotor
+# C = #average chord of a blade
+# N = #number of blades on rotor
+# V_tip = #Blade tip speed for cruise conditions
+# S_ch = #Total blade area of one rotor
+# A_ch = #Disk are of one rotor
