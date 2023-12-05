@@ -103,4 +103,7 @@ def generate_power_versus_disk_loading(P_hover_array, DL_array):
     # Now we have arrays in lb/hp and lb/ft^2
     # We plot this to compare with NASA data (See literature)
     plt.scatter(DL_array, PL_array)
+    plt.grid()
+    plt.xlabel('Disk Loading in lb/ft^2')
+    plt.ylabel('Power efficiency in lb/hp')
     plt.show()
