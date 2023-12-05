@@ -1,7 +1,7 @@
 import numpy as np
 from parameters_weight_estimations import *
 
-#Weight estimation fixed wing:
+#Weight estimation dual phase:
 # Weight estimation of main wing (full cantilever wing assumed)
 W_wing = 0.04674*MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712
 
