@@ -53,7 +53,7 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     P_profile_drag_arr = P_hov * (1 + 4.65*(advanced_ratio**2))
 
     #induced drag power
-    v_ih = np.sqrt(W / (2*rho*np.pi*R**2))
+    v_ih = np.sqrt(W / (N * 2*rho*np.pi*R**2))
     # v_ibar = 1 / v
     # v_i = v_ibar * 
     a = v_ih**-4
