@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .inputs import *
 
+
 def rotor_sizing_tool(DL, N):
     #rotor sizing
     R               = np.sqrt(W/(N * DL * np.pi))
@@ -91,3 +92,15 @@ def generate_number_of_blades(R, sigma):
     # The following connects the possible AR to the number of blades based on index
     number_of_blades = possible_number_blades[np.in1d(AR, AR_contrained).nonzero()[0]]
     print('Number of blades:', number_of_blades)
+
+
+def generate_power_versus_disk_loading(P_hover_array, DL_array):
+    # Assuming units in kg/Watts and kg/m^2 respectively
+    print('Hover Power:', P_hover_array)
+    PL_array = (M_gross * 2.20462) / (P_hover_array * 0.00135962)
+    DL_array = DL_array * (0.204816)
+
+    # Now we have arrays in lb/hp and lb/ft^2
+    # We plot this to compare with NASA data (See literature)
+    plt.scatter(DL_array, PL_array)
+    plt.show()

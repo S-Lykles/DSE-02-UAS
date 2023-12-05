@@ -37,9 +37,9 @@ if rotor_calc:
 
     if Plot:
         plt.figure(dpi=200)
-        #plt.plot(v_rot, P_p, label='Profile Drag')
-        #plt.plot(v_rot, P_i, label='Induced Drag')
-        #plt.plot(v_rot, P_par, label='Parasitic Drag')
+        plt.plot(v_rot, P_p, label='Profile Drag')
+        plt.plot(v_rot, P_i, label='Induced Drag')
+        plt.plot(v_rot, P_par, label='Parasitic Drag')
         plt.plot(v_rot, Preq_rotor, label='Total Power Required')
 
 if ac_calc:
@@ -76,3 +76,5 @@ print()
 
 print('Hover power climb', Clim_P)
 generate_number_of_blades(R, sig_max)
+
+generate_power_versus_disk_loading(Preq_rotor[0], DL)

@@ -6,7 +6,8 @@ from aero.cl_cd import *
 g0 = 9.81
 
 #AIRCRAFT PARAMETERS
-W	= 160 * g0 #Given in req's #Input
+M_gross = 160
+W	= M_gross * g0 #Given in req's #Input
 
 V_max =	50 #Minimun required cruise speed * 1.3
 psi_deg	= 20 #Arbitrarily chosen
