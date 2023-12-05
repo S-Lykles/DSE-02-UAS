@@ -1,10 +1,10 @@
 #Parameters listed for the weight estimation
 #General parameters:
 
-MTOW = 160 #kg
-payload_com = 20 #kg
-payload_sup = 50 #kg
-W_fuel = 20 #kg
+MTOW = 160*2.20462262 #lbs
+payload_com = 20*2.20462262 #lbs
+payload_sup = 50*2.20462262 #lbs
+W_fuel = 20*2.20462262 #kg
 W_L = MTOW - W_fuel - payload_sup #Landing mass
 
 
@@ -18,18 +18,18 @@ l_sm =  #Shock strut length fro main gear
 l_sn = #Shock strut length for nose gear
 
 # Wing parameters
-b = 6 #m
-S = 3.763 #Wing surface main wing in squared meters
+b = 6* 3.28084 #ft
+S = 3.763* 3.28084**2 #Wing surface main wing in ft^2
 A = b**2/S #Aspect ratio main wing
 
 #Empennage parameters
-# S_h = #Surface area horizontal tailwing
+# S_h = #Surface area horizontal tailwing in ft^2
 # A_h = #Aspect ratio horizontal tailwing
-# S_v = #Surface area vertical tailwing
+# S_v = #Surface area vertical tailwing in ft^2
 # A_v = #Aspect ratio vertical tailwing
-# t_rh = #Maximum root thickness of the horizontal tailwing
-# t_rv = #Maximum root thickness of the vertical tailwing
-# chord_sweep_angle = #Sweep angle of the quarter chord vertical wing
+# t_rh = #Maximum root thickness of the horizontal tailwing in ft
+# t_rv = #Maximum root thickness of the vertical tailwing in ft
+# chord_sweep_angle = #Sweep angle of the quarter chord vertical wing in radians
 
 
 # Specs
@@ -73,9 +73,9 @@ W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
 # Compound helicopter parameters\
 
 #rpm =  #expected rpm of the rotors
-#R = #radius main rotor
-# C = #average chord of a blade
+#R = #radius main rotor in ft
+# C = #average chord of a blade in ft
 # N = #number of blades on rotor
-# V_tip = #Blade tip speed for cruise conditions
-# S_ch = #Total blade area of one rotor
-# A_ch = #Disk are of one rotor
+# V_tip = #Blade tip speed for cruise conditions in ft/s
+# S_ch = #Total blade area of one rotor in ft^2
+# A_ch = #Disk are of one rotor in ft
