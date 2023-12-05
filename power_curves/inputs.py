@@ -7,8 +7,8 @@ g0 = 9.81
 
 
 #AIRCRAFT PARAMETERS
-W	= 8000 * g0 #Given in req's
-V_max =	60 #Minimun required cruise speed * 1.3
+W	= 160 * g0 #Given in req's
+V_max =	50 #Minimun required cruise speed * 1.3
 psi_deg	= 20 #Arbitrarily chosen
 psi_rad	= psi_deg * (np.pi / 180)
 SFC = 0.5 #Given in ppt heli design
@@ -18,8 +18,8 @@ eff_prop = 0.7 #PLACEHOLDER
 vc = 2
 
 #Rotor design parameters
-DL = 375
-N = 1
+DL = 230
+N = 4
 A_eq = 5 * 0.0929
 
 #ENVIRONMENTAL PARAMETERS

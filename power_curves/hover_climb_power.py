@@ -14,7 +14,6 @@ Delta_P_climb = ((W / 550) * ((vc / 2) + np.sqrt(((vc / 2) ** 2 + (v1 ** 2) - v1
 
 Clim_P = HP + Delta_P_climb
 
-print('hover thrust', T_hover)
-print('hover power', HP)
-print('delta p for climb', Delta_P_climb)
-print('climb power', Clim_P)
+
+#print('hover power', HP)
+#print('climb power', Clim_P)

@@ -37,9 +37,9 @@ if rotor_calc:
 
     if Plot:
         plt.figure(dpi=200)
-        plt.plot(v_rot, P_p, label='Profile Drag')
-        plt.plot(v_rot, P_i, label='Induced Drag')
-        plt.plot(v_rot, P_par, label='Parasitic Drag')
+        #plt.plot(v_rot, P_p, label='Profile Drag')
+        #plt.plot(v_rot, P_i, label='Induced Drag')
+        #plt.plot(v_rot, P_par, label='Parasitic Drag')
         plt.plot(v_rot, Preq_rotor, label='Total Power Required')
 
 if ac_calc:
@@ -48,11 +48,11 @@ if ac_calc:
     #Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
 
     if Plot:
-        # plt.plot(v_ac, Preq_ac, label='Fixed Wing')
+        plt.plot(v_ac, Preq_ac, label='Fixed Wing')
         pass
 
 # Plot a single data point
-plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
+#plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
 plt.scatter(single_point_v, single_point_hoverclimb, color='blue', marker='x', label='Hover climb power')
 
 if Plot:
@@ -69,9 +69,10 @@ if Plot:
 # Now, you can access these variables outside the if blocks
 print("Minimum Rotor Power Requirement:", Preq_rotor.min() if Preq_rotor is not None else "N/A")
 print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not None else "N/A")
-
+print()
 print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
 print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
+print()
 
+print('Hover power clim', Clim_P)
 generate_number_of_blades(R, sig_max)
-generate_number_of_blades(R, sig_min)
