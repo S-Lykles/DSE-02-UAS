@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt, log10
 
+# Wetted area from statistics
 def s_wet(MTOM):
     Sw = 0.262*MTOM**0.745
     return Sw
@@ -13,7 +14,7 @@ def cd0_fuselage(h,v):
     T0 = 288.15
     p0 = 101325
     T = T0 - 0.0065*h
-    a = sqrt(1.4*8.314*T)
+    a = sqrt(1.4*287.05*T)
     p = (T/T0)**(-9.81/(-0.0065*287.05))*p0
     rho = p/287.05/T
 
@@ -28,7 +29,7 @@ def cd0_fuselage(h,v):
     Sw = s_wet(160)
     Sf = 2
     cd0_fus = Sw/Sf*cf
-    return cd0_fus,cf,Re, rho, T, p
+    return cd0_fus,cf,Re, rho, T, p, M
 
 def dragpolar(b,S):                                  
     Sw = s_wet(160)                      # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
@@ -36,33 +37,33 @@ def dragpolar(b,S):
     A = b**2/S             
     e = 1.78*(1-0.045*A**0.68)-0.64             # Preliminary Design Method and Prototype Testing of a Novel Rotors Retractable Hybrid VTOL UAV 
     cd0_wing = e * Sw/S * cf_e                     # Lit. from erwin
-    cd0_fus,cf,Re,rho, T, p = cd0_fuselage(500,43)
-    cl = np.linspace(0.2,1.5,100)
-    cd = (cd0_wing * 2.5 + cl**2/(pi*A*e)) + cd0_fus     # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
-    return cl,cd
+    cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(500,43)
+    cl = np.linspace(0,1.5,100)
+    cd = 2.5*cd0_wing + cl**2/(pi*A*e) + cd0_fus    # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
+    return cl,cd, cd0_wing
 
 def plotdragpolar(b,S):
-    cl,cd = dragpolar(b,S)
+    cl,cd,cdowing = dragpolar(b,S)
     plt.plot(cd,cl)
     plt.xlabel("cd")
     plt.ylabel("cl")
     plt.title("cd vs cl")
-    # plt.xlim(0,0.5)
-    # plt.ylim(0,1.5)
     plt.show()
 
 if __name__ == "__main__":
     b = 6                                       # maximum width according to REQ
-    S = 3.763                                 # found from statistics
+    S = 3.673                                 # found from statistics
     plotdragpolar(b,S)
+    cl,cd, cd0_wing = dragpolar(b,S)
     h = 500
-    v = 43
-    cd0_fus,cf,Re, rho, T, p = cd0_fuselage(h,v)
+    v = 42
+    cd0_fus,cf,Re, rho, T, p, M = cd0_fuselage(h,v)
     print("T is",T)
     print("p is",p)
     print("rho is",rho)
-    print(cd0_fus)
-
+    print("cd0 is", cd[0])
+    print("cd0 wing is", cd0_wing)
+    print("cd0 fuselage is", cd0_fus)
 
 
 
