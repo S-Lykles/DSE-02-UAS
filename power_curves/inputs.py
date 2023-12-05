@@ -5,13 +5,9 @@ from aero.cl_cd import *
 #CONSTANTS
 g0 = 9.81
 
-#Rotor design parameters
-DL = 46
-N = 2
-A_eq = 5 * 0.0929
 
 #AIRCRAFT PARAMETERS
-W	= 1569.6
+W	= 8000 * g0 #Given in req's
 V_max =	60 #Minimun required cruise speed * 1.3
 psi_deg	= 20 #Arbitrarily chosen
 psi_rad	= psi_deg * (np.pi / 180)
@@ -21,6 +17,10 @@ k = 1.1
 eff_prop = 0.7 #PLACEHOLDER
 vc = 2
 
+#Rotor design parameters
+DL = 375
+N = 1
+A_eq = 5 * 0.0929
 
 #ENVIRONMENTAL PARAMETERS
 rho	= 1.2 #Arbitrarily chosen
@@ -28,7 +28,7 @@ V_g	= 9.2 #Given in req's
 
 
 #AERODYNAMIC PARAMETERS
-S = 3.2 #PLACEHOLDER
+S = 3.763 #PLACEHOLDER
 b = 6
 AR = S**2 / b #PLACEHOLDER
 e = 0.77 #PLACEHOLDER

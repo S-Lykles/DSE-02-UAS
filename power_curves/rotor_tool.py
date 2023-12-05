@@ -54,9 +54,14 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
 
     #induced drag power
     v_ih = np.sqrt(W / (2*rho*np.pi*R**2))
-    v_ibar = 1 / v
-    v_i = v_ibar * v_ih
-    P_induced_1_arr = k * T_level * v_i
+    # v_ibar = 1 / v
+    # v_i = v_ibar * 
+    a = v_ih**-4
+    b = (v**2/v_ih**4)
+    c = -1
+    x = (-b + np.sqrt(b**2 - 4*a*c))/(2*a)
+    v_i = np.sqrt(x)
+    P_induced_1_arr = k * T_level * v_i 
 
     #parsite power
     P_parasite_arr = 0.5 * rho * A_eq * (v**3)
@@ -67,7 +72,8 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     #total power
     P_tot_req_level_arr = P_profile_drag_arr + P_induced_1_arr + P_parasite_arr + P_loss_arr
 
-    return P_tot_req_level_arr, v
+    # return P_tot_req_level_arr, v
+    return v, P_profile_drag_arr, P_induced_1_arr, P_parasite_arr, P_loss_arr
 
 
 def generate_number_of_blades(R, sigma):

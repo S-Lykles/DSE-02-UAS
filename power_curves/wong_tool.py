@@ -16,7 +16,7 @@ def generate_Preq_ac(W, S, rho, CD, CL, eff_prop):
     v = np.sqrt(2*W / (rho*S*CL))
     D = W * (CD/ CL)
     Preq_tot = D * v
-    Preq_shaft = Preq_tot / eff_prop
+    Preq_shaft = Preq_tot
     Preq_lst = Preq_shaft
 
     return Preq_lst, v
