@@ -5,9 +5,9 @@ from aero.cl_cd import *
 #CONSTANTS
 g0 = 9.81
 
-
 #AIRCRAFT PARAMETERS
-W	= 160 * g0 #Given in req's
+W	= 160 * g0 #Given in req's #Input
+
 V_max =	50 #Minimun required cruise speed * 1.3
 psi_deg	= 20 #Arbitrarily chosen
 psi_rad	= psi_deg * (np.pi / 180)
@@ -26,16 +26,16 @@ A_eq = 5 * 0.0929
 rho	= 1.2 #Arbitrarily chosen
 V_g	= 9.2 #Given in req's
 
-
 #AERODYNAMIC PARAMETERS
-S = 3.763 #PLACEHOLDER
-b = 6
+S = 3.763 #input
+b = 6 #input
+
 AR = S**2 / b #PLACEHOLDER
 e = 0.77 #PLACEHOLDER
 Cd0 = 0.02345 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
 
-CL, CD = dragpolar(b, S)
+CL, CD = dragpolar(b, S) #From cl_cd.py
 
 #conversion factors
 HPtoWatt = 745.699872

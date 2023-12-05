@@ -70,9 +70,9 @@ if Plot:
 print("Minimum Rotor Power Requirement:", Preq_rotor.min() if Preq_rotor is not None else "N/A")
 print("Minimum Fixed Wing Power Requirement:", Preq_ac.min() if Preq_ac is not None else "N/A")
 print()
-print('optimum rotor only', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
-print('optimum fixed wing', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
+print('V endurance, V range for RW', find_optimum_range_and_endurance_speed(Preq_rotor, v_rot))
+print('V endurance, V range for FW', find_optimum_range_and_endurance_speed(Preq_ac, v_ac))
 print()
 
-print('Hover power clim', Clim_P)
+print('Hover power climb', Clim_P)
 generate_number_of_blades(R, sig_max)
