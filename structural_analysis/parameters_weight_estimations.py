@@ -69,3 +69,6 @@ W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
 # W_electric_circuit =
 
 
+# Compound helicopter parameters\
+
+

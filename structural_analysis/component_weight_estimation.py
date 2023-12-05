@@ -1,6 +1,7 @@
 import numpy as np
 from parameters_weight_estimations import *
 
+#Weight estimation fixed wing:
 # Weight estimation of main wing
 W_wing = 0.04674*MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712
 
@@ -39,3 +40,35 @@ OEW = W_prop + W_struc + W_avionics + payload_sup
 MTOW = OEW + W_fuel
 payload_range = 50 + 160-MTOW
 print("The payload range for the supply mission is [50,", payload_range "].")
+
+#Weight estimation compound helicopter
+#Rotor weight estimation
+
+W_R = 3.45*10**(-4)* (R*C*N_blades* V_tip**2 *(t_avg + 0.21))**0.89
+
+#Tail weight estimation
+#Tail rotor weight estimation
+W_tr = 7.4*10**(-4) * MTOW
+
+#Horizontal tail stabilizer weight estimation
+W_hs = 6.9*10**(-4)* MTOW**1.2
+
+W_tail = W_tr + W_hs
+
+#Weight estimation of the main body (internal cargo assumed)
+W_body = 0.058*R*MTOW**0.67*n_ult**0.335
+
+#Weight estimation landing gear and support structure (skid-type assumed)
+W_LG = 0.03 *MTOW
+
+#Weight estimation of propulsion group (shaft-driven assumed)
+#Weight estimation of engine
+W_E = 36.4 * P_hov_max**0.31
+
+#Weight estimation of main rotor drive system
+W_T = 0.2 * (P_hov_max*5250/rpm)**0.787
+
+#Weight estimation of propulsion system accessories
+W_PA = 0.52*W_E
+
+W_prop_sys = W_E + W_T + W_PA
