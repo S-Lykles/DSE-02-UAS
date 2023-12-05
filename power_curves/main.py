@@ -32,7 +32,7 @@ if rotor_calc:
     cl1, cd1 = dragpolar(b, S, 0, 1,1)
     CD0 = cd1[0]
     # print('CD0', CD0)
-    # P_par = 0.5*rho*S*v_rot**3*CD0
+    P_par = 0.5*rho*S*v_rot**3*CD0
     Preq_rotor = 1.04 * (P_p + P_i + P_par)
 
     if Plot:
@@ -48,11 +48,11 @@ if ac_calc:
     #Preq_ac, v_ac = generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start_ac, t_end_ac, step)
 
     if Plot:
-        # plt.plot(v_ac, Preq_ac, label='Fixed Wing')
+        plt.plot(v_ac, Preq_ac, label='Fixed Wing')
         pass
 
 # Plot a single data point
-plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
+# plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
 plt.scatter(single_point_v, single_point_hoverclimb, color='blue', marker='x', label='Hover climb power')
 
 if Plot:
