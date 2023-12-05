@@ -18,9 +18,6 @@ rotor_calc = True
 ac_calc = True
 Plot = True
 
-single_point_v = 0
-single_point_hover = HP  # Replace with the actual value for rotorcraft at single_point_v
-single_point_hoverclimb = Clim_P    # Replace with the actual value for fixed-wing at single_point_v
 
 # Initialize variables outside of if blocks
 Preq_rotor = v_rot = Preq_ac = v_ac = None
@@ -37,9 +34,9 @@ if rotor_calc:
 
     if Plot:
         plt.figure(dpi=200)
-        plt.plot(v_rot, P_p, label='Profile Drag')
-        plt.plot(v_rot, P_i, label='Induced Drag')
-        plt.plot(v_rot, P_par, label='Parasitic Drag')
+        #plt.plot(v_rot, P_p, label='Profile Drag')
+        #plt.plot(v_rot, P_i, label='Induced Drag')
+        #plt.plot(v_rot, P_par, label='Parasitic Drag')
         plt.plot(v_rot, Preq_rotor, label='Total Power Required')
 
 if ac_calc:
@@ -51,8 +48,22 @@ if ac_calc:
         plt.plot(v_ac, Preq_ac, label='Fixed Wing')
         pass
 
+## Hover climb power
+v1 = np.sqrt(DL / (2 * rho)) #induced velocity
+
+Delta_P_climb = ((W / 550) * ((vc / 2) + np.sqrt(((vc / 2) ** 2 + (v1 ** 2) - v1) ))) * HPtoWatt
+
+Hover_P = Preq_rotor[0] + Delta_P_climb
+
+print(Hover_P)
+
+## Scatter poins
+single_point_v = 0
+single_point_hover = Preq_rotor[0]  # Replace with the actual value for rotorcraft at single_point_v
+single_point_hoverclimb = Hover_P    # Replace with the actual value for fixed-wing at single_point_v
+
 # Plot a single data point
-#plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
+plt.scatter(single_point_v, single_point_hover, color='red', marker='o', label='Hover power')
 plt.scatter(single_point_v, single_point_hoverclimb, color='blue', marker='x', label='Hover climb power')
 
 if Plot:
@@ -78,3 +89,6 @@ print('Hover power climb', Clim_P)
 generate_number_of_blades(R, sig_max)
 
 generate_power_versus_disk_loading(Preq_rotor[0], DL)
+
+
+
