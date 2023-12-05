@@ -164,6 +164,9 @@ def mass_frac_power(which = 'endurance'):
     Mass fraction calculation assuming constant power required during each phase
     """
     # SFC = input.SFC * ..
+
+    Wtake_off = 23000 # W
+
     SFC = 320 / (1000 * 1000 * 3600)
     VCRUISE = 45
     if which == 'payload':
@@ -171,7 +174,7 @@ def mass_frac_power(which = 'endurance'):
     else:
         P_aux = 1000 + 800 # [W] payload and auxillary power
 
-    W1 = inputs.W * Mfrac_climb(500, 320) * 0.99 # [N]
+    W1 = inputs.W * Mfrac_climb(500, 320) - Wtake_off * SFC * 60*3 # [N]
     print(f'Fuel used for take-off and climb: {(inputs.W - W1)/inputs.g0:.3f} kg')
 
     V1 = np.sqrt(2 * W1 / (rho * inputs.S * inputs.CL))
@@ -199,6 +202,7 @@ def mass_frac_power(which = 'endurance'):
     D2 = W2 * (inputs.CD / inputs.CL)
     P2 = D2 * V2 + P_aux
 
+
     if which == 'endurance':
         T2 = 10 * 3600
     else:
@@ -215,9 +219,12 @@ def mass_frac_power(which = 'endurance'):
     W3 = W2 - Mfuel2 * g0
     if which == 'payload':
         W3 -= 50 * inputs.g0
+    
+    W3_1 = W3 * Mfrac_climb(500, 320) - Wtake_off * SFC * 60*3
+    print(f'Fuel used for land take-off and climb: {(W3 - W3_1)/inputs.g0:.3f} kg')
 
-    V3 = np.sqrt(2 * W3 / (rho * inputs.S * inputs.CL))
-    D3 = W3 * (inputs.CD / inputs.CL)
+    V3 = np.sqrt(2 * W3_1 / (rho * inputs.S * inputs.CL))
+    D3 = W3_1 * (inputs.CD / inputs.CL)
     P3 = D3 * V3 + P_aux
     T3 = 185e3 / V3
     E3 = P3 * T3
@@ -228,6 +235,13 @@ def mass_frac_power(which = 'endurance'):
 
     Mfuel3 = (P3*T3*SFC)[idx]
     print(f'Fuel used for 185 km: {Mfuel3:.3f} kg')
+
+    Wfinal = W3_1 - Mfuel3 * g0
+    print(f'Final weight: {Wfinal/inputs.g0:.3f} kg')
+    if which == 'payload':
+        print(f'Final mass fraction: {(Wfinal + 50*inputs.g0)/(160*9.81):.3f}')
+    else:
+        print(f'Final mass fraction: {(Wfinal)/(160*9.81):.3f}')
 
 
     
