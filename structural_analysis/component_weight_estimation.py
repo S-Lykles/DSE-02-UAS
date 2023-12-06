@@ -2,7 +2,7 @@ import numpy as np
 from parameters_weight_estimations import *
 
 
-#Class 2 weight estimation dual phase using cessna method from roskam book:
+#Class 2 weight estimation dual phase using cessna method from Roskam book:
 def class_two_dual_phase( ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     W_wing = (0.04674*MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712)/2.20462262
@@ -64,7 +64,7 @@ def class_two_compound_helicopter( ):
     W_body = 0.058*R*MTOW**0.67*n_ult**0.335 /2.20462262
 
     #Weight estimation landing gear and support structure (skid-type assumed)
-    W_LG = 0.03 *MTOW /2.20462262
+    W_lg = 0.03 *MTOW /2.20462262
 
     #Weight estimation of the wing (full cantilever wings assumed)
     W_wing = 0.04674*MTOW**0.397 * S_ch**0.36 * n_ult**0.397 * A_ch**1.712 /2.20462262
@@ -74,13 +74,13 @@ def class_two_compound_helicopter( ):
 
     #Weight estimation of propulsion group (shaft-driven assumed)
     #Weight estimation of engine
-    W_E = 36.4 * P_hov_max**0.31 /2.20462262
+    W_motor = 36.4 * P_hov_max**0.31 /2.20462262
 
     #Weight estimation of main rotor drive system
-    W_T = 0.2 * (P_hov_max*5250/rpm)**0.787 /2.20462262
+    W_drivetrain = 0.2 * (P_hov_max*5250/rpm)**0.787 /2.20462262
 
     #Weight estimation of propulsion system accessories
-    W_PA = 0.52*W_E /2.20462262
+    W_prop_acc = 0.52*W_E /2.20462262
 
     #Weight estimation of tail rotor drive system
     W_trd = 2.46*10**(-3)*R**3.248 /2.20462262
@@ -96,7 +96,7 @@ def class_two_compound_helicopter( ):
     print("The payload range of the compound helicopter for the supply mission is [50,", payload_range "].")
     pass
 
-# Class 2 weight estimation for the tilt-wing configuration using cessna method from roskam book:
+# Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
 def class_two_tilt_wing( ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / 2.20462262
@@ -138,10 +138,39 @@ def class_two_tilt_wing( ):
     OEW = W_prop + W_struc + W_avionics + payload_sup
     MTOW = OEW + W_fuel
     payload_range = 50 + 160 - MTOW
-    print("The payload range of the dual phase configuration for the supply mission is [50,", payload_range, "].")
+    print("The payload range of the tilt-wing configuraiton for the supply mission is [50,", payload_range, "].")
     pass
 
-# Class 2 weight estimation for the tailsitter configuration
+# Class 2 weight estimation for the tailsitter configuration (empennage/landing gear more interesting) based on Roskam book
 def class_2_tailsitter( ):
+    # Weight estimation of main wing in kg(full cantilever wing assumed)
+    W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / 2.20462262
 
+    # Weight estimation of fuselage (high wing configuration assumed)
+    W_f = (14.86 * MTOW ** 0.144 * (l / d) ** 0.778 * l ** 0.383) / 2.20462262
+
+    # Weight estimation of the nacelle (horizontally opposed engines assumed)
+    W_nac = (0.24 * P_cruise_max) / 2.20462262
+
+    # Weight estimation of a non-retractable landing gear (this is now the same as the empennage)
+    W_m_lg = (0.013 * MTOW + 0.362 * W_L ** 0.417 * l_sm ** 0.183) / 2.20462262
+    W_n_lg = (0.0013 * MTOW + 0.007157 * W_L ** 0.749 * n_ult_l * l_sn ** 0.788) / 2.20462262
+
+    # Summation of both nose and main landing gear (decreased constant factor by factor 5 as design will be lighter)
+    W_lg = 1.24 + W_m_lg + W_n_lg
+
+    # Summation to generate a final estimation for the structural weight
+    W_struc = W_wing + W_f + W_nac + W_lg
+
+    # Summation to generate estimation for the propulsion system
+    W_prop = N_electric * (W_electro_motor + W_rotor) + N_gas * (
+                W_gas_motor + W_rotor) + W_fuel_sys + W_battery + W_generator
+
+    # Summation to generate an estimation for the avionics system
+    W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
+
+    OEW = W_prop + W_struc + W_avionics + payload_sup
+    MTOW = OEW + W_fuel
+    payload_range = 50 + 160 - MTOW
+    print("The payload range of the tailsitter configuration for the supply mission is [50,", payload_range, "].")
     pass
