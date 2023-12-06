@@ -1,4 +1,4 @@
-from .inputs import *
+# from .inputs import *
 from .rotor_tool import generate_Preq_rotor, rotor_sizing_tool
 from .wong_tool import generate_Preq_ac, find_optimum_range_and_endurance_speed
 import matplotlib.pyplot as plt
