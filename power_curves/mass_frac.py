@@ -95,7 +95,21 @@ def fuel_weight(CL, CD, SFC, S, which='payload'):
     """
     Calculate fuel weight used for endurance or payload mission
     This is only the weight for cruising and loitering, not including take-off and climb
+
+    Parameters
+    ----------
+    CL : numpy.ndarray
+        Lift coefficient
+    CD : numpy.ndarray
+        Drag coefficient
+    SFC : float
+        Specific fuel consumption [kg/W/s]
+    S : float
+        Wing area [m^2]
+    which : str, optional
+        'payload' or 'endurance'. The default is 'payload'.
     """
+
 
 
 
