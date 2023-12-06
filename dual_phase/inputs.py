@@ -19,6 +19,8 @@ V_tip = 140 * D ** 0.171
 # M_max = (V_max + V_tip)/c_s
 # if M_max<0.95
 
+N_bl = 5
+c =
 
 alpha_m =
 rho =
