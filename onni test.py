@@ -1,10 +1,28 @@
 import numpy as np
+import pandas as pd
 
+#Constants needed from constants file
+#-------------------------------------------------------------------------------------------
 eff_GB  = 0.96 #Gearbox efficiency from literature
 eff_GEN = 0.96 #Generator efficiency from literature
 eff_EM  = 0.96 #Electro motor efficiency from literature
 eff_PM  = 0.99 #Power management module efficiency from literature
 eff_FC  = 0.76 #Hydrogen fuel cell efficiency from literature
+
+spec_tank_W = 11.5 #unit weight of hydrogen fuel tank per unit weight of liquid hydrogen from literature
+spec_P_fuelcell = 8#kW/kg specific power of a fuell cell, basically how much power can a fuell cell deliver per kg of fuel cell weight from literature
+E_rho_bat = 1.06 #MJ/kg #Battery specific energy FIND BETTER SOURCE THAN WIKIPEDIA!
+E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
+
+#Flight characteristics from power curves
+#-------------------------------------------------------------------------------------------
+P_cruise = 10
+t_cruise = 185000/40
+P_loiter = 5
+t_loiter = 10*3600
+P_max = 30
+t_atPmax = 250
+
 
 def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
     '''
@@ -100,37 +118,28 @@ def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_P
     return W_bat
 
 
-def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC):
-    '''
-    Calculation of the battery weight for fully electric propulsion.
-    Parameters
-    ----------
-    P_cruise: float
-        power required in kW for cruise computed from power curves
-    t_cruise: float
-        time needed in s to travel 185km and back at cruise speed
-    P_loiter: float
-        power required in kW for loitering. Computed from power curves
-    t_loiter: float
-        time needed to loiter for the endurance mission communication relay
-    P_max: float
-        maximum power in kW during operations computed from power curves
-    t_atPmax: float
-        time in s for how long the maximum power is needed to perform ONE take-off
-    E_rho_bat: float
-        energy density in MJ/kg
-    eff_EM: float
-        efficiency of electro motor from literature (DOI: 10.2514/6.2018-4228)
-    eff_PM: float
-        efficiency of power management module from literature (DOI: 10.2514/6.2018-4228)
+def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell):
+    """
+    Calculates battery weights and liquid hydrogen system weight for different missions if only electric propulsion is used.
 
-    Outputs
-    -------
-    W_bat_supply: float
-        Weight needed for batteries in kg for the supply delivery mission
-    W_bat_endurance: float
-        Weight needed for batteries in kg for the communication relay mission         
-    '''
+    :param P_cruise: Cruise power in kW
+    :param t_cruise: Cruise time for travelling 185km two times in s
+    :param P_loiter: Loiter power in kW
+    :param t_loiter: Cruise time for loitering in s
+    :param P_max: Maximum power needed (during VTOL) in kW
+    :param t_atPmax: time that P_max is needed for ONE take-off
+    :param E_rho_bat: battery energy density
+    :param E_rho_H: liquid hydrogen energy density
+    :param eff_EM: electro motor efficiency
+    :param eff_PM: power management module efficiency
+    :param eff_FC: fuel cell conversion efficiency
+    :param spec_tank_W: fuel tank weight per unit weight of liquid hydrogen
+    :return:
+        W_bat_supply: battery weight for supply delivery mission in the case of fully electric propulsion using batteries
+        W_bat_endurance: battery weight for communication relay mission in the case of fully electric propulsion using batteries
+        W_H_supply: weight of liquid hydrogen propulsion system (weight of liquid hydrogen and weight of storage tank) for supply delivery mission in case of electric propulsion from hydrogen fuel cell
+        W_H_endurance: weight of liquid hydrogen propulsion system (weight of liquid hydrogen and weight of storage tank) for communication relay mission in case of electric propulsion from hydrogen fuel cell
+    """
     #batteries
     eff = eff_PM*eff_EM
     E_needed_supply = (P_cruise*t_cruise + 4*P_max*t_atPmax)/eff #kJ
@@ -140,12 +149,14 @@ def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, 
 
     #hydrogen
     eff_H = eff_FC*eff_PM*eff_EM
+    P_peak = P_max/eff_H
+    W_fuelcell = P_peak / spec_P_fuelcell
     E_needed_supply_H = (P_cruise * t_cruise + 4 * P_max * t_atPmax) / eff_H  # kJ
     E_needed_endurance_H = (P_cruise * t_cruise + 2 * P_max * t_atPmax + P_loiter * t_loiter) * eff_H  # kJ
     W_H_supply = E_needed_supply_H/1000 / E_rho_H
-    W_H_tank_supply = W_H_supply * 11.5
+    W_H_supply += (spec_tank_W*W_H_supply + W_fuelcell)
     W_H_endurance = E_needed_endurance_H/1000 / E_rho_H
-    W_H_tank_endurance = W_H_supply
+    W_H_endurance += (spec_tank_W*W_H_endurance + W_fuelcell)
 
 
 
@@ -153,23 +164,35 @@ def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, 
 
 
 
+def table_hybrid_propulsion_weights():
+    """
+    Produces a pandas dataframe (a fancy table) which presents all the weights for conventional and hybrid propulsion (so no full electric propulsion!) and engine types.
+    :return:
+    """
+    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM)
+    W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
+    zero_array = np.zeros_like(W_engines_hybrid)
+    zero_array[:, 2:] = W_batteries_hybrid
+    result_array = W_engines_hybrid + zero_array
+    result_array = np.round(result_array, 1)
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary'])
+
+    return result_dataframe
+
+def table_electric_propulsion_weights():
+    """
+    Produces a pandas dataframe (a fancy table) which presents all the weights for conventional and hybrid propulsion (so no full electric propulsion!) and engine types.
+    :return:
+    """
+    W_bat_supply,  W_bat_endurance, W_H_supply, W_H_endurance = W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell)
+    result_array = np.array([[W_bat_supply, W_bat_endurance],[W_H_supply, W_H_endurance]])
+    result_array = np.round(result_array, 1)
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Supply Delivery', 'Communication Relay'], index = ['Battery Powered', 'Liquid Hydrogen Powered'])
+    return result_dataframe
 
 
+print(table_hybrid_propulsion_weights())
+print(table_electric_propulsion_weights())
 
-
-
-
-P_cruise = 10
-t_cruise = 185000/40
-P_loiter = 5
-t_loiter = 10*3600
-P_max = 30
-t_atPmax = 250
-E_rho_bat = 1.06 #MJ/kg
-E_rho_H = 119.93 #MJ/kg LHV
-a, b, c, d = W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC)
-e = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM)
-f = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
-print(a, b, c, d)
-print(e)
-print(f)
+#LATEX BOOKTABS CODE
+#print(table_hybrid_propulsion_weights().to_latex(index=False, formatters={"name": str.upper}, float_format="{:.1f}".format,))
