@@ -97,7 +97,7 @@ def class_two_compound_helicopter( ):
     pass
 
 # Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
-#Notes: still requires mechanical and increased wing weight due to tilt mechanism
+#Notes: did the weight of the main wing twice without a credible source, still requires a source!!
 def class_two_tilt_wing( ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / 2.20462262
@@ -127,7 +127,7 @@ def class_two_tilt_wing( ):
     #W_mech =
 
     # Summation to generate a final estimation for the structural weight
-    W_struc = W_wing + W_emp + W_f + W_nac + W_lg #+ W_mech
+    W_struc = 2*W_wing + W_emp + W_f + W_nac + W_lg #+ W_mech
 
     # Summation to generate estimation for the propulsion system
     W_prop = N_electric * (W_electro_motor + W_rotor) + N_gas * (
