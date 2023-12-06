@@ -22,7 +22,7 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
         ...
     """
     R               = np.sqrt(W/(N * DL * np.pi))
-    V_tip           = 150*(2*R)**0.171
+    V_tip           = 140*(2*R)**0.171
     D_v             = 0.04*W
     k_dl            = 1 + D_v/W
     omega           = V_tip/R
