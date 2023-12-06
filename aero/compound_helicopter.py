@@ -11,7 +11,7 @@ def parasite_drag(MTOM,S):
     return cd_parasite, d_airframe_wing, d_rotors
 
 # Set up cl and cd for plot
-def dragpolar_heli(b,S):
+def dragpolar_heli(b,S,Cl_start=0.2, Cl_end=0.8, Cl_step=100):
     cd_parasite, d_airframe_wing, d_rotors = parasite_drag(160,2)
     cl = np.linspace(-1.5,1.5,150)
     A = b**2/S

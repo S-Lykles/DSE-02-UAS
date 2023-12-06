@@ -28,13 +28,14 @@ def cd0_fuselage(h,v,c,Sf):
     cd0_fus = Sw/Sf*cf
     return cd0_fus,cf,Re, rho, T, p, M
 
-def dragpolar(b,S, CL_start=0.2, CL_end=1, CL_step=100):                                  
+def dragpolar(b,S,CL_start=0.2, CL_end=1, CL_step=100):                                  
     Sw = s_wet(160)                      # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
     cf_e = 0.01                                 # Lit. from erwin
-    A = b**2/S             
+    A = b**2/S
+    c = S/b
     e = 1.78*(1-0.045*A**0.68)-0.64             # Preliminary Design Method and Prototype Testing of a Novel Rotors Retractable Hybrid VTOL UAV 
     cd0_wing = e * Sw/S * cf_e                     # Lit. from erwin
-    cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(500,43)
+    cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(500,43,c,Sw)
     cl = np.linspace(CL_start,CL_end,CL_step)
     cd = 2.5*cd0_wing + cl**2/(pi*A*e) + cd0_fus    # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
     return cl,cd
@@ -50,9 +51,4 @@ def dragpolar_dual(b,S,h,v,c,Sf, CL_start=0.2, CL_end=1, CL_step=100):
     cl = np.linspace(-1.5,1.5,150)
     cd = 2.5*cd0_wing + cl**2/(pi*A*e) + cd0_fus            # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
     return cl,cd, cd0_wing
-
-
-
-
-
 

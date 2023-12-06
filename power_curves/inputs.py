@@ -36,7 +36,7 @@ e = 0.77 #PLACEHOLDER
 Cd0 = 0.02345 #PLACEHOLDER
 Cl_alpha_rot = 5.73 #Given in ppt heli design
 
-CL, CD = dragpolar(b, S) #From cl_cd.py
+CL, CD = dragpolar(b, S, 0.2, 0.8) #From cl_cd.py
 
 #conversion factors
 HPtoWatt = 745.699872

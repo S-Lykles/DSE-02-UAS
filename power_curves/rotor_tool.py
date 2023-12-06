@@ -1,28 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .inputs import *
+import const
+# from .inputs import *
 
 
-def rotor_sizing_tool(DL, N):
-    #rotor sizing
+def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
+    """
+    Rotor sizing tool based on the ppt from Marilena
+
+    Parameters
+    ----------
+    W : float
+        Weight of the aircraft [N]
+    DL : float
+        Disk loading [N/m^2]
+    N : int
+        Number of rotors [-]
+    V_max : float
+        Maximum speed of the aircraft [m/s]
+    psi_rad : float, optional
+        ...
+    C_T_sig : float, optional
+        ...
+    """
     R               = np.sqrt(W/(N * DL * np.pi))
     V_tip           = 150*(2*R)**0.171
     D_v             = 0.04*W
     k_dl            = 1 + D_v/W
     omega           = V_tip/R
-    Vne             = 1.1* V_max
+    Vne             = 1.1*V_max
     mu_Vne          = 1.1*Vne/(omega*R)
     Advance_ratio   = V_max / V_tip
 
     #level flight
     T_level         = W*k_dl
-    C_T_level       = T_level/ (rho*pi*R**2*omega**2*R**2)
+    C_T_level       = T_level/ (const.rho*np.pi*R**2*omega**2*R**2)
     sig_level       = C_T_level/C_T_sig
 
     #turning flight
     n_z             = 1 / np.cos(psi_rad)
     T_turn          = W * k_dl * n_z
-    C_T_turn        = T_turn / (rho * pi * R**2 * (omega*R)**2)
+    C_T_turn        = T_turn / (const.rho * np.pi * R**2 * (omega*R)**2)
     sig_turn        = C_T_turn / C_T_sig
 
     # T_gust = n_z*k_dl*
@@ -33,14 +51,29 @@ def rotor_sizing_tool(DL, N):
 
     return R, D_v, omega, T_level, sig_max, sig_min
 
+def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
+    """
+    Calculates the profile drag power using the formula from the ppt.
 
-def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, step):
-    v = np.linspace(t_start, t_end, step)
-
-    #Profile drag
+    Parameters
+    ----------
+    v : np.ndarray
+        Velocity of the aircraft [m/s]
+    W : float
+        Weight of the aircraft [N]
+    N : int
+        Number of rotors [-]
+    R : float
+        Radius of the rotor [m]
+    omega : float
+        Angular velocity of the rotor [rad/s]
+    sig_max : float
+        Maximum solidity of the rotor [-]
+    Cl_alpha_rot : float, optional
+        Lift coefficient of the rotor [-]. The default is 5.73
+    """
     advanced_ratio = v / (omega*R)
-
-    C_t = (W/N) / (rho * np.pi * R**2 * (omega*R)**2)
+    C_t = (W/N) / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     Cl_bar = 6.6*(C_t / sig_max)
     alpha_m = Cl_bar / Cl_alpha_rot
 
@@ -49,12 +82,28 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     CD_p3 = 0.009 + 0.73*(alpha_m**2)
     C_D_p = (CD_p1 + CD_p3 + CD_p2) / 3
 
-    P_hov = (1/8)*sig_max*C_D_p*rho*(omega*R)**3*np.pi*(R**2)
+    P_hov = (1/8)*sig_max*C_D_p*const.rho0*(omega*R)**3*np.pi*(R**2)
 
-    P_profile_drag_arr = P_hov * (1 + 4.65*(advanced_ratio**2)) * N
+    return P_hov * (1 + 4.65*(advanced_ratio**2)) * N
+    
 
-    #induced drag power
-    v_ih = np.sqrt(DL / (2 * rho))
+def P_induced(v, DL, W, k=1.15, k_dl=1.04):
+    """
+    Calculates the induced power using the formula for
+    low speed forward flight from the ppt.
+
+    Parameters
+    ----------
+    DL : float
+        Disk loading [N/m^2]
+    W : float
+        Weight of the aircraft [N]
+    k : float, optional
+        Inflow correction [-]. Default is 1.15.
+    k_dl : float, optional
+        Drag correction [-]. Default is 1.04.
+    """
+    v_ih = np.sqrt(DL / (2 * const.rho))
     # v_ibar = 1 / v
     # v_i = v_ibar * 
     a = v_ih**-4
@@ -62,19 +111,7 @@ def generate_Preq_rotor(A_eq, R, D_v, omega, T_level, sig_max, t_start, t_end, s
     c = -1
     x = (-b + np.sqrt(b**2 - 4*a*c))/(2*a)
     v_i = np.sqrt(x)
-    P_induced_1_arr = k * T_level * v_i 
-
-    #parsite power
-    P_parasite_arr = 0.5 * rho * A_eq * (v**3)
-
-    #power loss
-    P_loss_arr = 0.04*(P_profile_drag_arr + P_induced_1_arr + P_parasite_arr)
-
-    #total power
-    P_tot_req_level_arr = P_profile_drag_arr + P_induced_1_arr + P_parasite_arr + P_loss_arr
-
-    # return P_tot_req_level_arr, v
-    return v, P_profile_drag_arr, P_induced_1_arr, P_parasite_arr, P_loss_arr
+    return k * k_dl * W * v_i
 
 
 def generate_number_of_blades(R, sigma):
