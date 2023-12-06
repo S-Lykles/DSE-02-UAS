@@ -15,7 +15,7 @@ def dragpolar_comp(b,S):
     cd_parasite = parasite_drag(160,2)
     cl = np.linspace(-0.4,1.5,150)
     A = b**2/S
-    e = 0.78
+    e = 1.78*(1-0.045*A**0.68)-0.64 
     cd_comp = cd_parasite + cl**2/(pi * A * e)
     return cl, cd_comp
 

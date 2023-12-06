@@ -2,11 +2,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read Xfoil data from the file
+# Dual Phase
 data_4412 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca4412.txt")
 data_23012 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca23012.txt")
 data_632A015 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63(2)A015.txt")
 data_63215 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63215.txt")
 data_63512 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63512.txt")
+# Tilt rotor
+data_2410 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca2410.txt")
+data_2412 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca2412.txt")
+data_16 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\ag16.txt")
+data_26 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\ag26.txt")
+data_1223 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\s1223.txt")
 
 # Extract columns
 alpha_4412 = data_4412[:, 0]      # Angle of attack
@@ -39,7 +46,37 @@ cd_63512 = data_63512[:, 2]       # Drag coefficient
 cdp_63512 = data_63512[:, 3]      # Pressure drag coefficient
 cm_63512 = data_63512[:, 4]       # Moment coefficient
 
-# Plot the data
+alpha_2410 = data_2410[:, 0]      # Angle of attack
+cl_2410 = data_2410[:, 1]         # Lift coefficient
+cd_2410 = data_2410[:, 2]         # Drag coefficient
+cdp_2410 = data_2410[:, 3]        # Pressure drag coefficient
+cm_2410 = data_2410[:, 4]         # Moment coefficient
+
+alpha_2412 = data_2412[:, 0]      # Angle of attack
+cl_2412 = data_2412[:, 1]         # Lift coefficient
+cd_2412 = data_2412[:, 2]         # Drag coefficient
+cdp_2412 = data_2412[:, 3]        # Pressure drag coefficient
+cm_2412 = data_2412[:, 4]         # Moment coefficient
+
+alpha_16 = data_16[:, 0]      # Angle of attack
+cl_16 = data_16[:, 1]         # Lift coefficient
+cd_16 = data_16[:, 2]         # Drag coefficient
+cdp_16 = data_16[:, 3]        # Pressure drag coefficient
+cm_16 = data_16[:, 4]         # Moment coefficient
+
+alpha_26 = data_26[:, 0]      # Angle of attack
+cl_26 = data_26[:, 1]         # Lift coefficient
+cd_26 = data_26[:, 2]         # Drag coefficient
+cdp_26 = data_26[:, 3]        # Pressure drag coefficient
+cm_26 = data_26[:, 4]         # Moment coefficient
+
+alpha_1223 = data_1223[:, 0]      # Angle of attack
+cl_1223 = data_1223[:, 1]         # Lift coefficient
+cd_1223 = data_1223[:, 2]         # Drag coefficient
+cdp_1223 = data_1223[:, 3]        # Pressure drag coefficient
+cm_1223 = data_1223[:, 4]         # Moment coefficient
+
+# Plot the data Dual Phase
 plt.figure(figsize=(10, 6))
 plt.subplot(1,3,1)
 plt.plot(alpha_4412, cl_4412, label='NACA 4412')
@@ -47,7 +84,7 @@ plt.plot(alpha_23012, cl_23012, label='NACA 23012')
 plt.plot(alpha_632A015, cl_632A015, label='NACA 632A015')
 plt.plot(alpha_63215, cl_63215, label='NACA 63215')
 plt.plot(alpha_63512, cl_63512, label='NACA 63512')
-plt.title('Xfoil Data - Lift Coefficient vs. Angle of Attack')
+plt.title('Xfoil Data - Cl vs alpha')
 plt.xlabel('Angle of Attack (degrees)')
 plt.ylabel('Lift Coefficient (Cl)')
 plt.grid(True)
@@ -59,7 +96,7 @@ plt.plot(cd_23012, cl_23012, label='NACA 23012')
 plt.plot(cd_632A015, cl_632A015, label='NACA 632A015')
 plt.plot(cd_63215, cl_63215, label='NACA 63215')
 plt.plot(cd_63512, cl_63512, label='NACA 63512')
-plt.title('Xfoil Data - Lift Coefficient vs. Drag Coefficient')
+plt.title('Xfoil Data - Cl vs Cd')
 plt.xlabel('Drag Coefficient (Cd)')
 plt.ylabel('Lift Coefficient (Cl)')
 plt.grid(True)
@@ -71,7 +108,47 @@ plt.plot(alpha_23012, cm_23012, label='NACA 23012')
 plt.plot(alpha_632A015, cm_632A015, label='NACA 632A015')
 plt.plot(alpha_63215, cm_63215, label='NACA 63215')
 plt.plot(alpha_63512, cm_63512, label='NACA 63512')
-plt.title('Xfoil Data - Moment Coefficient vs. Angle of Attack')
+plt.title('Xfoil Data - Cm vs alpha')
+plt.xlabel('Angle of Attack (degrees)')
+plt.ylabel('Moment Coefficient (Cm)')
+plt.grid(True)
+plt.legend()
+
+plt.show()
+
+# Plot the data Tilt Wing
+plt.figure(figsize=(10, 6))
+plt.subplot(1,3,1)
+plt.plot(alpha_4412, cl_4412, label='NACA 4412')
+plt.plot(alpha_2410, cl_2410, label='NACA 2410')
+plt.plot(alpha_2412, cl_2412, label='NACA 2412')
+plt.plot(alpha_16, cl_16, label='AG 16')
+plt.plot(alpha_26, cl_26, label='AG 26')
+plt.title('Xfoil Data - Cl vs alpha')
+plt.xlabel('Angle of Attack (degrees)')
+plt.ylabel('Lift Coefficient (Cl)')
+plt.grid(True)
+plt.legend()
+
+plt.subplot(1,3,2)
+plt.plot(cd_4412, cl_4412, label='NACA 4412')
+plt.plot(cd_2410, cl_2410, label='NACA 2410')
+plt.plot(cd_2412, cl_2412, label='NACA 2412')
+plt.plot(cd_26, cl_26, label='AG 26')
+plt.plot(cd_16, cl_16, label='AG 16')
+plt.title('Xfoil Data - Cl vs Cd')
+plt.xlabel('Drag Coefficient (Cd)')
+plt.ylabel('Lift Coefficient (Cl)')
+plt.grid(True)
+plt.legend()
+
+plt.subplot(1,3,3)
+plt.plot(alpha_4412, cm_4412, label='NACA 4412')
+plt.plot(alpha_2410, cm_2410, label='NACA 2410')
+plt.plot(alpha_2412, cm_2412, label='NACA 2412')
+plt.plot(alpha_16, cm_16, label='AG 16')
+plt.plot(alpha_26, cm_26, label='AG 26')
+plt.title('Xfoil Data - Cm vs alpha')
 plt.xlabel('Angle of Attack (degrees)')
 plt.ylabel('Moment Coefficient (Cm)')
 plt.grid(True)
