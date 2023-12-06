@@ -8,19 +8,18 @@ W_fuel = 20*2.20462262 #kg
 W_L = MTOW - W_fuel - payload_sup #Landing mass
 
 
-# Dual phase based on the FD180P(most similar specs in database with comparable main conf)
-# Cessna method used for this particular main configuration
-
 # Dimensional parameters
 l = 3.35 #m
 d = 0.8 #Diameter fuselage m
 # l_sm =  #Shock strut length fro main gear
 # l_sn = #Shock strut length for nose gear
 
+
 # Wing parameters
 b = 6* 3.28084 #ft
 S = 3.763* 3.28084**2 #Wing surface main wing in ft^2
 A = b**2/S #Aspect ratio main wing
+
 
 #Empennage parameters
 # S_h = #Surface area horizontal tailwing in ft^2
