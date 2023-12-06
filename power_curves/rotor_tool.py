@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import const
-# from .inputs import *
-
 
 def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
     """
@@ -34,13 +32,13 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
 
     #level flight
     T_level         = W*k_dl
-    C_T_level       = T_level/ (const.rho*np.pi*R**2*omega**2*R**2)
+    C_T_level       = T_level/ (const.rho0*np.pi*R**2*omega**2*R**2)
     sig_level       = C_T_level/C_T_sig
 
     #turning flight
     n_z             = 1 / np.cos(psi_rad)
     T_turn          = W * k_dl * n_z
-    C_T_turn        = T_turn / (const.rho * np.pi * R**2 * (omega*R)**2)
+    C_T_turn        = T_turn / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     sig_turn        = C_T_turn / C_T_sig
 
     # T_gust = n_z*k_dl*
@@ -103,7 +101,7 @@ def P_induced(v, DL, W, k=1.15, k_dl=1.04):
     k_dl : float, optional
         Drag correction [-]. Default is 1.04.
     """
-    v_ih = np.sqrt(DL / (2 * const.rho))
+    v_ih = np.sqrt(DL / (2 * const.rho0))
     # v_ibar = 1 / v
     # v_i = v_ibar * 
     a = v_ih**-4
