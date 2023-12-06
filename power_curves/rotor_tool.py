@@ -45,9 +45,8 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
     # C_T_gust = T_gust/ (Vne*pi*R**2*omega**2*R**2)
 
     sig_max = max(sig_level, sig_turn)
-    sig_min = min(sig_level, sig_turn)
 
-    return R, D_v, omega, T_level, sig_max, sig_min
+    return R, D_v, omega, T_level, sig_max
 
 def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
     """
@@ -70,7 +69,7 @@ def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
     Cl_alpha_rot : float, optional
         Lift coefficient of the rotor [-]. The default is 5.73
     """
-    advanced_ratio = v / (omega*R)
+    advance_ratio = v / (omega*R)
     C_t = (W/N) / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     Cl_bar = 6.6*(C_t / sig_max)
     alpha_m = Cl_bar / Cl_alpha_rot
@@ -82,7 +81,7 @@ def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
 
     P_hov = (1/8)*sig_max*C_D_p*const.rho0*(omega*R)**3*np.pi*(R**2)
 
-    return P_hov * (1 + 4.65*(advanced_ratio**2)) * N
+    return P_hov * (1 + 4.65*(advance_ratio**2)) * N
     
 
 def P_induced(v, DL, W, k=1.15, k_dl=1.04):

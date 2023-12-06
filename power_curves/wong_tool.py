@@ -1,6 +1,7 @@
 from .inputs import *
 import numpy as np
 from numpy import pi
+import const
 '''
 def generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start, t_end, step):
     v = np.linspace(t_start, t_end, step)
@@ -12,11 +13,12 @@ def generate_Preq_ac(W, rho, S, AR, e, Cd0, eff_prop, t_start, t_end, step):
     return Preq_lst, v
 '''
 
-def generate_Preq_ac(W, S, rho, CD, CL, eff_prop):
-    v = np.sqrt(2*W / (rho*S*CL))
+
+def generate_Preq_ac(W, S, CD, CL, eta):
+    v = np.sqrt(2*W / (const.rho0 * S * CL))
     D = W * (CD/ CL)
     Preq_tot = D * v
-    Preq_shaft = Preq_tot
+    Preq_shaft = Preq_tot / eta
     Preq_lst = Preq_shaft
 
     return Preq_lst, v
