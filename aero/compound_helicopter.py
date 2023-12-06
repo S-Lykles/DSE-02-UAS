@@ -19,7 +19,5 @@ def dragpolar_comp(b,S):
     cd_comp = cd_parasite + cl**2/(pi * A * e)
     return cl, cd_comp
 
-print(parasite_drag(160,3.763))
-
 
 
