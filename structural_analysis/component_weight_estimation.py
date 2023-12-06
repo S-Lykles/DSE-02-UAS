@@ -97,6 +97,7 @@ def class_two_compound_helicopter( ):
     pass
 
 # Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
+#Notes: still requires mechanical and increased wing weight due to tilt mechanism
 def class_two_tilt_wing( ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / 2.20462262
@@ -141,7 +142,8 @@ def class_two_tilt_wing( ):
     print("The payload range of the tilt-wing configuraiton for the supply mission is [50,", payload_range, "].")
     pass
 
-# Class 2 weight estimation for the tailsitter configuration (empennage/landing gear more interesting) based on Roskam book
+# Class 2 weight estimation for the tailsitter configuration based cessna method from Roskam book:
+#Notes: empennage/landing gear more interesting, need input for those
 def class_2_tailsitter( ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / 2.20462262
