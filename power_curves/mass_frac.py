@@ -91,7 +91,7 @@ import const
 #     Mfrac = (E * SFC * CD * V1 / (2 * eta * CL) + 1)**2
 #     return Mfrac
     
-def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1):
+def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, eta=0.75):
     """
     Calculate fuel weight used for endurance or payload mission
     This is only the weight for cruising and loitering, not including take-off and climb
@@ -119,7 +119,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1):
     E = const.R_cruise / v1 * P
     idx = np.argmin(E[np.where(v1 > v_cruise)])
     E = E[idx]
-    M_fuel1 = E * SFC
+    M_fuel1 = E * SFC / eta
 
     W2 = W1 - M_fuel1 * const.g0
 
@@ -132,7 +132,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1):
         E = const.T_loiter_end * P
     
     idx = np.argmin(E)
-    M_fuel2 = E[idx] * SFC
+    M_fuel2 = E[idx] * SFC / eta
 
     W3 = W2 - M_fuel2 * const.g0
     
@@ -144,7 +144,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1):
     P = D * v3
     E = const.R_cruise / v3 * P
     idx = np.argmin(E)
-    M_fuel3 = E[idx] * SFC
+    M_fuel3 = E[idx] * SFC / eta
 
     return  M_fuel1 + M_fuel2 + M_fuel3
 
