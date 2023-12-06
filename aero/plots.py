@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read Xfoil data from the file
-data_4412 = np.loadtxt("naca4412.txt")
-data_23012 = np.loadtxt("naca23012.txt")
-data_632A015 = np.loadtxt("naca63(2)A015.txt")
-data_63215 = np.loadtxt("naca63215.txt")
-data_63512 = np.loadtxt("naca63512.txt")
+data_4412 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca4412.txt")
+data_23012 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca23012.txt")
+data_632A015 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63(2)A015.txt")
+data_63215 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63215.txt")
+data_63512 = np.loadtxt(r"C:\Users\Florian Tjepkema\Documents\Aerospace Engineering\AeroSpace 2023-2024\DSE\DSE-02-UAS\aero\naca63512.txt")
 
 # Extract columns
 alpha_4412 = data_4412[:, 0]      # Angle of attack
