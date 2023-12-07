@@ -20,7 +20,7 @@ if rw_calc:
     plt.figure(dpi=600)
     for DL in [200, 230, 260, 290, 320]:
         cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross, S)
-        R, D_v, omega, T_level, sig_max, sig_min = rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11)
+        R, D_v, omega, T_level, sig_max = rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11)
         P_ind = P_induced(v_range_rot, DL, W, k=1.15, k_dl=1.04)
         P_prof = P_profile_drag(v_range_rot, W, N, R, omega, sig_max, Cl_alpha_rot=5.73)
         P_par = 0.5 * rho0 * v_range_rot**3 * (d_airframe_wing + d_rotors + d_interference)     # = aeq = Cd * S
@@ -36,7 +36,7 @@ if fw_calc:
     for S,b in [(3.7,6), (3.2,5), (3.0,4), (2.7,3), (2.3,2)]:
         cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross,S)
         CL, CD = dragpolar_heli(b, S, Cl_start=0.2, Cl_end=cl_max, Cl_step=1000)
-        P_tot_wing, v_range_wing = generate_Preq_ac(W, S, rho, CD, CL, eff_prop)
+        P_tot_wing, v_range_wing = generate_Preq_ac(W, S, CD, CL, eff_prop)
 
         plt.plot(v_range_wing, P_tot_wing, label=f'Wing power b={b}')
 
@@ -55,4 +55,3 @@ plt.show()
 
 print('Stall speed of wing', v_stall(W, S, rho0, cl_max))
 print('Power required at stall', P_tot_wing[-1])
-
