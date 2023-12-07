@@ -1,6 +1,5 @@
 #Parameters listed for the weight estimation
 #General parameters:
-
 MTOW = 160 *2.20462262 #lbs
 payload_com = 20 *2.20462262 #lbs
 payload_sup = 50 *2.20462262 #lbs
