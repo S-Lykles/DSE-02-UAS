@@ -1,9 +1,9 @@
 import numpy as np
 
-
 # Class 2 weight estimation dual phase using cessna method from Roskam book:
 def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
+    kw_to_hp = 1.341022
     lb_to_kg = 2.20462262
     W_wing = (0.04674 * MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712) / lb_to_kg
 
@@ -13,7 +13,7 @@ def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor):
     W_f = (14.86*MTOW**0.144 *(l/d)**0.778 *l**0.383) / lb_to_kg
 
     # Weight estimation of the nacelle (horizontally opposed engines assumed)
-    W_nac = (0.24 * P_cruise_max) / lb_to_kg
+    W_nac = (0.24 * P_cruise_max* kw_to_hp) / lb_to_kg
 
     # Weight estimation of a non-retractable landing gear
     W_m_lg = (0.013*MTOW + 0.362*W_L**0.417 * l_sm**0.183) / lb_to_kg
@@ -100,6 +100,7 @@ def class_two_compound_helicopter(R, C, N_blades, V_tip, t_avg, MTOW, S_ch, A_ch
 def class_two_tilt_wing(MTOW, l_sm, l_sn):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     lb_to_kg = 2.20462262
+    kw_to_hp = 1.341022
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / lb_to_kg
 
     # Weight estimation of empennage (traditional empennage assumed)
@@ -115,7 +116,7 @@ def class_two_tilt_wing(MTOW, l_sm, l_sn):
     W_f = (14.86 * MTOW ** 0.144 * (l / d)**0.778 * l**0.383) / lb_to_kg
 
     # Weight estimation of the nacelle (horizontally opposed engines assumed)
-    W_nac = (0.24 * P_cruise_max) / lb_to_kg
+    W_nac = (0.24 * P_cruise_max*kw_to_hp) / lb_to_kg
 
     # Weight estimation of a non-retractable landing gear
     W_m_lg = (0.013 * MTOW + 0.362 * W_L**0.417 * l_sm**0.183) / lb_to_kg
@@ -148,13 +149,14 @@ def class_two_tilt_wing(MTOW, l_sm, l_sn):
 def class_2_tailsitter(MTOW, ):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     lb_to_kg = 2.20462262
+    kw_to_hp = 1.341022
     W_wing = (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712) / lb_to_kg
 
     # Weight estimation of fuselage (high wing configuration assumed)
     W_f = (14.86 * MTOW ** 0.144 * (l / d) ** 0.778 * l ** 0.383) / lb_to_kg
 
     # Weight estimation of the nacelle (horizontally opposed engines assumed)
-    W_nac = (0.24 * P_cruise_max) / lb_to_kg
+    W_nac = (0.24 * P_cruise_max*kw_to_hp) / lb_to_kg
 
     # Weight estimation of a non-retractable landing gear using a comparable design
     W_lg = 0.02 * MTOW / lb_to_kg
