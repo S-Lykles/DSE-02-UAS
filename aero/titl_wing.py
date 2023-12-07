@@ -19,12 +19,13 @@ def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda):
     c_root = b*Lambda/(1+Lambda)
     for i in range(N_eng//2):
         S_eng = S_eng + d_eng * (Lambda * c_root + i * delta_eng * (1-Lambda) * c_root)
-    cd0_tiltwing = cd0_clean + cd0_eng + ((S_eng/Sw) * cd0_clean)
+    cd_prop = (S_eng/Sw) * cd0_clean
+    cd0_tiltwing = cd0_clean + cd0_eng + cd_prop
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
 
-    cl = np.linspace(-0.4,1.5,150)
+    cl = np.linspace(-0.4,2,150)
     cd_tilt_wing = cd0_tiltwing + cl**2/(pi*A*e) + cd0_fus
     # print("cd0 tilt wing is",cd0_tiltwing)
     # print("cd0 fus",cd0_fus)
-    return cl,cd_tilt_wing
+    return cl,cd_tilt_wing, cd_prop
 

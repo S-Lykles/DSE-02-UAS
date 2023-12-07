@@ -39,7 +39,7 @@ def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2):
     e = 1.78*(1-0.045*A**0.68)-0.64                         # Preliminary Design Method and Prototype Testing of a Novel Rotors Retractable Hybrid VTOL UAV 
     cd0_wing = e * Sw/S * cf_e                              # Lit. from erwin
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
-    cl = np.linspace(-0.4,1.5,150)
+    cl = np.linspace(-0.4,2,150)
     cd_dual = 2*cd0_wing + cl**2/(pi*A*e) + cd0_fus       # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
     return cl,cd_dual
 
