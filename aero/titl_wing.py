@@ -5,7 +5,7 @@ from cl_cd import s_wet, cd0_fuselage
 
 
 # Calculate the cl and cd, updated with N_number of engines, evenly spaced, d_eng diameter of engine, assuming engine close to optimal slenderness ratio, fully turbulent flow over engine casing
-def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda):
+def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=0.,CL_end=1.2,CL_step=1000):
     Sw = s_wet(160)                                         # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
     cf_e = 0.01                                             # Lit. from erwin
     A = b**2/S
