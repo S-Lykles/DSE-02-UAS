@@ -3,9 +3,9 @@ from math import pi, sqrt
 
 # Calculate parasite drag coefficient with equations from literature
 def parasite_drag(MTOM,S):
-    d_airframe_wing = 1.6*(2.2046*MTOM/1000)**(2/3)                         # ft^2
-    d_rotors = 0.4*(2.2046*MTOM/1000)**(2/3)                                # ft^2
-    d_interference = 0.003                                                  # [-]
+    d_airframe_wing = 1.6*(2.2046*MTOM/1000)**(2/3)                         # ft^2 d/q for fuselage and wing
+    d_rotors = 0.4*(2.2046*MTOM/1000)**(2/3)                                # ft^2 d/q for rotors
+    d_interference = 0.003                                                  # [-] cd 
     cd_parasite = 0.0929* (d_airframe_wing + d_rotors)/S + d_interference   #conversion to m2, then make it unitless by /S        [-]
     return cd_parasite, d_airframe_wing, d_rotors, d_interference
 
