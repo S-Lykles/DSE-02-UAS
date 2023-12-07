@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt, log10
-from cl_cd import s_wet, cd0_fuselage
+from .cl_cd import s_wet, cd0_fuselage
 
 
 # Calculate the cl and cd, updated with N_number of engines, evenly spaced, d_eng diameter of engine, assuming engine close to optimal slenderness ratio, fully turbulent flow over engine casing
@@ -23,7 +23,7 @@ def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=0.,CL_end=1.2,C
     cd0_tiltwing = cd0_clean + cd0_eng + cd_prop
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
 
-    cl = np.linspace(-0.4,2,150)
+    cl = np.linspace(CL_start,CL_end,CL_step)
     cd_tilt_wing = cd0_tiltwing + cl**2/(pi*A*e) + cd0_fus
     # print("cd0 tilt wing is",cd0_tiltwing)
     # print("cd0 fus",cd0_fus)
