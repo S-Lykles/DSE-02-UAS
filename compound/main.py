@@ -17,31 +17,34 @@ rw_calc = True
 fw_calc = True
 
 if rw_calc:
-    cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross, S)
-    R, D_v, omega, T_level, sig_max, sig_min = rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11)
-    P_ind = P_induced(v_range_rot, DL, W, k=1.15, k_dl=1.04)
-    P_prof = P_profile_drag(v_range_rot, W, N, R, omega, sig_max, Cl_alpha_rot=5.73)
-    P_par = 0.5 * rho0 * v_range_rot**3 * (d_airframe_wing + d_rotors + d_interference)     # = aeq = Cd * S
-
-    P_tot_rot = P_ind + P_prof + P_par
-
     plt.figure(dpi=600)
-    #plt.plot(v_range_rot, P_ind, label='Induced drag power')
-    #plt.plot(v_range_rot, P_prof, label='Profile drag power')
-    #plt.plot(v_range_rot, P_par, label='Parasitic drag power')
-    plt.plot(v_range_rot, P_tot_rot, label='Tot drag power')
+    for DL in [200, 230, 260, 290, 320]:
+        cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross, S)
+        R, D_v, omega, T_level, sig_max, sig_min = rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11)
+        P_ind = P_induced(v_range_rot, DL, W, k=1.15, k_dl=1.04)
+        P_prof = P_profile_drag(v_range_rot, W, N, R, omega, sig_max, Cl_alpha_rot=5.73)
+        P_par = 0.5 * rho0 * v_range_rot**3 * (d_airframe_wing + d_rotors + d_interference)     # = aeq = Cd * S
+
+        P_tot_rot = P_ind + P_prof + P_par
+
+        #plt.plot(v_range_rot, P_ind, label='Induced drag power')
+        #plt.plot(v_range_rot, P_prof, label='Profile drag power')
+        #plt.plot(v_range_rot, P_par, label='Parasitic drag power')
+        plt.plot(v_range_rot, P_tot_rot, label=f'Tot drag power DL={DL}')
 
 if fw_calc:
-    cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross,S)
-    CL, CD = dragpolar_heli(b, S, Cl_start=0.2, Cl_end=cl_max, Cl_step=1000)
-    P_tot_wing, v_range_wing = generate_Preq_ac(W, S, rho, CD, CL, eff_prop)
+    for S,b in [(3.7,6), (3.2,5), (3.0,4), (2.7,3), (2.3,2)]:
+        cd_parasite, d_airframe_wing, d_rotors, d_interference = parasite_drag(M_gross,S)
+        CL, CD = dragpolar_heli(b, S, Cl_start=0.2, Cl_end=cl_max, Cl_step=1000)
+        P_tot_wing, v_range_wing = generate_Preq_ac(W, S, rho, CD, CL, eff_prop)
 
-    plt.plot(v_range_wing, P_tot_wing, label='Wing power')
+        plt.plot(v_range_wing, P_tot_wing, label=f'Wing power b={b}')
 
 plt.title('Preq vs V Comparison')
 #plt.plot(transition_param, smooth_transition, label='Smooth Transition')
-plt.axvline(x=v_sl, linestyle='--', color='black', label='Stall speed of wing')
-plt.axvline(x=1.1*v_sl, linestyle='--', color='green', label='Transition speed')
+#plt.axvline(x=v_sl, linestyle='--', color='black', label='Stall speed of wing')
+#plt.axvline(x=1.1*v_sl, linestyle='--', color='green', label='Transition speed')
+#plt.axvline(x=1.15*v_sl, linestyle='--', color='black', label='Transition Complete')
 plt.xlabel('Velocity (m/s)')
 plt.ylabel('Power Requirement (W)')
 plt.xlim(left=0)
