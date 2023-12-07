@@ -5,7 +5,7 @@ from aero.cl_cd import dragpolar
 from dual_phase.inputs import *
 
 rotor_calculation = True
-ac_calculation = True
+wing_calculation = True
 transitional_calculation = True
 Plot = True
 
@@ -44,7 +44,7 @@ if rotor_calculation:
         plt.plot(v_rot, P_loss, label='Power losses')
         plt.plot(v_rot, P_req_rotor, label='Total Power Required')
 
-if ac_calculation:
+if wing_calculation:
     cl, cd = dragpolar(b, S, 0.1, 1, 1000)
     P_req_ac, v_ac = generate_Preq_ac(W, S, cd, cl, eta)
 
