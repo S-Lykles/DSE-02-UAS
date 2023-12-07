@@ -3,6 +3,8 @@ import numpy as np
 g0 = 9.81  # [m/s^2]
 rho0 = 1.225  # [kg/m^3]
 
+HPtoWatt = 745.699872
+
 deg2rad = np.pi / 180
 rad2deg = 1 / deg2rad
 

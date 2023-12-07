@@ -5,8 +5,10 @@ import const
 g0 = 9.81
 
 #AIRCRAFT PARAMETERS
-M_gross = 230
+M_gross = 160
 W	= M_gross * g0 #Given in req's #Input
+vc = 1 #vertical climb speed m/s
+v_cruise = (185000)/(75*60)
 
 
 v_max =	50 #Minimun required cruise speed * 1.3
@@ -19,8 +21,8 @@ eff_prop = 0.75 #PLACEHOLDER
 vc = 2
 
 #Rotor design parameters
-DL = 230
-N = 1
+DL = 120
+N = 2
 A_eq = 5 * 0.0929
 
 #ENVIRONMENTAL PARAMETERS
@@ -28,8 +30,8 @@ rho	= 1.2 #Arbitrarily chosen
 V_g	= 9.2 #Given in req's
 
 #AERODYNAMIC PARAMETERS
-S = 3.7 #input
-b = 6 #input
+S = 1.644 #input
+b = 4 #input
 cl_max = 1.8
 
 AR = S**2 / b #PLACEHOLDER

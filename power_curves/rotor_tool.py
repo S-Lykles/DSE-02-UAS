@@ -141,3 +141,10 @@ def generate_power_versus_disk_loading(P_hover_array, DL_array):
     plt.xlabel('Disk Loading in lb/ft^2')
     plt.ylabel('Power efficiency in lb/hp')
     plt.show()
+
+def delta_p_climb(vc, W):
+    delta_p = (W*0.224808943)*((vc*3.2808399)/2)
+    return delta_p
+
+
+
