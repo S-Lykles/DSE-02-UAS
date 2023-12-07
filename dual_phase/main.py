@@ -34,26 +34,21 @@ fuel_w = pd.DataFrame(fuel_w)
 W = const.MTOW
 N_r = 4
 DL = np.arange(100,400+n,n)
-R = [np.sqrt((W/N_r)/(x*np.pi)) for x in DL]
-V_tip = [140*(x*2)**0.171 for x in R]
-RPM = [x/y*60/(2*np.pi) for x,y in zip(V_tip, R)]
-
-power = 50
-torque = [x*5252/y for x,y in zip(power, RPM)]
+R = np.sqrt((W/N_r)/(DL*np.pi))
 plt.plot(DL,R)
 plt.xlabel("Disk loading [N/m^2]")
 plt.ylabel("Radius [m]")
 plt.show()
 
 
-#Example: JUMP20
-MTOW_e = 97.5*9.80665
-D = np.sqrt((87-193)**2+(204-249)**2)/np.sqrt((52-648)**2+(388-53)**2)*5.7
-bar = np.sqrt((133-342)**2+(241-332)**2)/np.sqrt((52-648)**2+(388-53)**2)*5.7
-R = D/2
-N_r = 4
-DL = (MTOW_e/N_r)/(np.pi*R**2)
-print(DL,R,bar)
+# #Example: JUMP20
+# MTOW_e = 97.5*9.80665
+# D = np.sqrt((87-193)**2+(204-249)**2)/np.sqrt((52-648)**2+(388-53)**2)*5.7
+# bar = np.sqrt((133-342)**2+(241-332)**2)/np.sqrt((52-648)**2+(388-53)**2)*5.7
+# R = D/2
+# N_r = 4
+# DL = (MTOW_e/N_r)/(np.pi*R**2)
+# print(DL,R,bar)
 
 
 
