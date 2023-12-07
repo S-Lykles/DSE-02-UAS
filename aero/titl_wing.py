@@ -19,7 +19,7 @@ def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=0.,CL_end=1.2,C
     c_root = b*Lambda/(1+Lambda)
     for i in range(N_eng//2):
         S_eng = S_eng + d_eng * (Lambda * c_root + i * delta_eng * (1-Lambda) * c_root)
-    cd_prop = (S_eng/Sw) * cd0_clean
+    cd_prop = ((2 * S_eng)/Sw) * cd0_clean
     cd0_tiltwing = cd0_clean + cd0_eng + cd_prop
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
 
