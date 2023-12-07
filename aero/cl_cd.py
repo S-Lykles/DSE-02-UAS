@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt, log10
+import const
 
 # Wetted area from statistics
 def s_wet(MTOM):
@@ -29,7 +30,9 @@ def cd0_fuselage(h,v,c,Sf):
     return cd0_fus,cf,Re, rho, T, p, M
 
 # Calculate the cl and cd 
-def dragpolar_dual(b,S,h,v,c,Sf):                                 
+def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2):    
+    if c == None:
+        c = S/b                             
     Sw = s_wet(160)                                         # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
     cf_e = 0.01                                             # Lit. from erwin
     A = b**2/S             

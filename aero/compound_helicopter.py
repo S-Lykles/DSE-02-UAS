@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt
 from cl_cd import *
+import const
 
 
 
@@ -23,7 +24,9 @@ def parasite_drag(MTOM,S):
     return cd_parasite
 
 # Set up cl and cd for plot
-def dragpolar_comp(b,S,h,v,c,Sf):
+def dragpolar_comp(b,S,h=500,v=const.v_cruise,c=None,Sf=2):
+    if c == None:
+        c = S/b
     cd_profile = profile_drag(h,v,c,Sf)
     cd_parasite = parasite_drag(160,S)
     cl = np.linspace(-0.4,1.5,150)
