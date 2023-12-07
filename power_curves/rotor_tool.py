@@ -48,6 +48,7 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
 
     return R, D_v, omega, T_level, sig_max
 
+
 def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
     """
     Calculates the profile drag power using the formula from the ppt.
