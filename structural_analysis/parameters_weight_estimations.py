@@ -10,8 +10,8 @@ W_L = MTOW - W_fuel - payload_sup #Landing mass
 # Dimensional parameters
 l = 3.35 #m
 d = 0.8 #Diameter fuselage m
-# l_sm =  #Shock strut length fro main gear
-# l_sn = #Shock strut length for nose gear
+l_sm = 1  # Shock strut length for main gear [ft]
+l_sn = 1  # Shock strut length for nose gear [ft]
 
 
 # Wing parameters
