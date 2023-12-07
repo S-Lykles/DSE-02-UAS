@@ -28,9 +28,9 @@ rho	= 1.2 #Arbitrarily chosen
 V_g	= 9.2 #Given in req's
 
 #AERODYNAMIC PARAMETERS
-S = 2.8 #input
-b = 5 #input
-cl_max = 1.47
+S = 3.7 #input
+b = 6 #input
+cl_max = 1.8
 
 AR = S**2 / b #PLACEHOLDER
 e = 0.77 #PLACEHOLDER
