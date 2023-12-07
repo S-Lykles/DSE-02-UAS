@@ -10,7 +10,8 @@ eff_PM  = 0.99 #Power management module efficiency from literature
 eff_FC  = 0.76 #Hydrogen fuel cell efficiency from literature
 
 spec_tank_W = 11.5 #unit weight of hydrogen fuel tank per unit weight of liquid hydrogen from literature
-spec_P_fuelcell = 8#kW/kg specific power of a fuell cell, basically how much power can a fuell cell deliver per kg of fuel cell weight from literature
+spec_P_fuelcell = 0.3#kW/kg specific power of a fuell cell, basically how much power can a fuell cell deliver per kg of fuel cell weight from literature
+spec_P_fuelcell_fut = 8#kW/kg from literature
 E_rho_bat = 1.06 #MJ/kg #Battery specific energy FIND BETTER SOURCE THAN WIKIPEDIA!
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
 
@@ -65,6 +66,7 @@ def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
     W_2stroke_arr = np.array([])
     W_4stroke_arr = np.array([])
     W_rotary_arr = np.array([])
+    W_turbshft_arr = np.array([])
 
     for P in P_req_powertrains:
         W_2stroke = 8.804e-7*P**4 - 1.577e-4*P**3 + 8.233e-3*P**2 + 0.504*P
@@ -73,8 +75,10 @@ def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
         W_4stroke_arr = np.append(W_4stroke_arr, W_4stroke)
         W_rotary  = 9.331e-4*P**2 + 0.625*P
         W_rotary_arr = np.append(W_rotary_arr, W_rotary)
+        W_turbshft = -0.00001*P**2 + 0.2781*P + 5.0058
+        W_turbshft_arr = np.append(W_turbshft_arr, W_turbshft)
 
-    W_all_configs = np.array([W_2stroke_arr, W_4stroke_arr, W_rotary_arr])
+    W_all_configs = np.array([W_2stroke_arr, W_4stroke_arr, W_rotary_arr, W_turbshft_arr])
 
     return W_all_configs
 
@@ -118,7 +122,7 @@ def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_P
     return W_bat
 
 
-def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell):
+def W_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell):
     """
     Calculates battery weights and liquid hydrogen system weight for different missions if only electric propulsion is used.
 
@@ -143,7 +147,7 @@ def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, 
     #batteries
     eff = eff_PM*eff_EM
     E_needed_supply = (P_cruise*t_cruise + 4*P_max*t_atPmax)/eff #kJ
-    E_needed_endurance = (P_cruise*t_cruise + 2*P_max*t_atPmax + P_loiter*t_loiter)*eff #kJ
+    E_needed_endurance = (P_cruise*t_cruise + 2*P_max*t_atPmax + P_loiter*t_loiter)/eff #kJ
     W_bat_supply = E_needed_supply/1000 / E_rho_bat #kg
     W_bat_endurance = E_needed_endurance/1000 / E_rho_bat #kg
 
@@ -151,16 +155,22 @@ def W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, 
     eff_H = eff_FC*eff_PM*eff_EM
     P_peak = P_max/eff_H
     W_fuelcell = P_peak / spec_P_fuelcell
+    W_fuelcell_fut = P_peak / spec_P_fuelcell_fut
     E_needed_supply_H = (P_cruise * t_cruise + 4 * P_max * t_atPmax) / eff_H  # kJ
     E_needed_endurance_H = (P_cruise * t_cruise + 2 * P_max * t_atPmax + P_loiter * t_loiter) * eff_H  # kJ
-    W_H_supply = E_needed_supply_H/1000 / E_rho_H
-    W_H_supply += (spec_tank_W*W_H_supply + W_fuelcell)
-    W_H_endurance = E_needed_endurance_H/1000 / E_rho_H
-    W_H_endurance += (spec_tank_W*W_H_endurance + W_fuelcell)
+
+    W_H_supply = E_needed_supply_H/1000 / E_rho_H #kg
+    W_H_supply += (spec_tank_W*W_H_supply + W_fuelcell) #kg adds the fueltank weight and fuel cell weight to hydrogen fuel weight
+    W_H_endurance = E_needed_endurance_H/1000 / E_rho_H #kg
+    W_H_endurance += (spec_tank_W*W_H_endurance + W_fuelcell) #kg
+
+    W_H_fut_supply = E_needed_supply_H/1000 / E_rho_H #kg
+    W_H_fut_supply += (spec_tank_W*W_H_fut_supply + W_fuelcell_fut) #kg adds the fueltank weight and fuel cell weight to hydrogen fuel weight
+    W_fut_H_endurance = E_needed_endurance_H/1000 / E_rho_H #kg
+    W_fut_H_endurance += (spec_tank_W*W_fut_H_endurance + W_fuelcell_fut) #kg
 
 
-
-    return W_bat_supply, W_bat_endurance, W_H_supply, W_H_endurance
+    return W_bat_supply, W_bat_endurance, W_H_supply, W_H_endurance, W_H_fut_supply, W_fut_H_endurance
 
 
 
@@ -169,13 +179,16 @@ def table_hybrid_propulsion_weights():
     Produces a pandas dataframe (a fancy table) which presents all the weights for conventional and hybrid propulsion (so no full electric propulsion!) and engine types.
     :return:
     """
+    #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
     W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM)
     W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
+
+    #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
     zero_array = np.zeros_like(W_engines_hybrid)
     zero_array[:, 2:] = W_batteries_hybrid
     result_array = W_engines_hybrid + zero_array
     result_array = np.round(result_array, 1)
-    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary'])
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft'])
 
     return result_dataframe
 
@@ -184,10 +197,10 @@ def table_electric_propulsion_weights():
     Produces a pandas dataframe (a fancy table) which presents all the weights for conventional and hybrid propulsion (so no full electric propulsion!) and engine types.
     :return:
     """
-    W_bat_supply,  W_bat_endurance, W_H_supply, W_H_endurance = W_battery_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell)
-    result_array = np.array([[W_bat_supply, W_bat_endurance],[W_H_supply, W_H_endurance]])
+    W_bat_supply,  W_bat_endurance, W_H_supply, W_H_endurance, W_fut_H_supply, W_fut_H_endurance = W_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_bat, E_rho_H, eff_EM, eff_PM, eff_FC, spec_tank_W, spec_P_fuelcell)
+    result_array = np.array([[W_bat_supply, W_bat_endurance],[W_H_supply, W_H_endurance], [W_fut_H_supply, W_fut_H_endurance]])
     result_array = np.round(result_array, 1)
-    result_dataframe = pd.DataFrame(data = result_array, columns = ['Supply Delivery', 'Communication Relay'], index = ['Battery Powered', 'Liquid Hydrogen Powered'])
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Supply Delivery', 'Communication Relay'], index = ['Battery Powered', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech'])
     return result_dataframe
 
 
