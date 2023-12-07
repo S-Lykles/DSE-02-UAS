@@ -15,8 +15,12 @@ m2ft = 1 / ft2m
 kts2ms = 0.514444
 ms2kts = 1 / kts2ms
 
-# SFC
+WH2J = 3600
 
+
+# SFC
+J_KG2WH_KG = 1 / 3600
+WH_KG2J_KG = 1 / J_KG2WH_KG
 
 # Disk loading
 
