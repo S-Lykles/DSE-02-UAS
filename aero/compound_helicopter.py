@@ -6,7 +6,7 @@ from titl_wing import *
 import const
 
 # Set up cl and cd for plot
-def dragpolar_comp(b,S,d_eng,N_eng,Lambda,h=500,v=const.v_cruise,c=None,Sf=2):
+def dragpolar_comp(b,S,d_eng,N_eng,Lambda,h=500,v=const.v_cruise,c=None,Sf=2,CL_start=0.,CL_end=1.2,CL_step=1000):
     if c == None:
         c = S/b
     d_eng = d_eng/2                     # Compared to engine diameter of tilt wing
@@ -14,7 +14,7 @@ def dragpolar_comp(b,S,d_eng,N_eng,Lambda,h=500,v=const.v_cruise,c=None,Sf=2):
     cd_parasite = 0.04/0.67*1.2
     cl,cd_tilt_wing, cd_prop = dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda)
     cd0_eng = N_eng * 0.006
-    cl = np.linspace(-0.4,2,150)
+    cl = np.linspace(CL_start,CL_end,CL_step)
     A = b**2/S
     e = 1.78*(1-0.045*A**0.68)-0.64 
     cd_comp = cd_parasite + cd_prop + cd0_eng + cl**2/(pi * A * e)
