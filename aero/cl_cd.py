@@ -37,12 +37,8 @@ def dragpolar_dual(b,S,h,v,c,Sf):
     cd0_wing = e * Sw/S * cf_e                              # Lit. from erwin
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
     cl = np.linspace(-0.4,1.5,150)
-    cd_dual = 2.5*cd0_wing + cl**2/(pi*A*e) + cd0_fus       # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
-    #print(cd0_fus,cd0_wing)
+    cd_dual = 2*cd0_wing + cl**2/(pi*A*e) + cd0_fus       # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
     return cl,cd_dual
-
-
-
 
 
 
