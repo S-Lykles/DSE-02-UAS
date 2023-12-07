@@ -5,7 +5,7 @@ import seaborn as sns
 import const
 import power_curves.inputs as i
 from power_curves.mass_frac import fuel_weight
-from aero.compound_helicopter import dragpolar_heli
+from aero.compound_helicopter import dragpolar_comp
 
 n = 0.5
 b = np.arange(2,6+n,n)
@@ -17,8 +17,8 @@ unit_conversion = 0.45359237 / 745.7/ 60**2
 SFC = 0.5 * unit_conversion
 for i in range(len(b)):
     for j in range(len(S)):
-        CL, CD = dragpolar_heli(b[i], S[j], Cl_start=0.01)
-        fw = fuel_weight(CL, CD, SFC, S[j], which='endurance', v_cruise=const.v_cruise*1.1)
+        CL, CD = dragpolar_comp(b[i], S[j], CL_start=0.01)
+        fw = fuel_weight(CL, CD, SFC, S[j], which='payload', v_cruise=const.v_cruise*1.1)
         fuel_w[i][j] = fw
 
 

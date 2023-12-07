@@ -5,7 +5,7 @@ import seaborn as sns
 import const
 import power_curves.inputs as i
 from power_curves.mass_frac import fuel_weight
-from aero.cl_cd import dragpolar
+from aero.cl_cd import dragpolar_dual
 
 n = 0.5
 b = np.arange(2,6+n,n)
@@ -17,28 +17,28 @@ unit_conversion = 0.45359237 / 745.7/ 60**2
 SFC = 0.5 * unit_conversion
 for i in range(len(b)):
     for j in range(len(S)):
-        CL, CD = dragpolar(b[i], S[j], CL_start=0.01)
+        CL, CD = dragpolar_dual(b[i], S[j], CL_start=0.01)
         fw = fuel_weight(CL, CD, SFC, S[j], which='endurance', v_cruise=const.v_cruise*1.1)
         fuel_w[i][j] = fw
 
 
 fuel_w = pd.DataFrame(fuel_w)
 # # Create a heatmap
-# plt.figure(figsize=(10, 8))
-# sns.heatmap(fuel_w, annot=True, xticklabels=b, yticklabels=S, cmap='viridis')
-# plt.xlabel('b')
-# plt.ylabel('S')
-# plt.title('Fuel weight')
-# plt.show()
-
-W = const.MTOW
-N_r = 4
-DL = np.arange(100,400+n,n)
-R = np.sqrt((W/N_r)/(DL*np.pi))
-plt.plot(DL,R)
-plt.xlabel("Disk loading [N/m^2]")
-plt.ylabel("Radius [m]")
+plt.figure(figsize=(10, 8))
+sns.heatmap(fuel_w, annot=True, xticklabels=b, yticklabels=S, cmap='viridis')
+plt.xlabel('b')
+plt.ylabel('S')
+plt.title('Fuel weight')
 plt.show()
+
+# W = const.MTOW
+# N_r = 4
+# DL = np.arange(100,400+n,n)
+# R = np.sqrt((W/N_r)/(DL*np.pi))
+# plt.plot(DL,R)
+# plt.xlabel("Disk loading [N/m^2]")
+# plt.ylabel("Radius [m]")
+# plt.show()
 
 
 # #Example: JUMP20
