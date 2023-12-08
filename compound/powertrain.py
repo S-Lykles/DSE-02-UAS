@@ -26,6 +26,7 @@ SFC_battery = 1 / (E_rho_bat*1e6)
 
 def P_max(DL, N):
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise)
+    print(R, D_v, omega, T_level, sig_max)
     v = 0
     P_p = P_profile_drag(v, const.MTOW, N, R, omega, sig_max)
     P_i = P_induced(0,DL,const.MTOW, k_dl=k_dl)
