@@ -2,10 +2,11 @@ import numpy as np
 from parameters_weight_estimations import *
 
 # Class 2 weight estimation dual phase using cessna method from Roskam book:
-def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor_gas):
+def class_two_dual_phase(MTOW):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     kw_to_hp = 1.341022
     lb_to_kg = 2.20462262
+    m_to_ft = 0.3048
     W_wing = (0.04674 * MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712) / lb_to_kg
 
     W_emp = 0.023 * MTOW / lb_to_kg
@@ -27,7 +28,7 @@ def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor_gas):
     W_struc = (W_wing + W_emp + W_f + W_nac + W_lg) / lb_to_kg
 
     # Summation to generate estimation for the propulsion system
-    W_prop = (25 + N_electric * W_rotor_electric + N_gas * W_rotor_gas + W_generator) #(N_electric * (W_electro_motor + W_rotor_electric) + N_gas * (W_gas_motor + W_rotor_gas)
+    W_prop = (20 + N_electric * W_rotor_electric + N_gas * W_rotor_gas + W_generator + W_fuel_sys)
                #+ W_fuel_sys + W_battery)
 
     # Summation to generate an estimation for the avionics system
@@ -37,7 +38,13 @@ def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor_gas):
     MTOW = OEW + W_fuel / lb_to_kg
     payload_range = 50 + 160 - MTOW
 
-    return W_prop, W_avionics/lb_to_kg, payload_sup/lb_to_kg, W_struc, W_fuel/lb_to_kg, OEW, MTOW
+    print("The weight for the prop is:", W_prop)
+    print("The weight for the electric rotors is:", N_electric * W_rotor_electric)
+    print("The weight for the gas rotors is:", W_rotor_gas)
+    print("The weight for the generator is:", W_generator)
+    print(MTOW)
+
+    return #W_prop, W_avionics/lb_to_kg, payload_sup/lb_to_kg, W_struc, W_fuel/lb_to_kg, OEW, MTOW
 
 
 

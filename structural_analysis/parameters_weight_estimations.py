@@ -1,15 +1,18 @@
+import numpy as np
+
 #Parameters listed for the weight estimation
 #General parameters:
 MTOW = 160 *2.20462262 #lbs
 payload_com = 20 *2.20462262 #lbs
 payload_sup = 50 *2.20462262 #lbs
-W_fuel = 15 *2.20462262 #lbs
+W_fuel = 20 *2.20462262 #lbs
 W_L = MTOW - W_fuel - payload_sup #Landing mass
 
 
 # Dimensional parameters
-l = 3.35 #m
-d = 0.8 #Diameter fuselage m
+l = 2.5 * 0.3048 # Length fuselage in ft
+d = 0.8  * 0.3048 # Max diameter fuselage in ft
+perimeter = d*np.pi # Max perimeter fuselage in ft
 l_sm = 1  # Shock strut length for main gear [ft]
 l_sn = 1  # Shock strut length for nose gear [ft]
 
