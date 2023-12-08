@@ -1,7 +1,8 @@
 import numpy as np
+from parameters_weight_estimations import *
 
 # Class 2 weight estimation dual phase using cessna method from Roskam book:
-def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor):
+def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor_gas):
     # Weight estimation of main wing in kg(full cantilever wing assumed)
     kw_to_hp = 1.341022
     lb_to_kg = 2.20462262
@@ -23,20 +24,20 @@ def class_two_dual_phase(MTOW, l_sm, l_sn, W_rotor):
     W_lg = 1.24 + W_m_lg + W_n_lg
 
     # Summation to generate a final estimation for the structural weight
-    W_struc = W_wing + W_emp + W_f + W_nac + W_lg
+    W_struc = (W_wing + W_emp + W_f + W_nac + W_lg) / lb_to_kg
 
     # Summation to generate estimation for the propulsion system
-    W_prop = (N_electric * (W_electro_motor + W_rotor) + N_gas * (W_gas_motor + W_rotor)
-              + W_fuel_sys + W_battery + W_generator)
+    W_prop = (25 + N_electric * W_rotor_electric + N_gas * W_rotor_gas + W_generator) #(N_electric * (W_electro_motor + W_rotor_electric) + N_gas * (W_gas_motor + W_rotor_gas)
+               #+ W_fuel_sys + W_battery)
 
     # Summation to generate an estimation for the avionics system
     W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
 
-    OEW = W_prop + W_struc + W_avionics + payload_sup
-    MTOW = OEW + W_fuel
+    OEW = W_prop + W_struc + W_avionics / lb_to_kg + payload_sup / lb_to_kg
+    MTOW = OEW + W_fuel / lb_to_kg
     payload_range = 50 + 160 - MTOW
-    print("The payload range of the dual phase configuration for the supply mission is [50,", payload_range, "].")
-    return OEW
+
+    return W_prop, W_avionics/lb_to_kg, payload_sup/lb_to_kg, W_struc, W_fuel/lb_to_kg, OEW, MTOW
 
 
 
@@ -132,8 +133,8 @@ def class_two_tilt_wing(MTOW, l_sm, l_sn):
     W_struc = 2*W_wing + W_emp + W_f + W_nac + W_lg #+ W_mech
 
     # Summation to generate estimation for the propulsion system
-    W_prop = N_electric * (W_electro_motor + W_rotor) + N_gas * (
-                W_gas_motor + W_rotor) + W_fuel_sys + W_battery + W_generator
+    W_prop = (N_electric * (W_electro_motor + W_rotor_electric) + N_gas * (W_gas_motor + W_rotor_gas)
+              + W_fuel_sys + W_battery + W_generator)
 
     # Summation to generate an estimation for the avionics system
     W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
@@ -165,8 +166,8 @@ def class_2_tailsitter(MTOW, ):
     W_struc = W_wing + W_f + W_nac + W_lg
 
     # Summation to generate estimation for the propulsion system
-    W_prop = N_electric * (W_electro_motor + W_rotor) + N_gas * (
-                W_gas_motor + W_rotor) + W_fuel_sys + W_battery + W_generator
+    W_prop = (N_electric * (W_electro_motor + W_rotor_electric) + N_gas * (W_gas_motor + W_rotor_gas)
+              + W_fuel_sys + W_battery + W_generator)
 
     # Summation to generate an estimation for the avionics system
     W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
