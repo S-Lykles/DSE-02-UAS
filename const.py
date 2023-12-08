@@ -37,3 +37,9 @@ T_cruise = 90 * 60  # [s]
 T_loiter_pay = 20 * 60  # [s]
 T_loiter_end = 10 * 3600  # [s]
 v_cruise = R_cruise / T_cruise  # [m/s]
+
+P_pay_pay = 400  # [W] Power required for payload during payload phase
+P_pay_end = 800  # [W] Power required for payload during endurance phase
+
+
+P_aux = 1000  # [W] Power required for auxiliaries
