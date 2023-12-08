@@ -114,11 +114,15 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, et
         Fraction fuel which is subtracted after each phase. The default is 1. In case
         you have batteries then this would be 0, in the case of hydrogen something like 0.1
     """
+    if which == 'payload':
+        P_pay = const.P_pay_pay
+    elif which == 'endurance':
+        P_pay = const.P_pay_end
     W1 = const.MTOW
     v1 = np.sqrt(W1 * 2 / (const.rho0 * S * CL))
 
     D = W1 * CD / CL
-    P = D * v1
+    P = D * v1 + const.P_aux + P_pay
     E = const.R_cruise / v1 * P
     idx = np.argmin(E[np.where(v1 > v_cruise)])
     E = E[idx]
@@ -128,7 +132,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, et
 
     v2 = np.sqrt(W2 * 2 / (const.rho0 * S * CL))
     D = W2 * CD / CL
-    P = D * v2
+    P = D * v2 + const.P_aux + P_pay
     if which == 'payload':
         E = const.T_loiter_pay * P
     elif which == 'endurance':
@@ -144,7 +148,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, et
 
     v3 = np.sqrt(W3 * 2 / (const.rho0 * S * CL))
     D = W3 * CD / CL
-    P = D * v3
+    P = D * v3 + const.P_aux + P_pay
     E = const.R_cruise / v3 * P
     idx = np.argmin(E)
     M_fuel3 = E[idx] * SFC / eta
