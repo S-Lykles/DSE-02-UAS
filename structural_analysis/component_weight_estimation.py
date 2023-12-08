@@ -38,10 +38,7 @@ def class_two_dual_phase(MTOW):
     MTOW = OEW + W_fuel / lb_to_kg
     payload_range = 50 + 160 - MTOW
 
-    print("The weight for the prop is:", W_prop)
-    print("The weight for the electric rotors is:", N_electric * W_rotor_electric)
-    print("The weight for the gas rotors is:", W_rotor_gas)
-    print("The weight for the generator is:", W_generator)
+
     print(MTOW)
 
     return #W_prop, W_avionics/lb_to_kg, payload_sup/lb_to_kg, W_struc, W_fuel/lb_to_kg, OEW, MTOW
@@ -51,20 +48,12 @@ def class_two_dual_phase(MTOW):
 # Class 2 weight estimation compound helicopter using "Weight estimation of helicopter design":
 
 def class_two_compound_helicopter(MTOW):
-    # Rotor weight estimation
     lb_to_kg = 2.20462262
     kw_to_hp = 1.341022
     m_to_ft = 0.3048
-    W_R = (9.56 * 10**(-4) * (sigma * MTOW * V_tip**2 / DL * sigma * R * t_c / N_blades+0.067)**0.89) / lb_to_kg
 
-    # Tail weight estimation
-    # Tail rotor weight estimation
-    W_tr = 7.4 * 10 ** (-4) * MTOW / lb_to_kg
-
-    # Horizontal tail stabilizer weight estimation
-    W_hs = 6.9 * 10 ** (-4) * MTOW ** 1.2 / lb_to_kg
-
-    W_tail = W_tr + W_hs
+    # Estimation of the empennage weight
+    W_emp = 0.023 * MTOW / lb_to_kg
 
     # Weight estimation of the main body (internal cargo assumed)
     W_body = 0.058 * R * MTOW ** 0.67 * n_ult ** 0.335 / lb_to_kg
@@ -76,30 +65,35 @@ def class_two_compound_helicopter(MTOW):
     W_wing = 0.04674 * MTOW ** 0.397 * S_ch ** 0.36 * n_ult ** 0.397 * AR_ch ** 1.712 / lb_to_kg
 
 
-    W_struc = W_tr + W_hs + W_tail + W_body + W_lg + W_wing
+    W_struc = W_emp + W_body + W_lg + W_wing
 
-    # Weight estimation of propulsion group (shaft-driven assumed)
-    # Weight estimation of engine
-    W_motor = 36.4 * (P_hov_max * kw_to_hp) ** 0.31 / lb_to_kg
+    # Weight estimation of propulsion group
+    W_R = (9.56 * 10 ** (-4) * (((sigma * MTOW * V_tip ** 2) / (DL)) * (sigma * R * t_c) / (N_blades) + 0.067) ** 0.89) / lb_to_kg
 
-    # Weight estimation of main rotor drive system
-    W_drivetrain = 0.2 * (P_hov_max * kw_to_hp * 5250/rpm) ** 0.787 / lb_to_kg
+    W_prop = (20 + N_electric * W_rotor_electric + W_R + W_generator + W_fuel_sys)
 
-    # Weight estimation of propulsion system accessories
-    W_prop_acc = 0.52 * W_motor
-
-    # Weight estimation of tail rotor drive system
-    W_trd = 2.46 * 10 ** (-3) * R ** 3.248 / lb_to_kg
-
-
-    W_prop_sys = W_motor + W_drivetrain + W_prop_acc + W_trd
+    # # Weight estimation of engine
+    # W_motor = 36.4 * (P_hov_max * kw_to_hp) ** 0.31 / lb_to_kg
+    # # Weight estimation of main rotor drive system
+    # W_drivetrain = 0.2 * (P_hov_max * kw_to_hp * 5250/rpm) ** 0.787 / lb_to_kg
+    # # Weight estimation of propulsion system accessories
+    # W_prop_acc = 0.52 * W_motor
+    # # Weight estimation of tail rotor drive system
+    # W_trd = 2.46 * 10 ** (-3) * R ** 3.248 / lb_to_kg
+    # W_prop_sys = W_motor + W_drivetrain + W_prop_acc + W_trd
 
     W_avionics = (W_missioncomputer + W_nav_sys + W_flt_ctrl) / lb_to_kg
 
-    OEW = W_prop_sys + W_avionics + W_R + W_struc
-    MTOW = OEW + W_fuel
+    OEW = W_prop + W_avionics + W_struc + payload_sup / lb_to_kg
+    MTOW = OEW + W_fuel /lb_to_kg
     payload_range = 50 + 160-MTOW
-    return MTOW
+
+    print("The weight for the structures is:", W_struc)
+    print("The weight for the empennage is:", W_emp)
+    print("The weight for the main body is:", W_body)
+    print("The weight for the landing gear is:", W_lg)
+    print("The weight for the wing is:", W_wing * lb_to_kg)
+    return MTOW, W_prop, W_avionics, W_struc, payload_sup / lb_to_kg
 
 # Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
 # Notes: did the weight of the main wing twice without a credible source, still requires a source!!

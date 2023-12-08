@@ -49,16 +49,16 @@ P_hov_max = 35 #kW Max power required during hover/take-off phase
 P_cruise_max = 15 #kW Max power required during cruise
 
 
-# Propulsion system parameters
-N_electric = 4 #number of rotors electrically driven in particular configuration
-N_gas = 1 #number of rotors gasoline driven
-W_electro_motor = 0.1836*(P_hov_max/N_electric)+ 2.7076 #Dependent on power required
-W_gas_motor = 10#Dependent on power required
-W_rotor_gas = 3#Dependent on rotor design
-W_rotor_electric = 1#Dependent on rotor design
-W_fuel_sys = W_fuel/9 #Literature research
-W_battery = 10 #kg, Dependent on propulsion configuration (battery weight for electric VTOL)
-W_generator = 15#Dependent on configuration
+# Propulsion system parameters dual phase
+# N_electric = 4 #number of rotors electrically driven in particular configuration
+# N_gas = 1 #number of rotors gasoline driven
+# W_electro_motor = 0.1836*(P_hov_max/N_electric)+ 2.7076 #Dependent on power required
+# W_gas_motor = 10#Dependent on power required
+# W_rotor_gas = 3#Dependent on rotor design
+# W_rotor_electric = 1#Dependent on rotor design
+# W_fuel_sys = W_fuel/9 #Literature research
+# W_battery = 10 #kg, Dependent on propulsion configuration (battery weight for electric VTOL)
+# W_generator = 12#Dependent on configuration
 
 
 # Mission and avionics system parameters
@@ -75,14 +75,20 @@ W_flt_ctrl = 0.024*MTOW
 
 
 # Compound helicopter parameters
-
-R = 1.4738579917347323 / 0.3048#radius main rotor in [ft]
+R = 1.4738579917347323 / m_to_ft#radius main rotor in [ft]
 t_c = 0.12#average tickness over chord of a blade
-N_blades = 3 #number of blades on rotor
-V_tip = 140*(2*R)**0.171 #Blade tip speed for cruise conditions in [ft/s]
+N_blades = 4 #number of blades on rotor
+V_tip = 140*(2*R*m_to_ft)**0.171 / m_to_ft #Blade tip speed for cruise conditions in [ft/s]
 DL = MTOW/np.pi/R**2 # Disk loading
 sigma = 0.06659266968898687
 b_ch = 5 * m_to_ft# Wing span of compound helicopter [ft]
 S_ch = 3.763 * m_to_ft**2 # Wing area of compound helicopter [ft^2]
-AR_ch = b_ch**2 / S_ch
-rpm =
+AR_ch = b_ch**2 / S_ch # Aspect ratio wing compound helicopter [-]
+
+# Propulsion system compound helicopter
+N_electric = 2 #number of rotors electrically driven in particular configuration
+N_gas = 1 #number of rotors gasoline driven
+W_rotor_electric = 1 #Dependent on rotor design [kg]
+W_fuel_sys = W_fuel/9 #Literature research [kg]
+W_generator = 15#Dependent on configuration
+
