@@ -1,17 +1,15 @@
-import const #AIRCRAFT PARAMETERS
+import const
 import numpy as np
-n = 0.1
 
-M_gross = 160
-W = M_gross * const.g0 #Given in req's #Input
+"""Aircraft Parameters"""
+eta = 0.75  # The propeller efficiency (Needs to be checked!)
 
-V_max =	50 #PLACEHOLDER, Minimun required cruise speed * 1.3
-V = np.arange(0,V_max+n, n)
 
-DL
-R = np.sqrt(W / (DL * np.pi))
-D = R * 2
-V_tip = 140 * D ** 0.171
+"""Design Parameters"""
+DL = 230  # Disk loading
+N = 4   # Number of rotors
+# N_bl = 5 Number of blades (Is this not calculated in a function??)
+
 # T = from ISA
 # R = 287
 # gamma = 1.4
@@ -19,18 +17,17 @@ V_tip = 140 * D ** 0.171
 # M_max = (V_max + V_tip)/c_s
 # if M_max<0.95
 
-N_bl = 5
-c =
-
-alpha_m =
-rho =
-sigma =
-omega =
-V =
-D_v =
-k =
-v_i =
-A_eq =
+# c =
+#
+# alpha_m =
+# rho =
+# sigma =
+# omega =
+# V =
+# D_v =
+# k =
+# v_i =
+# A_eq =
 
 # psi_deg	= 20 #Arbitrarily chosen
 # psi_rad	= np.radians(psi_deg)
@@ -40,10 +37,6 @@ A_eq =
 # eff_prop = 0.7 #PLACEHOLDER
 # vc = 2
 #
-# #Rotor design parameters
-# DL = 230
-# N = 4
-# A_eq = 5 * 0.0929
 #
 # #ENVIRONMENTAL PARAMETERS
 # rho	= 1.2 #Arbitrarily chosen

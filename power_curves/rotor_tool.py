@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import const
-# from .inputs import *
-
 
 def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
     """
@@ -24,7 +22,7 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
         ...
     """
     R               = np.sqrt(W/(N * DL * np.pi))
-    V_tip           = 150*(2*R)**0.171
+    V_tip           = 140*(2*R)**0.171
     D_v             = 0.04*W
     k_dl            = 1 + D_v/W
     omega           = V_tip/R
@@ -34,22 +32,22 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
 
     #level flight
     T_level         = W*k_dl
-    C_T_level       = T_level/ (const.rho*np.pi*R**2*omega**2*R**2)
+    C_T_level       = T_level/ (const.rho0*np.pi*R**2*omega**2*R**2)
     sig_level       = C_T_level/C_T_sig
 
     #turning flight
     n_z             = 1 / np.cos(psi_rad)
     T_turn          = W * k_dl * n_z
-    C_T_turn        = T_turn / (const.rho * np.pi * R**2 * (omega*R)**2)
+    C_T_turn        = T_turn / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     sig_turn        = C_T_turn / C_T_sig
 
     # T_gust = n_z*k_dl*
     # C_T_gust = T_gust/ (Vne*pi*R**2*omega**2*R**2)
 
     sig_max = max(sig_level, sig_turn)
-    sig_min = min(sig_level, sig_turn)
 
-    return R, D_v, omega, T_level, sig_max, sig_min
+    return R, D_v, omega, T_level, sig_max
+
 
 def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
     """
@@ -72,7 +70,7 @@ def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
     Cl_alpha_rot : float, optional
         Lift coefficient of the rotor [-]. The default is 5.73
     """
-    advanced_ratio = v / (omega*R)
+    advance_ratio = v / (omega*R)
     C_t = (W/N) / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     Cl_bar = 6.6*(C_t / sig_max)
     alpha_m = Cl_bar / Cl_alpha_rot
@@ -84,7 +82,7 @@ def P_profile_drag(v, W, N, R, omega, sig_max, Cl_alpha_rot=5.73):
 
     P_hov = (1/8)*sig_max*C_D_p*const.rho0*(omega*R)**3*np.pi*(R**2)
 
-    return P_hov * (1 + 4.65*(advanced_ratio**2)) * N
+    return P_hov * (1 + 4.65*(advance_ratio**2)) * N
     
 
 def P_induced(v, DL, W, k=1.15, k_dl=1.04):
@@ -103,7 +101,7 @@ def P_induced(v, DL, W, k=1.15, k_dl=1.04):
     k_dl : float, optional
         Drag correction [-]. Default is 1.04.
     """
-    v_ih = np.sqrt(DL / (2 * const.rho))
+    v_ih = np.sqrt(DL / (2 * const.rho0))
     # v_ibar = 1 / v
     # v_i = v_ibar * 
     a = v_ih**-4
@@ -144,3 +142,10 @@ def generate_power_versus_disk_loading(P_hover_array, DL_array):
     plt.xlabel('Disk Loading in lb/ft^2')
     plt.ylabel('Power efficiency in lb/hp')
     plt.show()
+
+def delta_p_climb(vc, W):
+    delta_p = (W*0.224808943)*((vc*3.2808399)/2)
+    return delta_p
+
+
+
