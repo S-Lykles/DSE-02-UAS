@@ -1,5 +1,10 @@
 import numpy as np
 
+# Unit factors
+kw_to_hp = 1.341022
+lb_to_kg = 2.20462262
+m_to_ft = 0.3048
+
 #Parameters listed for the weight estimation
 #General parameters:
 MTOW = 160 *2.20462262 #lbs
@@ -20,7 +25,7 @@ l_sn = 1  # Shock strut length for nose gear [ft]
 # Wing parameters
 b = 6 *3.28084 #ft
 S = 3.763 *3.28084**2 #Wing surface main wing in ft^2
-A = b**2/S #Aspect ratio main wing
+AR = b**2/S #Aspect ratio main wing
 
 
 #Empennage parameters
@@ -71,10 +76,13 @@ W_flt_ctrl = 0.024*MTOW
 
 # Compound helicopter parameters
 
-#rpm =  #expected rpm of the rotors
-#R = #radius main rotor in ft
-# C = #average chord of a blade in ft
-# N = #number of blades on rotor
-# V_tip = #Blade tip speed for cruise conditions in ft/s
-# S_ch = #Total blade area of one rotor in ft^2
-# A_ch = #Disk are of one rotor in ft
+R = 1.4738579917347323 / 0.3048#radius main rotor in [ft]
+t_c = 0.12#average tickness over chord of a blade
+N_blades = 3 #number of blades on rotor
+V_tip = 140*(2*R)**0.171 #Blade tip speed for cruise conditions in [ft/s]
+DL = MTOW/np.pi/R**2 # Disk loading
+sigma = 0.06659266968898687
+b_ch = 5 * m_to_ft# Wing span of compound helicopter [ft]
+S_ch = 3.763 * m_to_ft**2 # Wing area of compound helicopter [ft^2]
+AR_ch = b_ch**2 / S_ch
+rpm =

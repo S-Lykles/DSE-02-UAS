@@ -7,7 +7,7 @@ def class_two_dual_phase(MTOW):
     kw_to_hp = 1.341022
     lb_to_kg = 2.20462262
     m_to_ft = 0.3048
-    W_wing = (0.04674 * MTOW**0.397 * S**0.36 * n_ult**0.397 * A**1.712) / lb_to_kg
+    W_wing = (0.04674 * MTOW**0.397 * S**0.36 * n_ult**0.397 * AR**1.712) / lb_to_kg
 
     W_emp = 0.023 * MTOW / lb_to_kg
 
@@ -50,11 +50,12 @@ def class_two_dual_phase(MTOW):
 
 # Class 2 weight estimation compound helicopter using "Weight estimation of helicopter design":
 
-def class_two_compound_helicopter(R, C, N_blades, V_tip, t_avg, MTOW, S_ch, A_ch, rpm):
+def class_two_compound_helicopter(MTOW):
     # Rotor weight estimation
     lb_to_kg = 2.20462262
     kw_to_hp = 1.341022
-    W_R = (3.45 * 10**(-4) * (R * C * N_blades * V_tip**2 * (t_avg + 0.21))**0.89) / lb_to_kg
+    m_to_ft = 0.3048
+    W_R = (9.56 * 10**(-4) * (sigma * MTOW * V_tip**2 / DL * sigma * R * t_c / N_blades+0.067)**0.89) / lb_to_kg
 
     # Tail weight estimation
     # Tail rotor weight estimation
@@ -72,20 +73,20 @@ def class_two_compound_helicopter(R, C, N_blades, V_tip, t_avg, MTOW, S_ch, A_ch
     W_lg = 0.03 * MTOW / lb_to_kg
 
     # Weight estimation of the wing (full cantilever wings assumed)
-    W_wing = 0.04674 * MTOW ** 0.397 * S_ch ** 0.36 * n_ult ** 0.397 * A_ch ** 1.712 / lb_to_kg
+    W_wing = 0.04674 * MTOW ** 0.397 * S_ch ** 0.36 * n_ult ** 0.397 * AR_ch ** 1.712 / lb_to_kg
 
 
     W_struc = W_tr + W_hs + W_tail + W_body + W_lg + W_wing
 
     # Weight estimation of propulsion group (shaft-driven assumed)
     # Weight estimation of engine
-    W_motor = 36.4 * P_hov_max ** 0.31 / lb_to_kg
+    W_motor = 36.4 * (P_hov_max * kw_to_hp) ** 0.31 / lb_to_kg
 
     # Weight estimation of main rotor drive system
     W_drivetrain = 0.2 * (P_hov_max * kw_to_hp * 5250/rpm) ** 0.787 / lb_to_kg
 
     # Weight estimation of propulsion system accessories
-    W_prop_acc = 0.52 * W_motor / lb_to_kg
+    W_prop_acc = 0.52 * W_motor
 
     # Weight estimation of tail rotor drive system
     W_trd = 2.46 * 10 ** (-3) * R ** 3.248 / lb_to_kg
@@ -93,13 +94,12 @@ def class_two_compound_helicopter(R, C, N_blades, V_tip, t_avg, MTOW, S_ch, A_ch
 
     W_prop_sys = W_motor + W_drivetrain + W_prop_acc + W_trd
 
-    W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
+    W_avionics = (W_missioncomputer + W_nav_sys + W_flt_ctrl) / lb_to_kg
 
     OEW = W_prop_sys + W_avionics + W_R + W_struc
     MTOW = OEW + W_fuel
     payload_range = 50 + 160-MTOW
-    print("The payload range of the compound helicopter for the supply mission is [50,", payload_range, "].")
-    pass
+    return MTOW
 
 # Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
 # Notes: did the weight of the main wing twice without a credible source, still requires a source!!
