@@ -25,7 +25,7 @@ P_max = 30
 t_atPmax = 250
 
 
-def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
+def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut):
     '''
     Calculation of the engine weight for different powertrain configurations (conventional, turbo-electric, parallel and serial) and engine types
 
@@ -187,7 +187,7 @@ def table_hybrid_propulsion_weights():
     :return:
     """
     #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
-    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM)
+    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut)
     W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
 
     #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
