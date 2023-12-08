@@ -12,13 +12,13 @@ eff_FC  = 0.76 #Hydrogen fuel cell efficiency from literature
 spec_tank_W = 11.5 #unit weight of hydrogen fuel tank per unit weight of liquid hydrogen from literature
 spec_P_fuelcell = 0.3#kW/kg specific power of a fuell cell, basically how much power can a fuell cell deliver per kg of fuel cell weight from literature
 spec_P_fuelcell_fut = 8#kW/kg from literature
-E_rho_bat = 1.06 #MJ/kg #Battery specific energy FIND BETTER SOURCE THAN WIKIPEDIA!
+E_rho_bat = 1.44 #MJ/kg batteries of 1.75 MJ/kg were found (https://sionpower.com/files/Company-Brochure-21B.pdf) so I went a bit lower
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
 
 
 
 
-def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
+def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut):
     '''
     Calculation of the engine weight for different powertrain configurations (conventional, turbo-electric, parallel and serial) and engine types
 
@@ -60,6 +60,8 @@ def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
     W_4stroke_arr = np.array([])
     W_rotary_arr = np.array([])
     W_turbshft_arr = np.array([])
+    W_fuelcell_arr = np.array([])
+    W_fuelcell_fut_arr = np.array([])
 
     for P in P_req_powertrains:
         W_2stroke = 8.804e-7*P**4 - 1.577e-4*P**3 + 8.233e-3*P**2 + 0.504*P
@@ -70,8 +72,13 @@ def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
         W_rotary_arr = np.append(W_rotary_arr, W_rotary)
         W_turbshft = -0.00001*P**2 + 0.2781*P + 5.0058
         W_turbshft_arr = np.append(W_turbshft_arr, W_turbshft)
+        #Hydrogen computationt, added on Sieds' request
+        W_fuelcell = P / spec_P_fuelcell
+        W_fuelcell_arr = np.append(W_fuelcell_arr, W_fuelcell)
+        W_fuelcell_fut = P / spec_P_fuelcell_fut
+        W_fuelcell_fut_arr = np.append(W_fuelcell_fut_arr, W_fuelcell_fut)
 
-    W_all_configs = np.array([W_2stroke_arr, W_4stroke_arr, W_rotary_arr, W_turbshft_arr])
+    W_all_configs = np.array([W_2stroke_arr, W_4stroke_arr, W_rotary_arr, W_turbshft_arr, W_fuelcell_arr, W_fuelcell_fut_arr])
 
     return W_all_configs
 
@@ -145,12 +152,12 @@ def W_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_ba
     W_bat_endurance = E_needed_endurance/1000 / E_rho_bat #kg
 
     #hydrogen
-    eff_H = eff_FC*eff_PM*eff_EM
+    eff_H = eff_PM*eff_EM #The fuel cell efficiency doesn't belong here, right? (Onni)
     P_peak = P_max/eff_H
     W_fuelcell = P_peak / spec_P_fuelcell
     W_fuelcell_fut = P_peak / spec_P_fuelcell_fut
-    E_needed_supply_H = (P_cruise * t_cruise + 4 * P_max * t_atPmax) / eff_H  # kJ
-    E_needed_endurance_H = (P_cruise * t_cruise + 2 * P_max * t_atPmax + P_loiter * t_loiter) * eff_H  # kJ
+    E_needed_supply_H = (P_cruise * t_cruise + 4 * P_max * t_atPmax) / eff_H / eff_FC  # kJ
+    E_needed_endurance_H = (P_cruise * t_cruise + 2 * P_max * t_atPmax + P_loiter * t_loiter) * eff_H / eff_FC # kJ
 
     W_H_supply = E_needed_supply_H/1000 / E_rho_H #kg
     W_H_supply += (spec_tank_W*W_H_supply + W_fuelcell) #kg adds the fueltank weight and fuel cell weight to hydrogen fuel weight
@@ -172,7 +179,7 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     :return:
     """
     #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
-    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM)
+    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut)
     W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
 
     #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
@@ -180,7 +187,7 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     zero_array[:, 2:] = W_batteries_hybrid
     result_array = W_engines_hybrid + zero_array
     result_array = np.round(result_array, 1)
-    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft'])
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech'])
 
     return result_dataframe
 
