@@ -2,8 +2,6 @@ import const
 import numpy as np
 
 """Aircraft Parameters"""
-M_gross = 160
-W = M_gross * const.g0  # Given in requirements
 eta = 0.75  # The propeller efficiency (Needs to be checked!)
 
 
@@ -11,14 +9,6 @@ eta = 0.75  # The propeller efficiency (Needs to be checked!)
 DL = 230  # Disk loading
 N = 4   # Number of rotors
 # N_bl = 5 Number of blades (Is this not calculated in a function??)
-
-A_eq = 5 * 0.0929   # ?????
-V_max = 50  # PLACEHOLDER, Minimum required cruise speed * 1.3
-n = 0.1  # ????
-V = np.arange(0, V_max+n, n)    # ?????
-R = np.sqrt(W / (DL * np.pi))   # Rotor radius
-D = R * 2   # Rotor diameter
-V_tip = 140 * D ** 0.171    # Tip speed (Where do values in this come from?)
 
 # T = from ISA
 # R = 287
