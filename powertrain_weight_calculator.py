@@ -16,6 +16,26 @@ E_rho_bat = 1.44 #MJ/kg batteries of 1.75 MJ/kg were found (https://sionpower.co
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
 
 
+def SFC_from_Pmax(P_max, rho_JETA=800):
+    """
+    Calculate SFC for 2-Stroke, 4-Stroke, Rotary and Turboshaft
+
+    Parameters
+    ----------
+    P_max : float
+        Maximum power in W during operations computed from power curves
+    rho_JETA : float, optional
+        Energy density of JETA fuel in kg/m^3. The default is 800.
+
+    Return
+    ------
+        List of SFC in [kg/J]
+    """
+    SFC_base = 300 / (1000 * 1000 * 3600)
+    return [SFC_base * 1.2,
+            SFC_base * 1.05,
+            SFC_base * 1.1,
+            SFC_base]
 
 
 def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut):

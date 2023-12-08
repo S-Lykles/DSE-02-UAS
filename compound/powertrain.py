@@ -1,16 +1,16 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import const
-from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W, SFC_from_Pmax
-from aero.cl_cd import dragpolar_dual
+from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W
+from aero.compound_helicopter import dragpolar_comp
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb
 from power_curves.mass_frac import fuel_weight
 
-DL = 500
-N = 4
+DL = 230
+N = 1
 b = 6
 S = 3.763
-k_dl = 1.01 # lower than normal because the rotors are in free air
+k_dl = 1.05 # lower than normal because the rotors are in free air
 vc = 1
 Ploss_frac = 0.05
 
@@ -26,7 +26,6 @@ SFC_battery = 1 / (E_rho_bat*1e6)
 
 def P_max(DL, N):
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise)
-    print(R)
     v = 0
     P_p = P_profile_drag(v, const.MTOW, N, R, omega, sig_max)
     P_i = P_induced(0,DL,const.MTOW, k_dl=k_dl)
@@ -35,7 +34,7 @@ def P_max(DL, N):
     return P_max
 
 def P_cruise(b,S):
-    CL, CD = dragpolar_dual(b,S,CL_start=0.2,CL_end=1.2,CL_step=1000)
+    CL, CD = dragpolar_comp(b,S,CL_start=0.2,CL_end=1.2,CL_step=1000)
     v_cruise = const.v_cruise * 1.1 # A margin on the minimum cruise speed
     v1 = np.sqrt(const.MTOW * 2 / (const.rho0 * S * CL))
 
@@ -47,20 +46,17 @@ def P_cruise(b,S):
 
 
 if __name__ == '__main__':
-    CL, CD = dragpolar_dual(b,S,CL_start=0.1,CL_end=1.2,CL_step=1000)
-    P_m = P_max(DL, N)/1000
-    df = table_hybrid_propulsion_weights(P_cruise(b,S)/1000, P_m, 10*60)
+    CL, CD = dragpolar_comp(b,S,CL_start=0.1,CL_end=1.2,CL_step=1000)
+    df = table_hybrid_propulsion_weights(P_cruise(b,S)/1000, P_max(DL, N)/1000, 10*60)
     df.loc['Battery'] = ['-'] * len(df.columns)
 
-    SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]
-    SFC_jet = SFC[3]
-    print([s/SFC_jet for s in SFC])
-    print(SFC)
     opts = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech', 'Battery']
     e_frac = [1,1,1,1,1/spec_tank_W,1/spec_tank_W,0]
+    SFC = [SFC_2stroke, SFC_4stroke, SFC_rotarty, SFC_turboshaft, SFC_hydrogen, SFC_hydrogen, SFC_battery]
     m_f = []
     for o, e, s in zip(opts, e_frac, SFC):
         m_f.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
 
     df['Fuel Mass'] = m_f
+    print(df.to_latex())
     print(df)
