@@ -15,14 +15,7 @@ spec_P_fuelcell_fut = 8#kW/kg from literature
 E_rho_bat = 1.06 #MJ/kg #Battery specific energy FIND BETTER SOURCE THAN WIKIPEDIA!
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
 
-#Flight characteristics from power curves
-#-------------------------------------------------------------------------------------------
-P_cruise = 10
-t_cruise = 185000/40
-P_loiter = 5
-t_loiter = 10*3600
-P_max = 30
-t_atPmax = 250
+
 
 
 def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM):
@@ -173,8 +166,7 @@ def W_electric(P_cruise, t_cruise, P_loiter, t_loiter, P_max, t_atPmax, E_rho_ba
     return W_bat_supply, W_bat_endurance, W_H_supply, W_H_endurance, W_H_fut_supply, W_fut_H_endurance
 
 
-
-def table_hybrid_propulsion_weights():
+def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     """
     Produces a pandas dataframe (a fancy table) which presents all the weights for conventional and hybrid propulsion (so no full electric propulsion!) and engine types.
     :return:
@@ -203,9 +195,17 @@ def table_electric_propulsion_weights():
     result_dataframe = pd.DataFrame(data = result_array, columns = ['Supply Delivery', 'Communication Relay'], index = ['Battery Powered', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech'])
     return result_dataframe
 
-
-print(table_hybrid_propulsion_weights())
-print(table_electric_propulsion_weights())
+if __name__ == "__main__":
+    #Flight characteristics from power curves
+    #-------------------------------------------------------------------------------------------
+    P_cruise = 10
+    t_cruise = 185000/40
+    P_loiter = 5
+    t_loiter = 10*3600
+    P_max = 30
+    t_atPmax = 250
+    print(table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax))
+    print(table_electric_propulsion_weights())
 
 #LATEX BOOKTABS CODE
 #print(table_hybrid_propulsion_weights().to_latex(index=False, formatters={"name": str.upper}, float_format="{:.1f}".format,))
