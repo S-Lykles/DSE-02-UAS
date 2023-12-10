@@ -49,7 +49,7 @@ P_hov_max = 35 #kW Max power required during hover/take-off phase
 P_cruise_max = 15 #kW Max power required during cruise
 
 
-# Propulsion system parameters dual phase
+# # Propulsion system parameters dual phase
 # N_electric = 4 #number of rotors electrically driven in particular configuration
 # N_gas = 1 #number of rotors gasoline driven
 # W_electro_motor = 0.1836*(P_hov_max/N_electric)+ 2.7076 #Dependent on power required
@@ -57,7 +57,7 @@ P_cruise_max = 15 #kW Max power required during cruise
 # W_rotor_gas = 3#Dependent on rotor design
 # W_rotor_electric = 1#Dependent on rotor design
 # W_fuel_sys = W_fuel/9 #Literature research
-# W_battery = 10 #kg, Dependent on propulsion configuration (battery weight for electric VTOL)
+# W_battery = 0 #kg, Dependent on propulsion configuration (battery weight for electric VTOL)
 # W_generator = 12#Dependent on configuration
 
 
