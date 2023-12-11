@@ -34,8 +34,8 @@ def class_two_dual_phase(MTOW):
     # Summation to generate an estimation for the avionics system
     W_avionics = W_missioncomputer + W_nav_sys + W_flt_ctrl
 
-    OEW = W_prop + W_struc + W_avionics / lb_to_kg + payload_sup / lb_to_kg
-    MTOW = OEW + W_fuel / lb_to_kg
+    OEW = W_prop + W_struc + W_avionics / lb_to_kg
+    MTOW = OEW + W_fuel / lb_to_kg + payload_sup / lb_to_kg
     payload_range = 50 + 160 - MTOW
 
     print("The weight for the structures is:", W_struc)
@@ -43,7 +43,7 @@ def class_two_dual_phase(MTOW):
     print("The weight for the avionics subsystem is:", W_avionics/lb_to_kg)
     print("The weight for the fuel is:", W_fuel / lb_to_kg)
     print("The weight for the payload is:", payload_sup/lb_to_kg)
-    print(MTOW)
+    print(OEW)
     return #W_prop, W_avionics/lb_to_kg, payload_sup/lb_to_kg, W_struc, W_fuel/lb_to_kg, OEW, MTOW
 
 
@@ -59,7 +59,7 @@ def class_two_compound_helicopter(MTOW):
     W_emp = 0.023 * MTOW / lb_to_kg
 
     # Weight estimation of the main body (internal cargo assumed)
-    W_body = 0.058 * R * MTOW ** 0.67 * n_ult ** 0.335 / lb_to_kg
+    W_f = (14.86*MTOW**0.144 *(l/perimeter)**0.778 *l**0.383) / lb_to_kg
 
     # Weight estimation landing gear and support structure (skid-type assumed)
     W_lg = 0.03 * MTOW / lb_to_kg
@@ -67,8 +67,10 @@ def class_two_compound_helicopter(MTOW):
     # Weight estimation of the wing (full cantilever wings assumed)
     W_wing = 0.04674 * MTOW ** 0.397 * S_ch ** 0.36 * n_ult ** 0.397 * AR_ch ** 1.712 / lb_to_kg
 
+    # Weight estimation for the nacelle
+    W_nac = (0.24 * P_cruise_max * kw_to_hp) / lb_to_kg
 
-    W_struc = W_emp + W_body + W_lg + W_wing
+    W_struc = W_emp + W_f + W_lg + W_wing + W_nac
 
     # Weight estimation of propulsion group
     W_R = (9.56 * 10 ** (-4) * (((sigma * MTOW * V_tip ** 2) / (DL)) * (sigma * R * t_c) / (N_blades) + 0.067) ** 0.89) / lb_to_kg
@@ -87,16 +89,17 @@ def class_two_compound_helicopter(MTOW):
 
     W_avionics = (W_missioncomputer + W_nav_sys + W_flt_ctrl) / lb_to_kg
 
-    OEW = W_prop + W_avionics + W_struc + payload_sup / lb_to_kg
-    MTOW = OEW + W_fuel /lb_to_kg
+    OEW = W_prop + W_avionics + W_struc
+    MTOW = OEW + W_fuel /lb_to_kg + payload_sup / lb_to_kg
     payload_range = 50 + 160-MTOW
 
     print("The weight for the structures is:", W_struc)
-    print("The weight for the propulsion subsystem is:", W_prop)
-    print("The weight for the avionics subsystem is:", W_avionics)
-    print("The weight for the fuel is:", W_fuel / lb_to_kg)
-    print("The weight for the payload is:", payload_sup/lb_to_kg)
-    return MTOW
+    print("The weight for the wing is:", W_wing)
+    print("The weight for the fuselage is:", W_f)
+    print("The weight for the empennage is:", W_emp)
+    print("The weight for the nacelle is:", W_nac)
+    print("The weight for the landing gear:", W_lg)
+    return OEW
 
 # Class 2 weight estimation for the tilt-wing configuration using cessna method from Roskam book:
 # Notes: did the weight of the main wing twice without a credible source, still requires a source!!
@@ -143,8 +146,8 @@ def class_two_tilt_wing(MTOW):
     # Summation to generate an estimation for the avionics system
     W_avionics = (W_missioncomputer + W_nav_sys + W_flt_ctrl) / lb_to_kg
 
-    OEW = W_prop + W_avionics + W_struc + payload_sup / lb_to_kg
-    MTOW = OEW + W_fuel /lb_to_kg
+    OEW = W_prop + W_avionics + W_struc
+    MTOW = OEW + W_fuel /lb_to_kg + payload_sup / lb_to_kg
     payload_range = 50 + 160 - MTOW
 
     print("The weight for the structures is:", W_struc)
@@ -152,7 +155,7 @@ def class_two_tilt_wing(MTOW):
     print("The weight for the avionics subsystem is:", W_avionics)
     print("The weight for the fuel is:", W_fuel /lb_to_kg)
     print("The weight for the payload is:", payload_sup)
-    return MTOW
+    return OEW
 
 # Class 2 weight estimation for the tailsitter configuration based cessna method from Roskam book:
 #Notes: empennage/landing gear more interesting, need input for those

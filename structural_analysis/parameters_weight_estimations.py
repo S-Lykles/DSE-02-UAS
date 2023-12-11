@@ -49,7 +49,7 @@ P_hov_max = 35 #kW Max power required during hover/take-off phase
 P_cruise_max = 15 #kW Max power required during cruise
 
 
-# # Propulsion system parameters dual phase
+# # Propulsion system parameters dual phase and tilt wing
 # N_electric = 4 #number of rotors electrically driven in particular configuration
 # N_gas = 1 #number of rotors gasoline driven
 # W_electro_motor = 0.1836*(P_hov_max/N_electric)+ 2.7076 #Dependent on power required
