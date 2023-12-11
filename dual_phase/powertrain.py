@@ -26,7 +26,6 @@ SFC_battery = 1 / (E_rho_bat*1e6)
 
 def P_max(DL, N):
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise)
-    print(R)
     v = 0
     P_p = P_profile_drag(v, const.MTOW, N, R, omega, sig_max)
     P_i = P_induced(0,DL,const.MTOW, k_dl=k_dl)
@@ -53,14 +52,15 @@ if __name__ == '__main__':
     df.loc['Battery'] = ['-'] * len(df.columns)
 
     SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]
-    SFC_jet = SFC[3]
-    print([s/SFC_jet for s in SFC])
-    print(SFC)
     opts = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech', 'Battery']
     e_frac = [1,1,1,1,1/spec_tank_W,1/spec_tank_W,0]
-    m_f = []
+    m_f_e = []
+    m_f_p = []
     for o, e, s in zip(opts, e_frac, SFC):
-        m_f.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
+        m_f_e.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
+        m_f_p.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='payload'))
 
-    df['Fuel Mass'] = m_f
+    df['Fuel Mass Endurance'] = m_f_e
+    df['Fuel Mass Payload'] = m_f_p
+    print(df.to_latex())
     print(df)

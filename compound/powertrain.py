@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import const
-from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W
+from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W, SFC_from_Pmax
 from aero.compound_helicopter import dragpolar_comp
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb
 from power_curves.mass_frac import fuel_weight
@@ -47,16 +47,21 @@ def P_cruise(b,S):
 
 if __name__ == '__main__':
     CL, CD = dragpolar_comp(b,S,CL_start=0.1,CL_end=1.2,CL_step=1000)
+    P_m = P_max(DL, N)/1000
     df = table_hybrid_propulsion_weights(P_cruise(b,S)/1000, P_max(DL, N)/1000, 10*60)
     df.loc['Battery'] = ['-'] * len(df.columns)
+    SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]
 
     opts = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech', 'Battery']
     e_frac = [1,1,1,1,1/spec_tank_W,1/spec_tank_W,0]
-    SFC = [SFC_2stroke, SFC_4stroke, SFC_rotarty, SFC_turboshaft, SFC_hydrogen, SFC_hydrogen, SFC_battery]
-    m_f = []
+    SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]
+    m_f_e = []
+    m_f_p = []
     for o, e, s in zip(opts, e_frac, SFC):
-        m_f.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
+        m_f_e.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
+        m_f_p.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='payload'))
 
-    df['Fuel Mass'] = m_f
+    df['Fuel Mass Endurance'] = m_f_e
+    df['Fuel Mass Payload'] = m_f_p
     print(df.to_latex())
     print(df)
