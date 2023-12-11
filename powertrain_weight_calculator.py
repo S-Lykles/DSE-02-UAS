@@ -14,7 +14,7 @@ spec_P_fuelcell = 0.3#kW/kg specific power of a fuell cell, basically how much p
 spec_P_fuelcell_fut = 8#kW/kg from literature
 E_rho_bat = 1.44 #MJ/kg batteries of 1.75 Wh/kg were found (https://sionpower.com/files/Company-Brochure-21B.pdf) so I went a bit lower
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
-P_rho_bat = 1.0 #Kw/kg airbus battery from airbus https://www.airbus.com/en/newsroom/news/2022-03-airbus-high-voltage-battery-technology-prepares-for-ecopulse-flight-test
+P_rho_bat = 1 #kW/kg airbus battery from airbus https://www.airbus.com/en/newsroom/news/2022-03-airbus-high-voltage-battery-technology-prepares-for-ecopulse-flight-test
 
 
 def SFC_from_Pmax(P_max, rho_JETA=800):
@@ -208,14 +208,21 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     :return:
     """
     #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
-    W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut)
-    W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, eff_EM, eff_PM)
+    W_engines_hybrid = np.round(W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut),1)
+    W_batteries_hybrid = np.round(W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, eff_EM, eff_PM),1)
     print(W_batteries_hybrid)
     #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
     zero_array = np.zeros_like(W_engines_hybrid)
     zero_array[:, 2:] = W_batteries_hybrid
-    result_array = W_engines_hybrid + zero_array
-    result_array = np.round(result_array, 1)
+    zero_array_str = zero_array.astype(str)
+    W_engines_hybrid_str = W_engines_hybrid.astype(str)
+    # Concatenate strings element-wise using list comprehension and zip
+    result_array = [a + " + " + b for a, b in zip(W_engines_hybrid_str.flatten(), zero_array_str.flatten())]
+
+    # Reshape the concatenated array to match the original shape
+    result_array = np.array(result_array).reshape(W_engines_hybrid.shape)
+    #result_array = W_engines_hybrid + zero_array
+    #result_array = np.round(result_array, 1)
     result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech'])
 
     return result_dataframe
