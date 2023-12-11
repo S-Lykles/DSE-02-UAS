@@ -8,7 +8,7 @@ from power_curves.mass_frac import fuel_weight
 
 DL = 230
 N = 1
-b = 6
+b = 5
 S = 3.763
 k_dl = 1.05 # lower than normal because the rotors are in free air
 vc = 1

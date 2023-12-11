@@ -118,9 +118,9 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, et
         P_pay = const.P_pay_pay
     elif which == 'endurance':
         P_pay = const.P_pay_end
+    
     W1 = const.MTOW
     v1 = np.sqrt(W1 * 2 / (const.rho0 * S * CL))
-
     D = W1 * CD / CL
     P = D * v1 + const.P_aux + P_pay
     E = const.R_cruise / v1 * P

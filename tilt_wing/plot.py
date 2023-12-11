@@ -15,5 +15,6 @@ if __name__ == '__main__':
     Lambda = 0.45
 
     n = 100
-    plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01)[:-1])
-    plot_power_curves([400, 500, 600], [(6, 3.763), (5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01)[:-1], 0.01, 3.763)
+    for which in ['endurance', 'payload']:
+        plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01)[:-1], b_design=5, which=which)
+    plot_power_curves([400, 500, 600], [(5, 3.76), (4.5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01)[:-1], 0.01, 3.76)

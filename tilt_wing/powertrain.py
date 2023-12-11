@@ -6,11 +6,11 @@ from aero.titl_wing import dragpolar_tilt_wing
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb
 from power_curves.mass_frac import fuel_weight
 
-P_max_fac = 1.2  # facter for tilt wing because of the transition
+P_max_frac = 1.1  # facter for tilt wing because of the transition
 
 DL = 500
 N = 4
-b = 6
+b = 5
 S = 3.763
 k_dl = 1.05 # lower than normal because the rotors are in free air
 vc = 1
@@ -57,7 +57,7 @@ def P_cruise(b,S):
 
 if __name__ == '__main__':
     CL, CD, _ = dragpolar_tilt_wing(b,S,h,v,c,S_f,d_eng,N,Lambda,CL_start=0.1,CL_end=1.2,CL_step=1000)
-    P_m = P_max(DL, N)/1000
+    P_m = P_max(DL, N)/1000 * P_max_frac
     df = table_hybrid_propulsion_weights(P_cruise(b,S)/1000, P_max(DL, N)/1000, 10*60)
     df.loc['Battery'] = ['-'] * len(df.columns)
     SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]

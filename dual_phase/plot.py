@@ -6,11 +6,13 @@ from aero.cl_cd import dragpolar_dual
 
 
 if __name__ == '__main__':
+    k_dl = 1.01
     n = 10
     plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_dual(b, S,CL_start=0.01),which='endurance')
     # plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_dual(b, S,CL_start=0.01),which='payload')
     # plot_cd0(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: S*dragpolar_dual(b, S, CL_start=0.01)[1][0])
-    plot_power_curves([200, 300, 400, 500, 600], [(6, 3.763), (5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_dual(b, S, CL_start=0.01), 0.01, 3.763)
+    CD0 = dragpolar_dual(6, 3.763, CL_start=0.0)[1][0]
+    plot_power_curves([200, 300, 400, 500, 600], [(6, 3.763), (5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_dual(b, S, CL_start=0.01), CD0, S_design=3.763, k_dl=k_dl)
 
     for b,s in [(6, 3.763), (5, 3.5), (4, 3.2), (3, 2.7)]:
         CL, CD = dragpolar_dual(b, s, CL_start=0.01)

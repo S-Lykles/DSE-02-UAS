@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.patches as mpatches
+from matplotlib.lines import Line2D
 import pandas as pd
 import seaborn as sns
 import const
@@ -31,14 +33,25 @@ def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance'):
     plt.figure()
     CS = plt.contour(b, S, fuel_w, levels=8, colors='k')
     CSA = plt.contour(b, S, A, levels=8, colors='white', linestyles='dashed', linewidths=0.5)
+    Aspect_patch = mpatches.Patch(color='white', linestyle='dashed', label='Aspect ratio', linewidth=0.5)
+    A_line = Line2D([0], [0], color='white', linestyle='dashed', linewidth=1)
     plt.clabel(CS, inline=1, fontsize=10, colors='k')
     plt.clabel(CSA, inline=1, fontsize=10, colors='white')
-    plt.contourf(b, S, fuel_w, levels=100, cmap=new_cmap)
+    cnt = plt.contourf(b, S, fuel_w, levels=100, cmap=new_cmap)
+    cbar = plt.gca().figure.colorbar(cnt, ax = plt.gca())
+    if which == 'endurance':
+        name = "Fuel Mass Endurance [kg]"
+    elif which == 'payload':
+        name = "Fuel Mass Payload [kg]"
+    cbar.ax.set_ylabel(name, rotation = -90, va = "bottom")
     plt.scatter(b_design, S_design, c='r', marker='x', label='Design point')
     # sns.heatmap(fuel_w, annot=False, xticklabels=b, yticklabels=S, cmap='viridis')
     plt.xlabel('b [m]')
     plt.ylabel('S [$m^2$]')
-    plt.legend()
+    handles, labels = plt.gca().get_legend_handles_labels()
+    handles.append(A_line)
+    labels.append('Aspect ratio')
+    plt.legend(handles=handles, labels=labels)
     # plt.title('Fuel weight')
     plt.show()
 
