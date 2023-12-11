@@ -12,8 +12,9 @@ eff_FC  = 0.76 #Hydrogen fuel cell efficiency from literature
 spec_tank_W = 11.5 #unit weight of hydrogen fuel tank per unit weight of liquid hydrogen from literature
 spec_P_fuelcell = 0.3#kW/kg specific power of a fuell cell, basically how much power can a fuell cell deliver per kg of fuel cell weight from literature
 spec_P_fuelcell_fut = 8#kW/kg from literature
-E_rho_bat = 1.44 #MJ/kg batteries of 1.75 MJ/kg were found (https://sionpower.com/files/Company-Brochure-21B.pdf) so I went a bit lower
+E_rho_bat = 1.44 #MJ/kg batteries of 1.75 Wh/kg were found (https://sionpower.com/files/Company-Brochure-21B.pdf) so I went a bit lower
 E_rho_H = 119.93 #MJ/kg #Liquid hydrogen specific energy for Low Heating Value CHECK IF LHV OR HHV IS NEEDED
+P_rho_bat = 1.0 #Kw/kg airbus battery from airbus https://www.airbus.com/en/newsroom/news/2022-03-airbus-high-voltage-battery-technology-prepares-for-ecopulse-flight-test
 
 
 def SFC_from_Pmax(P_max, rho_JETA=800):
@@ -103,7 +104,7 @@ def W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, 
     return W_all_configs
 
 
-def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM):
+def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, eff_EM, eff_PM):
     '''
     Calculation of the battery weight for different hybrd powertrain configurations (parallel and serial). It is assumed that the battery generates the extra electricity needed for VTOL compared to cruise power (which is provided by the combustion engine)
 
@@ -137,8 +138,16 @@ def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_P
 
     P_bat = np.array([P_ser_bat, P_par_bat]) #kW
     E_bat = P_bat/1000*t_atPmax #MJ
-    W_bat = E_bat/E_rho_bat
-
+    W_bat_P = P_bat/P_rho_bat
+    W_bat_E = E_bat/E_rho_bat
+    print('W_bat_P: ', W_bat_P)
+    print('W_bat_E: ', W_bat_E)
+    W_bat = np.array([])
+    for i in range(len(W_bat_P)):
+        if W_bat_E[i] > W_bat_P[i]:
+            W_bat = np.append(W_bat, W_bat_E[i])
+        else:
+            W_bat = np.append(W_bat, W_bat_P[i])
     return W_bat
 
 
@@ -200,8 +209,8 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     """
     #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
     W_engines_hybrid = W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut)
-    W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, eff_GB, eff_EM, eff_PM)
-
+    W_batteries_hybrid = W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, eff_EM, eff_PM)
+    print(W_batteries_hybrid)
     #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
     zero_array = np.zeros_like(W_engines_hybrid)
     zero_array[:, 2:] = W_batteries_hybrid

@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Literal
-from numpy.typing import NDArray
+# from numpy.typing import NDArray
 import const
 
 # # Take of phase
