@@ -48,8 +48,13 @@ def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
     # Weight estimation of the nacelle (horizontally opposed engines assumed)
     W_nac = 0.24 * Pmax
 
-    # Weight estimation of a non-retractable landing gear using a comparable design
-    W_lg = 0.02 * MTOW
+    # Weight estimation of a non-retractable landing gear compound
+    if config == 'Compound':
+        W_lg = 0.03 * MTOW
+    else:
+        W_lgm = 0.013 * MTOW + (0.362 * (MTOW ** 0.417) * (1 ** 0.183))
+        W_lgn = 0.0013 * MTOW + (0.007157 * (MTOW ** 0.749) * (1 ** 0.788))
+        W_lg = 1.24 + W_lgm + W_lgn
 
     #Weight estimation of empennage using a comparable design
     W_emp = 0.023 * MTOW
@@ -58,7 +63,7 @@ def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
     W_strucIMP = W_wing + W_f + W_nac + W_lg + W_emp
     W_strucSI = W_strucIMP / kg_to_lb
 
-    return 'Cessna', config, W_strucIMP, W_strucSI, W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
+    return 'Cessna', config, W_strucIMP, W_strucSI, #W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
 
 #Class II Weight estimation General Aviation Roskam USAF method:
 #inputs IN SI: MTOW (Maximum Take Off Weight, kg), config (to select between configuration), S (Wing Surface Area, m^2),
@@ -148,5 +153,21 @@ def class_2_Torenbeek(MTOW, config, S, b, sweep, n_ult, Pmax, lfus, dfus, tr):
 
 
  # Rotor Weight Estimation
-def Propsizing():
-    rot = 1
+def Propsizing(sigma, MTOW, DL, t_c, Nblades):
+
+    R = np.sqrt(MTOW/(np.pi*DL))
+    V_tip = 140*(2*R) ** 0.171
+    MTOW *= kg_to_lb
+    DL *= kg_to_lb/(m_to_ft **2)
+    V_tip *= m_to_ft
+    R *= m_to_ft
+    W_R = (9.56 * 10 ** (-4)) * ((((sigma * MTOW * V_tip ** 2) / (DL)) * ((sigma * R * t_c)/(Nblades) + 0.067)) ** 0.89)
+
+    return R/ m_to_ft, W_R/kg_to_lb
+
+def Aviosizing(MTOW):
+    W_fc = 0.024*MTOW
+    W_nav = 0.013*MTOW
+    W_mc = 0.027*MTOW
+
+    return W_fc, W_nav, W_mc, W_fc + W_nav + W_mc
