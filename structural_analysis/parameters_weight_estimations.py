@@ -3,7 +3,7 @@ import numpy as np
 # Unit factors
 kw_to_hp = 1.341022
 lb_to_kg = 2.20462262
-m_to_ft = 0.3048
+m_to_ft = 3.28084
 
 #Parameters listed for the weight estimation
 #General parameters:
@@ -15,7 +15,7 @@ W_L = MTOW - W_fuel - payload_sup #Landing mass
 
 
 # Dimensional parameters
-l = 2.5 * 0.3048 # Length fuselage in ft
+l = 2.5 * 3.28084 # Length fuselage in ft
 d = 0.8  * 0.3048 # Max diameter fuselage in ft
 perimeter = d*np.pi # Max perimeter fuselage in ft
 l_sm = 1  # Shock strut length for main gear [ft]

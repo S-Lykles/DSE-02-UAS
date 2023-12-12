@@ -58,7 +58,7 @@ def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
     W_strucIMP = W_wing + W_f + W_nac + W_lg + W_emp
     W_strucSI = W_strucIMP / kg_to_lb
 
-    return W_strucIMP, W_strucSI, W_wing, W_f, W_nac, W_lg, W_emp
+    return 'Cessna', config, W_strucIMP, W_strucSI, W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
 
 #Class II Weight estimation General Aviation Roskam USAF method:
 #inputs IN SI: MTOW (Maximum Take Off Weight, kg), config (to select between configuration), S (Wing Surface Area, m^2),
@@ -101,12 +101,12 @@ def class_2_USAF(MTOW, config, S, A, sweep, taper, tcm, n_ult, Pmax, lf, wf, hf,
     W_strucIMP = W_wing + W_f + W_nac + W_lg + W_emp
     W_strucSI = W_strucIMP / kg_to_lb
 
-    return W_strucIMP, W_strucSI, W_wing, W_f, W_nac, W_lg, W_emp
+    return 'USAF', config, W_strucIMP, W_strucSI, W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
 
 #Class II Weight estimation General Aviation Roskam Torenbeek method:
 #inputs IN SI: MTOW (Maximum Take Off Weight, kg), config (to select between configuration), S (Wing Surface Area, m^2),
 #              b (span, m), sweep (sweep angle at 1/2 chord, rad),  n_ult (ultimate load factor),
-#              Pmax (maximum cruise power, kW), lfus (fuselage length, m), dfus (fuselage diameter, m)
+#              Pmax (maximum cruise power, kW), lfus (fuselage length, m), dfus (fuselage diameter, m), tr (max thickness at root, m)
 def class_2_Torenbeek(MTOW, config, S, b, sweep, n_ult, Pmax, lfus, dfus, tr):
     if config == 'Tiltwing':
         facwing = 2
@@ -142,7 +142,8 @@ def class_2_Torenbeek(MTOW, config, S, b, sweep, n_ult, Pmax, lfus, dfus, tr):
     W_strucIMP = W_wing + W_f + W_nac + W_lg + W_emp
     W_strucSI = W_strucIMP / kg_to_lb
 
-    return W_strucIMP, W_strucSI, W_wing, W_f, W_nac, W_lg, W_emp
+    return 'Torenbeek', config, W_strucIMP, W_strucSI, W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
+
 
 
 
