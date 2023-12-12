@@ -140,8 +140,8 @@ def W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, ef
     E_bat = P_bat/1000*t_atPmax #MJ
     W_bat_P = P_bat/P_rho_bat
     W_bat_E = E_bat/E_rho_bat
-    print('W_bat_P: ', W_bat_P)
-    print('W_bat_E: ', W_bat_E)
+    # print('W_bat_P: ', W_bat_P)
+    # print('W_bat_E: ', W_bat_E)
     W_bat = np.array([])
     for i in range(len(W_bat_P)):
         if W_bat_E[i] > W_bat_P[i]:
@@ -210,7 +210,7 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     #Import all the weights for the conventional, turbo-electric, serial hybrid and parallel hybrid powertrains with different engine types
     W_engines_hybrid = np.round(W_engine(P_cruise, P_max, eff_GB, eff_GEN, eff_EM, eff_PM, spec_P_fuelcell, spec_P_fuelcell_fut),1)
     W_batteries_hybrid = np.round(W_battery_hybrid(P_cruise, P_max, t_atPmax, E_rho_bat, P_rho_bat, eff_GB, eff_EM, eff_PM),1)
-    print(W_batteries_hybrid)
+    # print(W_batteries_hybrid)
     #create array of zeros to add battery weight to engine weight of serial and parallel hybrid
     zero_array = np.zeros_like(W_engines_hybrid)
     zero_array[:, 2:] = W_batteries_hybrid
@@ -223,7 +223,7 @@ def table_hybrid_propulsion_weights(P_cruise, P_max, t_atPmax):
     result_array = np.array(result_array).reshape(W_engines_hybrid.shape)
     #result_array = W_engines_hybrid + zero_array
     #result_array = np.round(result_array, 1)
-    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'Liquid Hydrogen Current Tech', 'Liquid Hydrogen Future Tech'])
+    result_dataframe = pd.DataFrame(data = result_array, columns = ['Conventional', 'Turbo-electric', 'Serial Hybrid', 'Parallel Hybrid'], index = ['2-Stroke', '4-Stroke', 'Rotary', 'Turboshaft', 'LH Current Tech', 'LH Future Tech'])
 
     return result_dataframe
 

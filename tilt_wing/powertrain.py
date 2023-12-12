@@ -12,7 +12,7 @@ DL = 500
 N = 4
 b = 5
 S = 3.763
-k_dl = 1.05 # lower than normal because the rotors are in free air
+k_dl = 1.05
 vc = 1
 Ploss_frac = 0.05
 
@@ -40,6 +40,7 @@ def P_max(DL, N):
     P_i = P_induced(0,DL,const.MTOW, k_dl=k_dl)
     dP_c = delta_p_climb(vc, const.MTOW)
     P_max = (P_p + P_i + dP_c) * (1 + Ploss_frac) + const.P_aux + const.P_pay_end
+    print(f'Advance ratio at cruise = {const.v_cruise/(omega*R):.2f}')
     return P_max
 
 
@@ -55,9 +56,28 @@ def P_cruise(b,S):
     return P[idx]
 
 
+def P_loiter(b,S):
+    CL, CD, _ = dragpolar_tilt_wing(b,S,h,v,c,S_f,d_eng,N,Lambda,CL_start=0.2,CL_end=1.2,CL_step=1000)
+    v1 = np.sqrt(const.MTOW * 2 / (const.rho0 * S * CL))
+
+    D = const.MTOW * CD / CL
+    P = D * v1 + const.P_aux + const.P_pay_end
+    E = const.R_cruise / v1 * P
+    idx = np.argmin(E)
+    return P[idx]
+
+
 if __name__ == '__main__':
+    R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise)
+    print(f'Rotor radius = {R:.2f} m')
+    print(f'Velocity at tip = {omega*R:.2f} m/s')
+    print(f'Solidity = {sig_max:.2f}')
+
     CL, CD, _ = dragpolar_tilt_wing(b,S,h,v,c,S_f,d_eng,N,Lambda,CL_start=0.1,CL_end=1.2,CL_step=1000)
     P_m = P_max(DL, N)/1000 * P_max_frac
+    print(f'P_cruise = {P_cruise(b,S)/1000:.1f} kW')
+    print(f'P_loiter = {P_loiter(b,S)/1000:.1f} kW')
+    print(f'P_max = {P_m:.1f} kW')
     df = table_hybrid_propulsion_weights(P_cruise(b,S)/1000, P_max(DL, N)/1000, 10*60)
     df.loc['Battery'] = ['-'] * len(df.columns)
     SFC = SFC_from_Pmax(P_m,800) +  [SFC_hydrogen, SFC_hydrogen, SFC_battery]
@@ -71,7 +91,7 @@ if __name__ == '__main__':
         m_f_e.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='endurance'))
         m_f_p.append(fuel_weight(CL,CD,s,S,energy_fraction=e,which='payload'))
 
-    df['Fuel Mass Endurance'] = m_f_e
-    df['Fuel Mass Payload'] = m_f_p
-    print(df.to_latex())
-    print(df)
+    df['$M_{f1}$'] = m_f_e
+    df['$M_{f2}$'] = m_f_p
+    # print(df.to_latex(float_format="{:.1f}".format))
+    # print(df)

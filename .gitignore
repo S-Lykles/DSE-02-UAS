@@ -152,3 +152,4 @@ aero/const.py
 *.jpg
 *.jpeg
 *.pdf
+*.pgf

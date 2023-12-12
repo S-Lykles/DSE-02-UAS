@@ -1,4 +1,5 @@
 import numpy as np
+from plot_setting import *
 import matplotlib.pyplot as plt
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
 from power_curves.wong_tool import generate_Preq_ac, find_optimum_range_and_endurance_speed
@@ -8,9 +9,14 @@ import const
 
 
 
-def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True):
 
-    plt.figure()
+def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):
+    plt.style.use('seaborn')
+    plt.rcParams.update(tex_fonts)
+
+
+    plt.figure(figsize=set_size())
+    plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='--',linewidth=0.3)
     if rotor_calculation:
         for i, DL in enumerate(DLs):
         # Sizing the rotor based on W, DL, N and max velocity
@@ -18,13 +24,13 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
 
 
             # Setting up a linear space for the speed of the rotorcraft (Limits still need to be refined)
-            v_rot = np.linspace(0, 30)
+            v_rot = np.linspace(0, 35)
 
             # Calculating the different drag components, where for power loss this is 6% of other components (as in slides)
             P_p = P_profile_drag(v_rot, const.MTOW, N, R, omega, sig_max)
             P_i = P_induced(v_rot, DL, const.MTOW, k_dl=k_dl)
             P_par = 0.5 * const.rho0 * S_design * v_rot ** 3 * CD0
-            P_loss = (P_p + P_i + P_par) * (1+Ploss_frac)
+            P_loss = (P_p + P_i + P_par) * Ploss_frac
 
             # Calculating the total required power based on all power components
             P_req_rotor = P_p + P_i + P_par + P_loss
@@ -33,7 +39,7 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
             # plt.plot(v_rot, P_i, label='Induced Drag')
             # plt.plot(v_rot, P_par, label='Parasitic Drag')
             # plt.plot(v_rot, P_loss, label='Power losses')
-            plt.plot(v_rot, P_req_rotor, label=f'DL={DL} [$N/m^2$]', c=plt.get_cmap('summer')((i+1)/(len(DLs)+4)))
+            plt.plot(v_rot, P_req_rotor/1e3, label=f'DL={DL} [$\\mathrm{{N}}/\\mathrm{{m}}^2$]', c=plt.get_cmap('summer')((i+1)/(len(DLs)+4)), zorder=3)
 
     v_stall = 1000 # large number
     if wing_calculation:
@@ -44,7 +50,7 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
             D = W1 * CD / CL
             P = D * v1 + const.P_aux
             
-            plt.plot(v1[v1<60], P[v1<60], label=f'b={b} [$m$], S={S} [m$^2$]', c=plt.get_cmap('autumn')((i)/(len(bs))))
+            plt.plot(v1[v1<55], P[v1<55]/1e3, label=f'b={b} [$\\mathrm{{m}}^2$], S={S} [$\\mathrm{{m}}^2$]', c=plt.get_cmap('autumn')((i)/(len(bs))),zorder=3)
 
             v_stall = min(v1[-1], v_stall)
 
@@ -56,15 +62,20 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
 
     #     v_transition_band = 10  # Hey! we need to check this!!!
 
-    plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='--',linewidth=0.5)
     plt.grid()
     plt.subplots_adjust(right=0.7)
 
-    plt.xlabel('Velocity [m/s]')
-    plt.ylabel('Power [W]')
+    plt.xlabel('Velocity [$\\mathrm{{m}}/\\mathrm{{s}}$]')
+    plt.ylabel('Power [$\\mathrm{{kW}}$]')
     # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5),fancybox=True)
-    plt.legend()
+    l = plt.legend(loc='upper left', ncols=2)
+    l.set_zorder(20)
+    plt.ylim(0, plt.ylim()[1]*1.3)
+    plt.xlim(left=0)
     plt.gca().grid(which='major', color='#DDDDDD', linewidth=0.8)
-    plt.gca().grid(which='minor', color='#EEEEEE', linestyle=':', linewidth=0.7)
+    plt.gca().grid(which='minor', color='#DDDDDD', linestyle=':', linewidth=0.7)
     plt.minorticks_on()
+    plt.tight_layout()
+    if name is not None:
+        plt.savefig('power_plots/'+name)
     plt.show()

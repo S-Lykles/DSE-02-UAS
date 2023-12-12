@@ -31,13 +31,13 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
     Advance_ratio   = V_max / V_tip
 
     #level flight
-    T_level         = W*k_dl
+    T_level         = W*k_dl / N
     C_T_level       = T_level/ (const.rho0*np.pi*R**2*omega**2*R**2)
     sig_level       = C_T_level/C_T_sig
 
     #turning flight
     n_z             = 1 / np.cos(psi_rad)
-    T_turn          = W * k_dl * n_z
+    T_turn          = W * k_dl * n_z / N
     C_T_turn        = T_turn / (const.rho0 * np.pi * R**2 * (omega*R)**2)
     sig_turn        = C_T_turn / C_T_sig
 
