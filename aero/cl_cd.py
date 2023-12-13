@@ -30,7 +30,7 @@ def cd0_fuselage(h,v,c,Sf):
     return cd0_fus,cf,Re, rho, T, p, M
 
 # Calculate the cl and cd 
-def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2,CL_start=0.,CL_end=1.2,CL_step=1000):
+def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2,CL_start=-0.4,CL_end=2,CL_step=1000):
     if c == None:
         c = S/b                             
     Sw = s_wet(160)                                         # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
@@ -41,6 +41,7 @@ def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2,CL_start=0.,CL_end=1.2
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
     cl = np.linspace(CL_start,CL_end,CL_step)
     cd_dual = 2*cd0_wing + cl**2/(pi*A*e) + cd0_fus       # (1/0.34) due to presence propellors -> Aerodynamic performance of aircraft wings with stationary vertical lift propellers
+
     return cl,cd_dual
 
 

@@ -5,7 +5,7 @@ from cl_cd import s_wet, cd0_fuselage
 
 
 # Calculate the cl and cd, updated with N_number of engines, evenly spaced, d_eng diameter of engine, assuming engine close to optimal slenderness ratio, fully turbulent flow over engine casing
-def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=0.,CL_end=1.2,CL_step=1000):
+def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=-0.4,CL_end=2,CL_step=1000):
     Sw = s_wet(160)                                         # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
     cf_e = 0.01                                             # Lit. from erwin
     A = b**2/S
@@ -19,11 +19,11 @@ def dragpolar_tilt_wing(b,S,h,v,c,Sf,d_eng,N_eng,Lambda,CL_start=0.,CL_end=1.2,C
     c_root = b*Lambda/(1+Lambda)
     for i in range(N_eng//2):
         S_eng = S_eng + d_eng * (Lambda * c_root + i * delta_eng * (1-Lambda) * c_root)
-    cd_prop = ((2 * S_eng)/Sw) * cd0_clean
+    cd_prop = ((2*S_eng)/Sw) * cd0_clean
     cd0_tiltwing = cd0_clean + cd0_eng + cd_prop
     cd0_fus,cf,Re,rho, T, p, M = cd0_fuselage(h,v,c,Sf)
 
-    cl = np.linspace(-0.4,2,150)
+    cl = np.linspace(CL_start,CL_end,CL_step)
     cd_tilt_wing = cd0_tiltwing + cl**2/(pi*A*e) + cd0_fus
     # print("cd0 tilt wing is",cd0_tiltwing)
     # print("cd0 fus",cd0_fus)

@@ -5,12 +5,13 @@ import const
 
 # Plot all configurations in 1 plot
 def plots():
+    plt.style.use('seaborn')
     plt.plot(cd_dual,cl,label="Dual-Phase")
     plt.plot(cd_comp,cl,label="Compound Helicopter")
     plt.plot(cd_tilt_wing,cl,label="Tilt Wing")
-    plt.xlabel("cd")
-    plt.ylabel("cl")
-    plt.title("cd vs cl")
+    plt.grid(True)
+    plt.xlabel("cd [-]")
+    plt.ylabel("cl [-]")
     plt.legend()
     plt.show()
 
@@ -21,15 +22,16 @@ h = 500
 v = const.v_cruise
 c = 0.5
 S_f = 2
-d_eng = 0.5
+d_eng = 0.75
 N_eng = 4
 Lambda = 0.45
 
 # Call separate configurations
-cl, cd_comp = dragpolar_comp(b-1,S,d_eng,N_eng,Lambda,v,h,c=None,Sf=2)
+cl, cd_comp = dragpolar_comp(b-1, S, d_eng, N_eng, Lambda, v, h, c=None, Sf=2)
 cl, cd_dual = dragpolar_dual(b,S,h,v,c,S_f)                                 # (b,S,h,v,c,S_fuselage)
 cl, cd_tilt_wing, cd_prop = dragpolar_tilt_wing(b-1,S,h,v,c,S_f,d_eng,N_eng,Lambda)
-    
+
+# Find cd0    
 def find_cd0():    
     print("cd0 dual",min(cd_dual))
     print("cd0 comp",min(cd_comp))
@@ -44,9 +46,10 @@ def maxL_D():
         print(f"L/D max for {data} is {max_L_D}")
     return
 
-find_cd0()
-maxL_D()
 plots()
+
+
+
 
 # def constants_aero():
 #     b = 6
