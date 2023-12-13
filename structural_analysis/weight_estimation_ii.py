@@ -25,7 +25,7 @@ def class_1_WE(MTOW):
 #inputs IN SI: MTOW (Maximum Take Off Weight, kg), config (to select between configuration), S (Wing Surface Area, m^2),
 #              A (Aspect Ratio), n_ult (ultimate load factor), Pmax (maximum cruise power, kW),
 #              lfus (fuselage length, m), dfus (fuselage diameter, m)
-def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
+def class_2_Cessna(MTOW, config, S, AR, n_ult, Pmax, lfus, dfus):
     if config == 'Tiltwing':
         facwing = 2
     else:
@@ -40,7 +40,7 @@ def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
 
     # Weight estimation of main wing in kg(full cantilever wing assumed)
 
-    W_wing = facwing * (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * A ** 1.712)
+    W_wing = facwing * (0.04674 * MTOW ** 0.397 * S ** 0.36 * n_ult ** 0.397 * AR ** 1.712)
 
     # Weight estimation of fuselage (high wing configuration assumed)
     W_f = (14.86 * (MTOW ** 0.144) * ((lfus / perfus) ** 0.778) * (lfus ** 0.383))
@@ -63,14 +63,14 @@ def class_2_Cessna(MTOW, config, S, A, n_ult, Pmax, lfus, dfus):
     W_strucIMP = W_wing + W_f + W_nac + W_lg + W_emp
     W_strucSI = W_strucIMP / kg_to_lb
 
-    return 'Cessna', config, W_strucIMP, W_strucSI, #W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
+    return 'Cessna', config, W_strucIMP, W_strucSI, W_wing / kg_to_lb, W_f/ kg_to_lb, W_nac / kg_to_lb, W_lg / kg_to_lb, W_emp / kg_to_lb
 
 #Class II Weight estimation General Aviation Roskam USAF method:
 #inputs IN SI: MTOW (Maximum Take Off Weight, kg), config (to select between configuration), S (Wing Surface Area, m^2),
 #              A (Aspect Ratio), sweep (sweep angle at 1/4 chord, rad), taper (taper ratio), tcm (maximum thickness/chord ratio),
 #              n_ult (ultimate load factor),  Pmax (maximum cruise power, kW), lf (fuselage length, m), wf (fuselage width, m),
 #              hf (fuselage height, m), Vmax (maximum flight speed, m/s), Vcruise (cruise speed, m/s)
-def class_2_USAF(MTOW, config, S, A, sweep, taper, tcm, n_ult, Pmax, lf, wf, hf, Vmax, Vcruise):
+def class_2_USAF(MTOW, config, S, AR, sweep, taper, tcm, n_ult, Pmax, lf, wf, hf, Vmax, Vcruise):
     if config == 'Tiltwing':
         facwing = 2
     else:
@@ -88,7 +88,7 @@ def class_2_USAF(MTOW, config, S, A, sweep, taper, tcm, n_ult, Pmax, lf, wf, hf,
 
     # Weight estimation of main wing in lbm (full cantilever wing assumed)
 
-    W_wing = facwing * 96.948 * ((((MTOW * n_ult / 10000) ** 0.65) * ((A/np.cos(sweep)) ** 0.57) * ((0.01*S) ** 0.61) * (((1 + taper)/(2 * tcm)) ** 0.36) * ((1 + (Vmax/500)) ** 0.5)) ** 0.993)
+    W_wing = facwing * 96.948 * ((((MTOW * n_ult / 10000) ** 0.65) * ((AR/np.cos(sweep)) ** 0.57) * ((0.01*S) ** 0.61) * (((1 + taper)/(2 * tcm)) ** 0.36) * ((1 + (Vmax/500)) ** 0.5)) ** 0.993)
 
     # Weight estimation of fuselage in lbm (high wing configuration assumed)
     W_f = 200*(((MTOW * n_ult/10000) ** 0.286 * ((0.1 * lf) ** 0.857) * (0.1*(wf + hf) * ((0.01 * Vcruise) ** 0.338))) ** 1.1)

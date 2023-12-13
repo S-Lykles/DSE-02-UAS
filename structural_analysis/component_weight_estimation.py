@@ -130,7 +130,7 @@ def class_two_tilt_wing(MTOW):
     W_f = (14.86 * MTOW ** 0.144 * (l / perimeter)**0.778 * l**0.383) / lb_to_kg
 
     # Weight estimation of the nacelle (horizontally opposed engines assumed)
-    W_nac = (0.24 * P_cruise_max*kw_to_hp) / lb_to_kg
+    W_nac = (0.24 * P_cruise_max * kw_to_hp) / lb_to_kg
 
     # Weight estimation of a non-retractable landing gear
     W_m_lg = (0.013 * MTOW + 0.362 * W_L**0.417 * l_sm**0.183) / lb_to_kg
