@@ -32,7 +32,8 @@ def cd0_fuselage(h,v,c,Sf):
 # Calculate the cl and cd 
 def dragpolar_dual(b,S,h=500,v=const.v_cruise,c=None,Sf=2,CL_start=-0.4,CL_end=2,CL_step=1000):
     if c == None:
-        c = S/b                             
+        c = S/b 
+        c = 0.5                            
     Sw = s_wet(160)                                         # Full confguration drag estimation of short‑to‑medium range fxed‑wing UAVs and its impact on initial sizing optimization
     cf_e = 0.01                                             # Lit. from erwin
     A = b**2/S             

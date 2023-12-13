@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt, log10
-from cl_cd import s_wet, cd0_fuselage
+from .cl_cd import s_wet, cd0_fuselage
 
 
 # Calculate the cl and cd, updated with N_number of engines, evenly spaced, d_eng diameter of engine, assuming engine close to optimal slenderness ratio, fully turbulent flow over engine casing

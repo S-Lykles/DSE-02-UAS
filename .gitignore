@@ -147,3 +147,9 @@ cython_debug/
 .vscode/
 
 aero/const.py
+
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.pgf

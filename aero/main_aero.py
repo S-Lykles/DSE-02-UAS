@@ -1,6 +1,6 @@
-from compound_helicopter import *
-from cl_cd import *
-from titl_wing import *
+from .compound_helicopter import *
+from .cl_cd import *
+from .titl_wing import *
 import const
 
 # Plot all configurations in 1 plot
@@ -27,7 +27,7 @@ N_eng = 4
 Lambda = 0.45
 
 # Call separate configurations
-cl, cd_comp = dragpolar_comp(b-1, S, d_eng, N_eng, Lambda, v, h, c=None, Sf=2)
+cl, cd_comp = dragpolar_comp(b-1,S,d_eng,2,Lambda,v,h,c=None,Sf=2)
 cl, cd_dual = dragpolar_dual(b,S,h,v,c,S_f)                                 # (b,S,h,v,c,S_fuselage)
 cl, cd_tilt_wing, cd_prop = dragpolar_tilt_wing(b-1,S,h,v,c,S_f,d_eng,N_eng,Lambda)
 
