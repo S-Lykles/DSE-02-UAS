@@ -2,12 +2,9 @@ import numpy as np
 from plot_setting import *
 import matplotlib.pyplot as plt
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
-from power_curves.wong_tool import generate_Preq_ac, find_optimum_range_and_endurance_speed
 from aero.cl_cd import dragpolar_dual
 import dual_phase.inputs as inputs
 import const
-
-
 
 
 def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):

@@ -4,11 +4,8 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
-import pandas as pd
 import const
-# import dual_phase.inputs as inputs
 from power_curves.mass_frac import fuel_weight
-# from aero.cl_cd import dragpolar_dual
 
 
 def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=None):

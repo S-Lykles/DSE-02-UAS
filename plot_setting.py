@@ -81,8 +81,8 @@ def set_size(width=textwidth, height=textwidth*golden_ratio, subplots=(1, 1)):
 
     # Figure height in inches
     if height is None:
-        fig_height_in = width * golden_ratio * (subplots[0] / subplots[1])
+        fig_height = width * golden_ratio * (subplots[0] / subplots[1])
     else:
-        fig_height_in = height    
+        fig_height = height    
 
-    return (width, fig_height_in)
+    return (width, fig_height)

@@ -2,7 +2,6 @@ import numpy as np
 from plot_setting import *
 import matplotlib.pyplot as plt
 from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
-from power_curves.wong_tool import generate_Preq_ac, find_optimum_range_and_endurance_speed
 from aero.cl_cd import dragpolar_dual
 import dual_phase.inputs as inputs
 import const
