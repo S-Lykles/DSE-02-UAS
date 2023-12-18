@@ -1,20 +1,27 @@
+from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-from plot_setting import tex_fonts, set_size
+from DSE.plot_setting import report_tex, set_size
+from DSE import const
 
 # Read Xfoil data from the file
 # Dual Phase
-data_4412 = np.loadtxt(r"aero/naca4412.txt")
-data_23012 = np.loadtxt(r"aero/naca23012.txt")
-data_632A015 = np.loadtxt(r"aero/naca63(2)A015.txt")
-data_63215 = np.loadtxt(r"aero/naca63215.txt")
-data_63512 = np.loadtxt(r"aero/naca63512.txt")
+
+# Get the directory where the script is located
+file_dir = Path(__file__).parent
+
+# Construct the path to the text file
+data_4412 = np.loadtxt(file_dir/r"naca4412.txt")
+data_23012 = np.loadtxt(file_dir/r"naca23012.txt")
+data_632A015 = np.loadtxt(file_dir/r"naca63(2)A015.txt")
+data_63215 = np.loadtxt(file_dir/r"naca63215.txt")
+data_63512 = np.loadtxt(file_dir/r"naca63512.txt")
 # Tilt rotor
-data_2410 = np.loadtxt(r"aero/naca2410.txt")
-data_2412 = np.loadtxt(r"aero/naca2412.txt")
-data_16 = np.loadtxt(r"aero/ag16.txt")
-data_26 = np.loadtxt(r"aero/ag26.txt")
-data_1223 = np.loadtxt(r"aero/s1223.txt")
+data_2410 = np.loadtxt(file_dir/r"naca2410.txt")
+data_2412 = np.loadtxt(file_dir/r"naca2412.txt")
+data_16 = np.loadtxt(file_dir/r"ag16.txt")
+data_26 = np.loadtxt(file_dir/r"ag26.txt")
+data_1223 = np.loadtxt(file_dir/r"s1223.txt")
 
 # Extract columns
 alpha_4412 = data_4412[:, 0]      # Angle of attack
@@ -78,7 +85,7 @@ cdp_1223 = data_1223[:, 3]        # Pressure drag coefficient
 cm_1223 = data_1223[:, 4]         # Moment coefficient
 
 # Plot the data Dual Phase
-plt.rcParams.update(tex_fonts)
+plt.rcParams.update(report_tex)
 # size = set_size(fraction=1, subplots=(1,1))
 # plt.figure(figsize=(size[0]*0.7,size[1]))
 plt.figure(figsize=(10, 6))
@@ -127,7 +134,7 @@ plt.minorticks_on()
 plt.tight_layout()
 plt.legend()
 
-plt.savefig('aero/dual_airfoil.pdf')
+# plt.savefig('aero/dual_airfoil.pdf')
 plt.show()
 
 # Plot the data Tilt Wing
@@ -180,5 +187,5 @@ plt.legend()
 
 
 plt.tight_layout()
-plt.savefig('aero/tilt_airfoil.pdf')
+# plt.savefig('aero/tilt_airfoil.pdf')
 plt.show()

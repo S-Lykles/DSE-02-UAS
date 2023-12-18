@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import const
+from DSE import const
 
 def rotor_sizing_tool(W, DL, N, V_max=10, psi_rad=10*const.deg2rad, C_T_sig=0.16):
     """
@@ -133,7 +133,7 @@ def generate_number_of_blades(R, sigma):
 def generate_power_versus_disk_loading(P_hover_array, DL_array):
     # Assuming units in kg/Watts and kg/m^2 respectively
     print('Hover Power:', P_hover_array)
-    PL_array = (M_gross * 2.20462) / (P_hover_array * 0.00135962)
+    PL_array = (const.MTOW/const.g0 * 2.20462) / (P_hover_array * 0.00135962)
     DL_array = DL_array * (0.204816)
 
     # Now we have arrays in lb/hp and lb/ft^2

@@ -1,21 +1,18 @@
 import numpy as np
-from plot_setting import *
+from DSE.plot_setting import *
 import matplotlib.pyplot as plt
-from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
-from aero.cl_cd import dragpolar_dual
-import dual_phase.inputs as inputs
-import const
-
+from DSE.power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
+from DSE.aero.cl_cd import dragpolar_dual
+import DSE.dual_phase.inputs as inputs
+from DSE import const
 
 
 
 def plot_power_components(DL, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, name=None):
-    # plt.style.use('seaborn')
     plt.rcParams.update(report_tex)
 
 
     plt.figure(figsize=set_size(textwidth, subplots=(1, 1)))
-    # plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='--',linewidth=0.3)
     # Sizing the rotor based on W, DL, N and max velocity
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise*1.5)
 

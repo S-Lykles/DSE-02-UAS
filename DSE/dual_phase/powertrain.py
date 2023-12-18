@@ -1,10 +1,9 @@
 import numpy as np
-from matplotlib import pyplot as plt
-import const
-from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W, SFC_from_Pmax
-from aero.cl_cd import dragpolar_dual
-from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb, generate_number_of_blades
-from power_curves.mass_frac import fuel_weight
+from DSE import const
+from DSE.powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W, SFC_from_Pmax
+from DSE.aero.cl_cd import dragpolar_dual
+from DSE.power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb, generate_number_of_blades
+from DSE.power_curves.mass_frac import fuel_weight
 
 DL = 500
 N = 4
@@ -83,5 +82,5 @@ if __name__ == '__main__':
 
     df['$M_{f1}$'] = m_f_e
     df['$M_{f2}$'] = m_f_p
-    # print(df.to_latex(float_format="{:.1f}".format))
+    print(df.to_latex(float_format="{:.1f}".format))
     # print(df)

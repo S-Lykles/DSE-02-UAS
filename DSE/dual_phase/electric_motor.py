@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from main import DL, R, W, N_r
-from plot_power import P_req_rotor
-
+# from main import DL, R, W, N_r
+# from plot_power import P_req_rotor
+#! CODE IS BROKEN, NOT SUPPOSED TO WORK RIGHT NOW
+print("WARNING: CODE IS BROKEN, NOT SUPPOSED TO WORK RIGHT NOW")
+assert False
 
 V_tip = 140*(R*2)**0.171
 RPM = V_tip/R*60/(2*np.pi)

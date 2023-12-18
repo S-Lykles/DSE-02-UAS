@@ -1,10 +1,8 @@
 import numpy as np
-from plot_setting import *
+from DSE.plot_setting import *
 import matplotlib.pyplot as plt
-from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
-from aero.cl_cd import dragpolar_dual
-import dual_phase.inputs as inputs
-import const
+from DSE.power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
+from DSE import const
 
 
 def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):
@@ -49,16 +47,7 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
 
             v_stall = min(v1[-1], v_stall)
 
-
-    # if transitional_calculation:
-    #     safety_factor = 1.1
-    #     print(v_stall)
-    #     v_transition = v_stall * safety_factor
-
-    #     v_transition_band = 10  # Hey! we need to check this!!!
-
     plt.grid()
-    # plt.subplots_adjust(right=0.7)
 
     plt.xlabel('Velocity [$\\mathrm{{m}}/\\mathrm{{s}}$]')
     plt.ylabel('Power [$\\mathrm{{kW}}$]')

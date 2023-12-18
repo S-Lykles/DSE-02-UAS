@@ -1,6 +1,5 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from cycler import cycler
 
 # Use the pgf backend (must be done before import pyplot interface)
 inches_per_pt = 1 / 72.27
@@ -13,8 +12,6 @@ slideheight = 7.5  # inches
 settings = {
     'axes.grid': True,
     'axes.grid.which': 'both',
-    'xtick.color': '#DDDDDD',
-    'ytick.color': '#DDDDDD',
     "axes.labelsize": "medium",
     "axes.titlesize": "medium",
     "figure.labelsize": "medium",
@@ -34,7 +31,7 @@ report_fast = settings | {
 report_tex = settings | {
     "text.usetex": True,
     "font.family": "Helvetica",
-    "font.size": 12,
+    "font.size": 9,
 }
 
 # Following doesnt allow previewing
@@ -43,6 +40,7 @@ report_pgf_tex = settings | {
     "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
     "font.sans-serif": [],
     "font.monospace": [],
+    "font.size": 9,
 }
 
 pressentation_tex = report_tex | {

@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from math import pi, sqrt, log10
-import const
+from DSE import const
 
 # Wetted area from statistics
 def s_wet(MTOM):

@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Literal
-# from numpy.typing import NDArray
-import const
+from numpy.typing import NDArray
+from DSE import const
 
     
 def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, eta=0.75, energy_fraction=1.):
@@ -69,7 +69,7 @@ def fuel_weight(CL, CD, SFC, S, which='payload', v_cruise=const.v_cruise*1.1, et
     return  M_fuel1 + M_fuel2 + M_fuel3
 
 if __name__ == '__main__':
-    from aero.cl_cd import dragpolar
-    CL, CD = dragpolar(6, 3.7)
+    from DSE.aero.cl_cd import dragpolar_dual
+    CL, CD = dragpolar_dual(6, 3.7)
     print(fuel_weight(CL, CD, 320 / (1000 * 1000 * 3600), 6, 'endurance'))
 
