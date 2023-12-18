@@ -1,17 +1,29 @@
 from .compound_helicopter import *
 from .cl_cd import *
 from .titl_wing import *
+from plot_setting import *
 import const
 
+
 # Plot all configurations in 1 plot
-def plots():
+def plots(name=None):
+    plt.rcParams.update(tex_fonts)
+    size = set_size(fraction=1, subplots=(1,1))
+    plt.figure(figsize=(size[0]*0.7,size[1]))
     plt.plot(cd_dual,cl,label="Dual-Phase")
     plt.plot(cd_comp,cl,label="Compound Helicopter")
     plt.plot(cd_tilt_wing,cl,label="Tilt Wing")
-    plt.xlabel("cd")
-    plt.ylabel("cl")
-    plt.title("cd vs cl")
+    plt.gca().grid(which='major', color='#DDDDDD', linewidth=0.8)
+    plt.gca().grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    plt.minorticks_on()
+    plt.xlabel("$C_D$")
+    plt.ylabel("$C_L$")
+    plt.title("$C_D$ vs $C_L$")
+    plt.tight_layout()
     plt.legend()
+    
+    if name is not None:
+        plt.savefig('aero/'+name)
     plt.show()
 
 
@@ -46,7 +58,7 @@ def maxL_D():
 
 find_cd0()
 maxL_D()
-plots()
+plots('cl_cd.pdf')
 
 # def constants_aero():
 #     b = 6

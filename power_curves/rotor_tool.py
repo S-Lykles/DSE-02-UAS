@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import const
 
-def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
+def rotor_sizing_tool(W, DL, N, V_max=10, psi_rad=10*const.deg2rad, C_T_sig=0.16):
     """
     Rotor sizing tool based on the ppt from Marilena
 
@@ -43,7 +43,8 @@ def rotor_sizing_tool(W, DL, N, V_max, psi_rad=20*const.deg2rad, C_T_sig=0.11):
 
     # T_gust = n_z*k_dl*
     # C_T_gust = T_gust/ (Vne*pi*R**2*omega**2*R**2)
-
+    # print(f'sig_level = {sig_level:.2f}')
+    # print(f'sig_turn = {sig_turn:.2f}')
     sig_max = max(sig_level, sig_turn)
 
     return R, D_v, omega, T_level, sig_max

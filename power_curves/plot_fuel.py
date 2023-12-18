@@ -12,8 +12,10 @@ from power_curves.mass_frac import fuel_weight
 
 
 def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=None):
-    # plt.style.use('seaborn')
-    plt.rcParams.update(tex_fonts)
+    style = report_tex.copy()
+    style['axes.grid'] = False
+    plt.rcParams.update(style)
+    # plt.gca().grid(False)
 
     fuel_w = np.zeros((len(b), len(S)))
     A = np.zeros((len(b), len(S)))
@@ -30,10 +32,11 @@ def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=N
     new_cmap = mcolors.LinearSegmentedColormap.from_list(
         'truncated_viridis', original_cmap(np.linspace(0.15, 1, 256))
     )
-    plt.figure(figsize=set_size(fraction=1, subplots=(2,1)))
+    plt.figure(figsize=(slidewidth*0.5, slideheight*0.7))
     CS = plt.contour(b, S, fuel_w, levels=8, colors='k')
     CSA = plt.contour(b, S, A, levels=8, colors='white', linestyles='dashed', linewidths=0.5)
     Aspect_patch = mpatches.Patch(color='white', linestyle='dashed', label='Aspect ratio', linewidth=0.5)
+    Mf_line = Line2D([0], [0], color='k', label='$M_f$ $[\\mathrm{kg}]$')
     A_line = Line2D([0], [0], color='white', linestyle='dashed', linewidth=1)
     plt.clabel(CS, inline=1, colors='k')
     plt.clabel(CSA, inline=1, colors='white')
@@ -43,13 +46,15 @@ def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=N
         c.set_rasterized(True)
 
     cbar = plt.gca().figure.colorbar(cnt, ax = plt.gca())
-    cbar.ax.set_ylabel('$M_f$ [kg]', rotation = -90, va = "bottom")
+    cbar.ax.set_ylabel('$M_f$ $[\\mathrm{kg}]$', rotation = -90, va = "bottom")
     plt.scatter(b_design, S_design, c='r', marker='x', label='Design point')
-    plt.xlabel('$b$ [m]')
-    plt.ylabel('$S$ [$\\mathrm{m}^2$]')
+    plt.xlabel('$b$ $[\\mathrm{m}]$')
+    plt.ylabel('$S$ $[\\mathrm{m}^2]$')
     # add Aspect ratio to legend, need some hack because contour doesn't allow a label
     handles, labels = plt.gca().get_legend_handles_labels()
+    handles.append(Mf_line)
     handles.append(A_line)
+    labels.append('$M_f$ $[\\mathrm{kg}]$')
     labels.append('Aspect ratio')
     plt.legend(handles=handles, labels=labels)
     plt.tight_layout()

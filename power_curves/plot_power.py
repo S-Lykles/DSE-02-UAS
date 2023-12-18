@@ -11,12 +11,10 @@ import const
 
 
 def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):
-    plt.style.use('seaborn')
-    plt.rcParams.update(tex_fonts)
+    plt.rcParams.update(report_tex)
 
-
-    plt.figure(figsize=set_size())
-    plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='--',linewidth=0.3)
+    plt.figure(figsize=set_size(width=slidewidth*0.55, height=slideheight*0.55, subplots=(1, 1)))
+    plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='solid',linewidth=0.3)
     if rotor_calculation:
         for i, DL in enumerate(DLs):
         # Sizing the rotor based on W, DL, N and max velocity
@@ -39,7 +37,7 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
             # plt.plot(v_rot, P_i, label='Induced Drag')
             # plt.plot(v_rot, P_par, label='Parasitic Drag')
             # plt.plot(v_rot, P_loss, label='Power losses')
-            plt.plot(v_rot, P_req_rotor/1e3, label=f'DL={DL} [$\\mathrm{{N}}/\\mathrm{{m}}^2$]', c=plt.get_cmap('summer')((i+1)/(len(DLs)+4)), zorder=3)
+            plt.plot(v_rot, P_req_rotor/1e3, label=f'DL={DL} [$\\mathrm{{N}}/\\mathrm{{m}}^2$]', c=plt.get_cmap('summer')((i+1)/(len(DLs)+2)))
 
     v_stall = 1000 # large number
     if wing_calculation:
@@ -50,7 +48,7 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
             D = W1 * CD / CL
             P = D * v1 + const.P_aux
             
-            plt.plot(v1[v1<55], P[v1<55]/1e3, label=f'b={b} [$\\mathrm{{m}}^2$], S={S} [$\\mathrm{{m}}^2$]', c=plt.get_cmap('autumn')((i)/(len(bs))),zorder=3)
+            plt.plot(v1[v1<55], P[v1<55]/1e3, label=f'b={b} [$\\mathrm{{m}}^2$], S={S} [$\\mathrm{{m}}^2$]', c=plt.get_cmap('autumn')((i)/(len(bs))))
 
             v_stall = min(v1[-1], v_stall)
 
@@ -63,19 +61,18 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
     #     v_transition_band = 10  # Hey! we need to check this!!!
 
     plt.grid()
-    plt.subplots_adjust(right=0.7)
+    # plt.subplots_adjust(right=0.7)
 
     plt.xlabel('Velocity [$\\mathrm{{m}}/\\mathrm{{s}}$]')
     plt.ylabel('Power [$\\mathrm{{kW}}$]')
     # plt.legend(loc='center left', bbox_to_anchor=(1, 0.5),fancybox=True)
-    l = plt.legend(loc='upper left', ncols=2)
-    l.set_zorder(20)
-    plt.ylim(0, plt.ylim()[1]*1.3)
+    l = plt.legend(ncols=2)
+    plt.ylim(bottom=-0.1)
     plt.xlim(left=0)
     plt.gca().grid(which='major', color='#DDDDDD', linewidth=0.8)
-    plt.gca().grid(which='minor', color='#DDDDDD', linestyle=':', linewidth=0.7)
+    plt.gca().grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
     plt.minorticks_on()
     plt.tight_layout()
     if name is not None:
-        plt.savefig('power_plots/'+name)
+        plt.savefig('power_plots/'+name, dpi=600)
     plt.show()

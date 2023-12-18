@@ -18,6 +18,7 @@ if __name__ == '__main__':
 
     n = 100
     for which in ['endurance', 'payload']:
-        plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01, CL_end=CL_max)[:-1], b_design=5, which=which,name='tilt_wing_mf_'+which+".pdf")
+        plot_fuel(np.linspace(2,6.3,n), np.linspace(1.5,5,n), lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01, CL_end=CL_max)[:-1], b_design=5, which=which,name='tilt_wing_mf_'+which+".svg")
     CD0 = dragpolar_tilt_wing(5, 3.76, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.0)[1][0]
-    plot_power_curves([400, 500, 600], [(5, 3.76), (4.5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01, CL_end=CL_max)[:-1], CD0, 3.76, name='tilt_wing_pc.pdf')
+    # plot_power_curves([400, 500, 600], [(5, 3.76), (4.5, 3.5), (4, 3.2), (3, 2.7)], 1, lambda b, S: dragpolar_tilt_wing(b, S, h, v, c, S_f, d_eng, N_eng, Lambda, CL_start=0.01, CL_end=CL_max)[:-1], CD0, 3.76, name='tilt_wing_pc.svg')
+    

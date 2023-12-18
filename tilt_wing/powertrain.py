@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import const
 from powertrain_weight_calculator import table_hybrid_propulsion_weights, E_rho_bat, E_rho_H, spec_tank_W, SFC_from_Pmax
 from aero.titl_wing import dragpolar_tilt_wing
-from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb
+from power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced, delta_p_climb, generate_number_of_blades
 from power_curves.mass_frac import fuel_weight
 
 P_max_frac = 1.1  # facter for tilt wing because of the transition
@@ -33,7 +33,7 @@ SFC_hydrogen = 1 / (E_rho_H*1e6/spec_tank_W)
 SFC_battery = 1 / (E_rho_bat*1e6)
 
 
-def P_max(DL, N):
+def P_max(DL, N, k_dl=k_dl):
     R, D_v, omega, T_level, sig_max = rotor_sizing_tool(const.MTOW, DL, N, const.v_cruise)
     v = 0
     P_p = P_profile_drag(v, const.MTOW, N, R, omega, sig_max)
@@ -72,6 +72,7 @@ if __name__ == '__main__':
     print(f'Rotor radius = {R:.2f} m')
     print(f'Velocity at tip = {omega*R:.2f} m/s')
     print(f'Solidity = {sig_max:.2f}')
+    generate_number_of_blades(R, sig_max)
 
     CL, CD, _ = dragpolar_tilt_wing(b,S,h,v,c,S_f,d_eng,N,Lambda,CL_start=0.1,CL_end=1.2,CL_step=1000)
     P_m = P_max(DL, N)/1000 * P_max_frac
