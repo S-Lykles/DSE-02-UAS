@@ -6,7 +6,6 @@ from DSE import const
 
 
 def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):
-    plt.rcParams.update(report_tex)
 
     plt.figure(figsize=set_size(width=slidewidth*0.55, height=slideheight*0.55, subplots=(1, 1)))
     plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='solid',linewidth=0.3)
@@ -28,10 +27,6 @@ def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.
             # Calculating the total required power based on all power components
             P_req_rotor = P_p + P_i + P_par + P_loss
 
-            # plt.plot(v_rot, P_p, label='Profile Drag')
-            # plt.plot(v_rot, P_i, label='Induced Drag')
-            # plt.plot(v_rot, P_par, label='Parasitic Drag')
-            # plt.plot(v_rot, P_loss, label='Power losses')
             plt.plot(v_rot, P_req_rotor/1e3, label=f'DL={DL} [$\\mathrm{{N}}/\\mathrm{{m}}^2$]', c=plt.get_cmap('summer')((i+1)/(len(DLs)+2)))
 
     v_stall = 1000 # large number

@@ -43,10 +43,16 @@ report_pgf_tex = settings | {
     "font.size": 9,
 }
 
+pressentation_fast = settings | {
+    "font.size": 14,
+}
+
 pressentation_tex = report_tex | {
     "font.size": 14,
 }
 
+default = report_fast
+plt.rcParams.update(default)
 
 # \textwidth of the document can be determine by \showthe\textwidth and checking the logs
 # for our document it las was 448.1309 pts
@@ -56,7 +62,7 @@ def set_size(width=textwidth, height=textwidth*golden_ratio, subplots=(1, 1)):
     Parameters
     ----------
     width: float or string
-        Document width in inches, or string of predined document type
+        Document width in inches
     height: float, optional
         Height of the figure in inches. Default is ``width * golden_ratio``
     subplots: array-like, optional
