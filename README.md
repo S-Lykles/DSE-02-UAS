@@ -15,4 +15,6 @@ Don't write scripts, use functions.
 Don't use global variables, use function keyword arguments if you want default values.
 Change the name and interface of functions as little as possible please.
 Avoid star imports: `from module import *`, please import only the functions and stuff you need.
-Use the `if __name__ == '__main__':` idiom to run scripts, but prefer to write seperate _test.py files if you want to run tests.
+Use the `if __name__ == '__main__':` idiom to run scripts, but prefer to write seperate myfile_test.py files if you want to run tests.
+Put `from DSE import const` at the top of your file to use the constants defined in `DSE/const.py` for all constants, unit conversions and requirement numbers.
+All functions use units in SI!!! Please also use W instead of kW, kg instead of g, etc.
