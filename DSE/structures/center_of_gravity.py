@@ -17,9 +17,12 @@ l_fus = 6
 
 fus_component_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                       'empty_fus':      [34.98, 0.45 * l_fus, 0, 0],
-                      'payload_supply': [50, 0.45 * l_fus, 0, 0],
-                      'payload_relay':  [20, 0.45 * l_fus, 0, 0],
-                      'avionics':       [10.24, 0.2 * l_fus, 0, 0]}
+                      'payload_supply': [50, 0.75 * l_fus, 0, 0],
+                      'payload_relay':  [20, 0.75 * l_fus, 0, 0],
+                      'avionics':       [10.24, 0.2 * l_fus, 0, 0],
+                      'fuel_supply':    [13.7, 0.3 * l_fus, 0, 0],
+                      'fuel_relay':     [38.7, 0.3 * l_fus, 0, 0],
+                      'power_plant':    [28.5, 0.5 * l_fus, 0, 0]}
 
 
 def fuselage_group_cg(class_one, component_dict):
@@ -35,7 +38,7 @@ def fuselage_group_cg(class_one, component_dict):
 
     if not class_one:
         # Selecting the components that are part of the fuselage
-        component_list = ['payload_supply', 'avionics']
+        component_list = ['payload_supply', 'avionics', 'power_plant']
         component_matrix = np.array([component_dict['empty_fus']])
         for component in component_list:
             component_matrix = np.concatenate((component_matrix, np.array([component_dict[component]])))
@@ -51,8 +54,6 @@ def fuselage_group_cg(class_one, component_dict):
         x_cg_fus = np.sum(w_components * x_cg_comp) / w_fus
         y_cg_fus = np.sum(w_components * y_cg_comp) / w_fus
         z_cg_fus = np.sum(w_components * z_cg_comp) / w_fus
-
-        pass
 
     calc_fuselage = [w_fus, x_cg_fus, y_cg_fus, z_cg_fus]
     return calc_fuselage
@@ -80,11 +81,32 @@ def tail_group_cg(class_one):
     """
     if class_one:
         w_tail = 3.68
-        x_cg_tail = 2
+        x_cg_tail = 0.9 * l_fus
         y_cg_tail = 0  # Assumed to be in the middle of the fuselage
         z_cg_tail = 0  # Assumed to be in the middle of the fuselage
 
     calc_emp = np.array([w_tail, x_cg_tail, y_cg_tail, z_cg_tail])
+    return calc_emp
+
+
+def propulsion_group_cg(class_one):
+    """
+    The output of the calculation is in the following form:
+    calc_wing = [W_wing, x_cg_wing, y_cg_wing, z_cg_wing]
+    """
+    if class_one:
+        n_rotors = 4
+        w_prop_i = 2
+
+        x_cg_prop_1 = x_cg_prop_2 = 0.2 * l_fus
+        x_cg_prop_3 = x_cg_prop_4 = 0.8 * l_fus
+        y_cg_prop = 0  # Assumed to be in the middle of the fuselage
+        z_cg_prop = 0  # Assumed to be in the middle of the fuselage
+
+        w_prop = 2 * n_rotors
+        x_cg_prop = (2 * w_prop_i * x_cg_prop_1 + 2 * w_prop_i * x_cg_prop_3)/w_prop
+
+    calc_emp = np.array([w_prop, x_cg_prop, y_cg_prop, z_cg_prop])
     return calc_emp
 
 
@@ -104,8 +126,9 @@ def class_two_cg_estimation(empty, fuel, payload_supply, payload_relay):
     fuselage_group_array = fuselage_group_cg(False, fus_component_dict)
     wing_group_array = wing_group_cg(True, x_lemac=3, c_bar=2)
     tail_group_array = tail_group_cg(True)
+    prop_group_array = propulsion_group_cg(True)
 
-    group_matrix = np.array([fuselage_group_array, wing_group_array, tail_group_array])
+    group_matrix = np.array([fuselage_group_array, wing_group_array, tail_group_array, prop_group_array])
 
     weight_of_groups = group_matrix[:, 0]
     x_cg_groups = group_matrix[:, 1]
