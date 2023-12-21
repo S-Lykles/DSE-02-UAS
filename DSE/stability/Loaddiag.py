@@ -10,12 +10,23 @@ def distance_stability():
     "All the X distance are measured from the datum point, the most forward point of the 6x6 ground surface"
     "All the Z distances are measured from the datum point, the center of the nose heigth"
 
-    l_fr  = Xcg - Xfr   'Xfr is the distance of the front rotor'
-    l_aft = Xaft - Xcg  'Xaft is the distance of the aft rotor'
-    l_acw = Xcg - Xac  'Xacw is the distance of the aerodynamic center of the wing'
-    l_h   = Xh - Xcg    'Xh is the distance of the aerodynamic center of the horizontal tail'
-    h_p   = Zp - Zcg    'Zp is the position of the propellor'
+    l_fr  = Xcg - Xfr   #'Xfr is the distance of the front rotor'
+    l_aft = Xaft - Xcg  #'Xaft is the distance of the aft rotor'
+    l_acw = Xcg - Xac  #'Xacw is the distance of the aerodynamic center of the wing'
+    l_h   = Xh - Xcg    #'Xh is the distance of the aerodynamic center of the horizontal tail'
+    h_p   = Zp - Zcg    #'Zp is the position of the propellor'
     h_acw = Zac - Zcg
     h_h   = Zh - Zcg
 
     return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h
+
+
+
+def load_diagram_plot(empty, fuel, payload_supply):
+    """Create potato plot based on Cg calculation
+    """
+    fuel_frac = np.linspace(0.0, 1.0, 101)
+    payload_frac = np.linspace(0.0, 1.0, 101)
+
+
+load_diagram_plot()
