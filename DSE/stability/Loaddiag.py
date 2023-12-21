@@ -7,7 +7,9 @@ from DSE import plot_setting
 
 
 def load_diagram_plot(empty, fuel, payload_supply, plots == False):
-    """Create potato plot based on Cg calculation
+    """UPDATE IF MULTIPLE FUEL TANKS OR PAYLOAD LOCATIONS ARE DEFINED
+
+    Create potato plot based on Cg calculation
 
     needs OEW
     needs fuel weight (fuel location estimation based on class II estimation)
