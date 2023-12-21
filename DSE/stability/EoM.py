@@ -51,3 +51,4 @@ def rotation_matrix():
                   [0,0,0,1,np.sin(r_phi)*np.sin(r_theta)/np.cos(r_theta) , np.sin(r_theta)*np.cos(r_phi)/np.cos(r_theta)],
                   [0,0,0,0,np.cos(r_phi) , -1*np.sin(r_phi)],
                   [0,0,0,0,np.sin(r_phi)/np.cos(r_theta)]])
+    return R
