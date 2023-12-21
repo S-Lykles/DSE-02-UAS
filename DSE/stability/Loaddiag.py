@@ -1,6 +1,6 @@
 import numpy as np
 from DSE import const
-# Cannot see Cg location function from structural_analysis import
+from DSE.structures.center_of_gravity import class_two_cg_estimation
 
 def distance_stability():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
