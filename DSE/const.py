@@ -2,8 +2,18 @@ import numpy as np
 
 g0 = 9.81  # [m/s^2]
 rho0 = 1.225  # [kg/m^3]
+T0 = 288.15  # [K]
+R = 287.058  # [J/kg/K]
+gamma = 1.4  # [-]
+P0 = 101325  # [Pa]
+alpha = -0.0065  # [K/m]
 
-HPtoWatt = 745.699872
+def m2rho(m):
+    """Return density of air at given altitude in kg/m^3"""
+    return rho0 * (1 - alpha * m / T0)**(g0 / alpha / R - 1)
+
+
+HPtoWatt = 745.6998720065
 
 deg2rad = np.pi / 180
 rad2deg = 1 / deg2rad
@@ -37,9 +47,11 @@ T_cruise = 3600 * 1.25  # [s]
 T_loiter_pay = 20 * 60  # [s]
 T_loiter_end = 10 * 3600  # [s]
 v_cruise = R_cruise / T_cruise  # [m/s]
+h_loiter = 500  # [m]
 
 P_pay_pay = 400  # [W] Power required for payload during payload phase
 P_pay_end = 800  # [W] Power required for payload during endurance phase
 
 
 P_aux = 1000  # [W] Power required for auxiliaries
+

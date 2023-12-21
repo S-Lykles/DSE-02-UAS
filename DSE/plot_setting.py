@@ -77,7 +77,6 @@ def set_size(width=textwidth, height=textwidth*golden_ratio, subplots=(1, 1)):
     https://jwalton.info/Embed-Publication-Matplotlib-Latex/
     """
 
-
     # Golden ratio to set aesthetic figure height
     # https://disq.us/p/2940ij3
     golden_ratio = (5**.5 - 1) / 2
