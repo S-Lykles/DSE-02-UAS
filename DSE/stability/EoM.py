@@ -39,13 +39,15 @@ def EoM():
 
 
 def rotation_matrix():
+    "A very nice matrix that converts the body axis angles into the earth axis -(0_0)- "
+
     r_theta = theta * deg2rad
     r_phi = phi * deg2rad
     r_psy = psy * deg2rad
 
-    R = np.matrix{[np.cos(r_theta)*np.cos(r_psy), np.cos(r_psy)*np.sin(r_theta)*np.sin(r_phi)-np.sin(r_psy)*np.cos(r_phi), np.cos(r_psy)*np.sin(r_theta)*np.cos(r_phi) + np.sin(r_psy)*np.sin(r_phi), 0,0,0],
+    R = np.array([[np.cos(r_theta)*np.cos(r_psy), np.cos(r_psy)*np.sin(r_theta)*np.sin(r_phi)-np.sin(r_psy)*np.cos(r_phi), np.cos(r_psy)*np.sin(r_theta)*np.cos(r_phi) + np.sin(r_psy)*np.sin(r_phi), 0,0,0],
                   [np.cos(r_theta)*np.sin(r_psy), np.sin(r_psy)*np.sin(r_theta)*np.sin(r_phi) + np.cos(r_psy)*np.cos(r_phi), np.sin(r_psy)*np.sin(r_theta)*np.cos(r_phi) - np.cos(r_psy)*np.sin(r_phi),0,0,0],
                   [-1*np.sin(r_theta), np.sin(r_phi)*np.cos(r_theta), np.cos(r_phi)*np.cos(r_theta),0,0,0],
                   [0,0,0,1,np.sin(r_phi)*np.sin(r_theta)/np.cos(r_theta) , np.sin(r_theta)*np.cos(r_phi)/np.cos(r_theta)],
                   [0,0,0,0,np.cos(r_phi) , -1*np.sin(r_phi)],
-                  [0,0,0,0,np.sin(r_phi)/np.cos(r_theta),np.cos(r_phi)/np.cos(r_theta)]}
+                  [0,0,0,0,np.sin(r_phi)/np.cos(r_theta)]])
