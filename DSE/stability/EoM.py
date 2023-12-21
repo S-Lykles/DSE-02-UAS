@@ -38,7 +38,7 @@ def EoM():
 
 
 
-def rotation_matrix():
+def rotation_matrix(theta, psy, phi, deg2rad):
     "A very nice matrix that converts the body axis angles into the earth axis -(0_0)- "
 
     r_theta = theta * deg2rad
