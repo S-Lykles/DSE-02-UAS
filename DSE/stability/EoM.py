@@ -11,4 +11,3 @@ def EoM():
                      CL_w * l_ac + CD_w * h_ac + (CD_h * h_h - CL_h * l_h) * (S_h / S) * (V_h / V) ** 2) * np.cos(
         alpha * deg2rad) - Ct_p * h_p + 2 * Ct_fr * l_fr - 2 * Ct_aft * l_aft
 
-# test
