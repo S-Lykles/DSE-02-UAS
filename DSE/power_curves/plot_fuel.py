@@ -7,9 +7,10 @@ from matplotlib.lines import Line2D
 from DSE.power_curves.mass_frac import fuel_weight
 from DSE import const
 
+plot_style = report_fast
 
 def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=None):
-    style = report_tex.copy()
+    style = plot_style.copy()
     style['axes.grid'] = False
     plt.rcParams.update(style)
     # plt.gca().grid(False)

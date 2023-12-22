@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from DSE.power_curves.rotor_tool import rotor_sizing_tool, P_profile_drag, P_induced
 from DSE import const
 
+plot_style = report_fast
 
 def plot_power_curves(DLs, bs, N, polar, CD0, S_design, k_dl=1.01, Ploss_frac=0.05, rotor_calculation=True, wing_calculation=True, name=None):
-    plt.rcParams.update(report_tex)
+    plt.rcParams.update(plot_style)
 
     plt.figure(figsize=set_size(width=slidewidth*0.55, height=slideheight*0.55, subplots=(1, 1)))
     plt.axvline(const.v_cruise, label='Minimum Cruise Speed', color='k', linestyle='solid',linewidth=0.3)
