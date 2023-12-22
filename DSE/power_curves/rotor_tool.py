@@ -149,4 +149,5 @@ def delta_p_climb(vc, W):
     return delta_p
 
 
-
+N_blades = generate_number_of_blades(1.4738579917347323, 0.06659266968898687)
+print(N_blades)

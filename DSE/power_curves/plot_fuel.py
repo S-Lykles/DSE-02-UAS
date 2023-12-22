@@ -1,5 +1,5 @@
 import numpy as np
-from DSE.plot_setting import *
+from DSE.plot_setting import report_tex, set_size, slidewidth, slideheight
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -7,13 +7,9 @@ from matplotlib.lines import Line2D
 from DSE.power_curves.mass_frac import fuel_weight
 from DSE import const
 
-plot_style = report_fast
 
 def plot_fuel(b, S, polar, b_design=6, S_design=3.763, which='endurance', name=None):
-    style = plot_style.copy()
-    style['axes.grid'] = False
-    plt.rcParams.update(style)
-    # plt.gca().grid(False)
+    plt.rcParams.update({'axes.grid': False})
 
     fuel_w = np.zeros((len(b), len(S)))
     A = np.zeros((len(b), len(S)))
