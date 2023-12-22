@@ -80,3 +80,4 @@ def gyroscopic_matrix(mass, velocity_vector):
                   [mass * w, 0.0, -mass * u, I_zz * r, 0.0, -I_xx * p],
                   [-mass * v, mass * u, 0.0, I_xx * q, -I_yy * p, 0.0]])
     return C
+
