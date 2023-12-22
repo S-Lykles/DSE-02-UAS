@@ -29,12 +29,12 @@ def EoM():
     deg2rad = const.deg2rad
     #Force equations
     F_x = T_p + (L_w + L_h + L_fus)*np.sin(alpha* deg2rad) - (D_w + D_h + D_fus)*np.cos(alpha* deg2rad) - W*np.sin(theta)
-    F_z = T_fr_left + T_fr_right + T_aft_left + T_aft_right + (L_w + L_h + L_fus)*np.cos(alpha* deg2rad) - (D_w + D_h + D_fus)*np.sin(alpha* deg2rad) - W*np.cos(theta)
+    F_z = -T_fr_left - T_fr_right - T_aft_left - T_aft_right - (L_w + L_h + L_fus)*np.cos(alpha* deg2rad) + (D_w + D_h + D_fus)*np.sin(alpha* deg2rad) + W*np.cos(theta)
 
     "Moment around axes of the C.G."
     #Cm_y / c_mean  = Cm_w + Cm_fus + Cm_h *(c_mean_h / c_mean) + (CL_w * h_ac - CD_w * l_ac + (CL_h * h_h + CD_h * l_h) * (S_h / S) *(c_mean_h / c_mean)* (v_h / v) ** 2) * np.sin(alpha * deg2rad) + (             CL_w * l_ac + CD_w * h_ac + (CD_h * h_h - CL_h * l_h) * (S_h / S) *(c_mean_h / c_mean)* (v_h / v) ** 2) * np.cos alpha * deg2rad) - T_p * h_p / (0.5*rho*S*v**2) + (2 * T_fr_left * l_fr - 2 * T_aft_left * l_aft) / (0.5* rho *S *v**2)
     M_x = T_fr_left*w_rot_left + T_aft_left* w_rot_left - T_fr_right * w_rot_right - T_aft_right * w_rot_right
-    M_y = M_ac_w + M_fus + M_ac_h - T_p*h_p + T_fr_right*l_fr + T_fr_left*l_fr - T_aft_right*l*aft -T_aft_left*l_aft +(L_w*h_ac +D_w*h_ac - L_h*h_h - D_h*l_h)*np.sin(alpha* deg2rad) +(L_w*l_ac +D_w*l_ac -L_h*l_h -D_h*h_h)*np.cos(alpha* deg2rad)
+    M_y = M_ac_w + M_fus + M_ac_h - T_p*h_p + T_fr_right*l_fr + T_fr_left*l_fr - T_aft_right*l*aft -T_aft_left*l_aft +(L_w*h_ac +D_w*l_ac - L_h*h_h - D_h*l_h)*np.sin(alpha* deg2rad) +(L_w*l_ac +D_w*h_ac -L_h*l_h -D_h*h_h)*np.cos(alpha* deg2rad)
 
     return F_x, F_z, M_x, M_y
 
