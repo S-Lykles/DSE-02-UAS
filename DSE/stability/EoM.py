@@ -1,5 +1,6 @@
 import numpy as np
 from DSE import const
+from DSE.structures.center_of_gravity import class_two_cg_estimation
 
 def distance_stability():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
@@ -52,3 +53,19 @@ def rotation_matrix(theta, psy, phi, deg2rad):
                   [0,0,0,0,np.cos(r_phi) , -1*np.sin(r_phi)],
                   [0,0,0,0,np.sin(r_phi)/np.cos(r_theta)]])
     return R
+
+def inertial_matrix(weight):
+    """Yet another matrix! We blessed!
+    Define inputs for class_two_cg_estimation in time"""
+    I_xx, I_yy, I_zz = class_two_cg_estimation()[3]
+
+    M = np.array([[weight, 0.0, 0.0, 0.0, 0.0, 0.0],
+                  [0.0, weight, 0.0, 0.0, 0.0, 0.0],
+                  [0.0, 0.0, weight, 0.0, 0.0, 0.0],
+                  [0.0, 0.0, 0.0, I_xx, 0.0, 0.0],
+                  [0.0, 0.0, 0.0, 0.0, I_yy, 0.0],
+                  [0.0, 0.0, 0.0, 0.0, 0.0, I_zz]])
+    return M
+
+def gyroscopic_matrix(weight, velocity_vector):
+    """Gyroscopic matrix, """
