@@ -149,6 +149,7 @@ def class_two_cg_estimation(empty, fuel, payload_supply, payload_relay):
     # Ixx = np.sum(0) + np.sum(wing_group_array * ((y_cg_groups - y_cg)**2 + (z_cg_groups - z_cg)**2))
     # Iyy = np.sum(0) + np.sum(wing_group_array * ((z_cg_groups - z_cg)**2 + (x_cg_groups - x_cg) **2))
     # Izz = np.sum(0) + np.sum(wing_group_array * ((x_cg_groups - x_cg)**2 + (y_cg_groups - y_cg) **2))
+    # Don't forget about Ixy, Ixz, Iyz
 
     return w_total, [x_cg, y_cg, z_cg], sensitivity  # [Ixx, Iyy, Izz]
 
