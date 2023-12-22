@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import csv
 from DSE.Rotor_Sizing import *
 from DSE import const
 from pathlib import Path
@@ -27,6 +26,15 @@ def data_file():
     return
 
 data_file()
+
+def lift_coefficient(r):
+    # Replace this with your actual lift coefficient function
+    # For illustration, let's assume a simple linear function: 1.0 + 0.2 * r
+    return 1.0 + 0.2 * r
+
+# Define the chord length as a function of r
+def chord_length(r):
+    return 0.03 - (0.06 * r)
 
 def lift_blade(r):
     Cl = 0.7370
@@ -59,5 +67,6 @@ plt.fill_between(r_values, 0, integrand_values, alpha=0.2)
 plt.title('Lift distribution over blade')
 plt.xlabel('Radius [r]')
 plt.ylabel('Lift [N]')
+plt.grid()
 plt.legend()
 plt.show()
