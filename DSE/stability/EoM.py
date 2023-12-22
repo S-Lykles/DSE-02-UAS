@@ -67,5 +67,16 @@ def inertial_matrix(weight):
                   [0.0, 0.0, 0.0, 0.0, 0.0, I_zz]])
     return M
 
-def gyroscopic_matrix(weight, velocity_vector):
-    """Gyroscopic matrix, """
+def gyroscopic_matrix(mass, velocity_vector):
+    """Gyroscopic matrix, Define inputs for class_two_cg_estimation, velocity vector called p in lit"""
+
+    I_xx, I_yy, I_zz = class_two_cg_estimation()[3]
+    u, v, w, p, q, r = velocity_vector
+
+    C = np.array([[0.0, -mass * r, mass * q, 0.0, 0.0, 0.0],
+                  [mass * r, 0.0, -mass * p, 0.0, 0.0, 0.0],
+                  [-mass * q, mass * p, 0.0, 0.0, 0.0, 0.0],
+                  [0.0, -mass * w, mass * v, 0.0, I_yy * r, -I_zz * q],
+                  [mass * w, 0.0, -mass * u, I_zz * r, 0.0, -I_xx * p],
+                  [-mass * v, mass * u, 0.0, I_xx * q, -I_yy * p, 0.0]])
+    return C
