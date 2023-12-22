@@ -26,6 +26,7 @@ def EoM():
     "T_p = the propellor thrust"
     "T_fr = the rotor thrust of the front two rotors"
     "T_aft = the rotor thrust of the aft two rotors"
+    deg2rad = const.deg2rad
     #Force equations
     F_x = T_p + (L_w + L_h + L_fus)*np.sin(alpha* deg2rad) - (D_w + D_h + D_fus)*np.cos(alpha* deg2rad) - W*np.sin(theta)
     F_z = T_fr_left + T_fr_right + T_aft_left + T_aft_right + (L_w + L_h + L_fus)*np.cos(alpha* deg2rad) - (D_w + D_h + D_fus)*np.sin(alpha* deg2rad) - W*np.cos(theta)
@@ -68,7 +69,7 @@ def inertial_matrix(mass):
     return M
 
 def gyroscopic_matrix(mass, velocity_vector):
-    """Gyroscopic matrix, Define inputs for class_two_cg_estimation, velocity vector called p in lit"""
+    """Gyroscopic matrix, Define inputs for class_two_cg_estimation, velocity vector called p in lit, this might be a wee bit wrong due to symmetry assumptions"""
 
     I_xx, I_yy, I_zz = class_two_cg_estimation()[3]
     u, v, w, p, q, r = velocity_vector
