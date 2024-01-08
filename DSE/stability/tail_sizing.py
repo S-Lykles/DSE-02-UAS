@@ -1,22 +1,24 @@
 import numpy as np
-from const import T, gamma, R
+from DSE import const
+from DSE.stability.EoM import distance_stability
 
 # default values
 T = 288.15
-gamma = 1.4
-R = 287
+#gamma = 1.4
+#R = 287
 eta = 0.95
-dz_h = z_t-z_w
-# A_h = b_h/S_h
-def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_015_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
 
+# A_h = b_h/S_h
+def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
+    l_h  = distance_stability()[3]
+    dz_h = distance_stability()[7]
     SM = 0.05 #PLACEHOLDER
 
     if tail_config == 'fuselage-mounted':
         Vh_V_2 = 0.85
     elif tail_config == 'fin-mounted':
         Vh_V_2 = 0.95
-    elif tail_config == 't-tail';
+    elif tail_config == 't-tail':
         Vh_V_2 = 1
     else:
         print('Check the values of tail configuration')
@@ -61,7 +63,7 @@ def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_n
     return Sh_S, x_np_bar, x_cg_bar
 
 
-def elevator_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= ,Sh_S,l_h,vtrans=34,uh=31):
+def elevator_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,Sh_S=0.3,vtrans=34,uh=31):
     # speed range ( Stall <-> Max + safety margin)
 
     #possible import ?  Cm_0 = Cm_ac - CL_alpha_h*(alhpa_0 - i_h)* x_h/c* (S_h/s)* (u_h/u)**2
@@ -69,7 +71,10 @@ def elevator_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
     u = vtrans
+    l_h = distance_stability()[3]
+
     Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
     Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh/be) * 1/Sh_S * c_bar/l_h * (u/uh)**2
 
-    return Tau_el
+    return Tau_el, Cm_delta_el
+
