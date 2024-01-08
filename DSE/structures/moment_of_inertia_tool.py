@@ -6,7 +6,6 @@ from pathlib import Path
 #Dimensions leading rib
 h_leading_rib_center =
 w_leading_rib_center =
-m_leading_rib_center =
 h_leading_rib_tips =
 w_leading_rib_tips =
 m_leading_rib_tips =
@@ -14,17 +13,19 @@ m_leading_rib_tips =
 #Dimensions trailing rib
 h_trailing_rib_center = h_leading_rib_center
 w_trailing_rib_center = w_leading_rib_center
-
 h_trailing_rib_tips = h_leading_rib_tips
 w_trailing_rib_tips = w_leading_rib_tips
+m_trailing_rib_tips =
 
 #Dimensions top sheet
 t_top_sheet =
 l_top_sheet =
+m_top_sheet =
 
 #Dimensions bottom sheet
 t_bottom_sheet =
 l_bottom_sheet =
+m_bottom_sheet =
 
 # Function computing moment of inertia around x-axis with cg on neutral line
 def compute_moment_of_inertia_object_x_axis(width, height):
@@ -59,5 +60,5 @@ def I_xx_wing_box(h_leading_rib_center, w_leading_rib_center, h_leading_rib_tips
     I_bottom_sheet = compute_moment_of_inertia_object_x_axis(l_bottom_sheet, t_bottom_sheet)
 
     # Including the parallel axis theorem
-    I_leading_rip_tips = parallel_axis_theorem(I_leading_rip_tips, )
+    I_leading_rip_tips = parallel_axis_theorem(I_leading_rip_tips, m_leading_rib_tips, )
 
