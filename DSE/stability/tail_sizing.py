@@ -59,3 +59,17 @@ def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_n
     x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h*(1-de_da)*Sh_S*l_h/c_bar*Vh_V_2-SM
 
     return Sh_S, x_np_bar, x_cg_bar
+
+
+def elevator_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= ,Sh_S,l_h,vtrans=34,uh=31):
+    # speed range ( Stall <-> Max + safety margin)
+
+    #possible import ?  Cm_0 = Cm_ac - CL_alpha_h*(alhpa_0 - i_h)* x_h/c* (S_h/s)* (u_h/u)**2
+    #possilbe import ?  Cm_alpha = d_Cm / d_CL * CL_alpha
+
+    delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
+    u = vtrans
+    Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
+    Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh/be) * 1/Sh_S * c_bar/l_h * (u/uh)**2
+
+    return Tau_el
