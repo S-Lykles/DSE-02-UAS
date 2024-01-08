@@ -35,7 +35,7 @@ def EoM():
     "Moment around axes of the C.G."
     #Cm_y / c_mean  = Cm_w + Cm_fus + Cm_h *(c_mean_h / c_mean) + (CL_w * h_ac - CD_w * l_ac + (CL_h * h_h + CD_h * l_h) * (S_h / S) *(c_mean_h / c_mean)* (v_h / v) ** 2) * np.sin(alpha * deg2rad) + (             CL_w * l_ac + CD_w * h_ac + (CD_h * h_h - CL_h * l_h) * (S_h / S) *(c_mean_h / c_mean)* (v_h / v) ** 2) * np.cos alpha * deg2rad) - T_p * h_p / (0.5*rho*S*v**2) + (2 * T_fr_left * l_fr - 2 * T_aft_left * l_aft) / (0.5* rho *S *v**2)
     M_x = T_fr_left*w_rot_left + T_aft_left* w_rot_left - T_fr_right * w_rot_right - T_aft_right * w_rot_right
-    M_y = M_ac_w + M_fus + M_ac_h - T_p*h_p + T_fr_right*l_fr + T_fr_left*l_fr - T_aft_right*l*aft -T_aft_left*l_aft +(L_w*h_ac +D_w*l_ac - L_h*h_h - D_h*l_h)*np.sin(alpha* deg2rad) +(L_w*l_ac +D_w*h_ac -L_h*l_h +D_h*h_h)*np.cos(alpha* deg2rad)
+    M_y = M_ac_w + M_ac_h - T_p*h_p + T_fr_right*l_fr + T_fr_left*l_fr - T_aft_right*l*aft -T_aft_left*l_aft +(L_w*h_ac +D_w*l_ac - L_h*h_h - D_h*l_h)*np.sin(alpha* deg2rad) +(L_w*l_ac +D_w*h_ac -L_h*l_h +D_h*h_h)*np.cos(alpha* deg2rad)
 
     return F_x, F_z, M_x, M_y
 
@@ -47,7 +47,7 @@ def rotation_matrix(theta, psy, phi, deg2rad):
     r_theta = theta * deg2rad
     r_phi = phi * deg2rad
     r_psy = psy * deg2rad
-
+ # R{Xd,Ye,Ze,Phi,Theta,Psy}^t
     R = np.array([[np.cos(r_theta)*np.cos(r_psy), np.cos(r_psy)*np.sin(r_theta)*np.sin(r_phi)-np.sin(r_psy)*np.cos(r_phi), np.cos(r_psy)*np.sin(r_theta)*np.cos(r_phi) + np.sin(r_psy)*np.sin(r_phi), 0,0,0],
                   [np.cos(r_theta)*np.sin(r_psy), np.sin(r_psy)*np.sin(r_theta)*np.sin(r_phi) + np.cos(r_psy)*np.cos(r_phi), np.sin(r_psy)*np.sin(r_theta)*np.cos(r_phi) - np.cos(r_psy)*np.sin(r_phi),0,0,0],
                   [-1*np.sin(r_theta), np.sin(r_phi)*np.cos(r_theta), np.cos(r_phi)*np.cos(r_theta),0,0,0],
