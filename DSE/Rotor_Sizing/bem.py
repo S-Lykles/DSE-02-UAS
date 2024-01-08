@@ -11,8 +11,14 @@ cd_clarky = data[:, 2]
 Cl_func_clarky = lambda a: np.interp(a, alpha_clarky, cl_clarky, left=0, right=0)
 Cd_func_clarky = lambda a: np.interp(a, alpha_clarky, cd_clarky)
 
-def chord_dist(r, a=0.03, b=-0.02):
+# r = np.linspace(0, 0.5, 1000)
+# omega = (5000*2*np.pi) / 60  # 5000 rpm
+
+def chord_dist(r, a=0.03*2, b=-0.02):
     return a + b*r
+
+def solidity(R, r, chord, N=2):
+    return N * np.trapz(chord, r) / (np.pi * R**2)
 
 def twist_dist(r, a=14, b=-22):
     return a + b*r
@@ -41,87 +47,59 @@ def solve_dT_dr(r, omega, chord, twist, N=2, Cl_func=Cl_func_clarky, max_iter=10
 
     return dT2
 
-def dQ_bem(r, dT, omega, chord, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_func_clarky):
+def dD_bem(r, dT, omega, chord, twist, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_func_clarky):
     vi = vi_bem(r, dT)
     alpha = twist - np.rad2deg((Vc + vi) / (omega * r))
-    dD = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
-    return (dT * (Vc + vi) / (omega * r) + dD) * r
+    dDp = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
+    return (dT * (Vc + vi) / (omega * r) + dDp)
+
 
 if __name__ == "__main__":
-    rpm_range = np.arange(1000, 6100, 100)
-
-    rpm_values = np.zeros_like(rpm_range, dtype=float)
-    total_thrust_values = np.zeros_like(rpm_range, dtype=float)
-
-    target_rpm = 4000
-
-    for i, rpm in enumerate(rpm_range):
-        R = 0.5
-        r = np.linspace(0.1, R, 1000)
-        N = 4
-        omega = (rpm*2*np.pi) / 60
-        chord = chord_dist(r)
-        twist = twist_dist(r)
-
-        dT = solve_dT_dr(r, omega, chord, twist, N=N)
-        vi = vi_bem(r, dT)
-        dQ = dQ_bem(r, dT, omega, chord, N=N)
-
-        # to account for tip losses we integrate only to 0.97 R
-        T = np.trapz(np.where(r<=0.97*R, dT, 0), r)
-        T_ideal = np.trapz(dT, r)
-
-        Q = np.trapz(dQ, r)
-        P = Q * omega
-
-        T_total = np.trapz(np.where(r <= 0.97 * R, dT, 0), r)
-        rpm_values[i] = rpm
-        total_thrust_values[i] = T_total
-
-        if rpm == target_rpm:
-            plt.plot(r, dT)
-            plt.fill_between(r, 0, dT, alpha=0.2)
-            plt.title(f"Thrust distribution at rpm = {rpm}")
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Thurst [N]')
-            plt.grid()
-            plt.show()
-
-            plt.plot(r, vi)
-            plt.title(f'Induced velocity distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Indiced velocity [m/s]')
-            plt.grid()
-            plt.show()
-
-            plt.plot(r, dQ)
-            plt.title(f'Torque distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Torque [N/m]')
-            plt.grid()
-            plt.show()
-
-            plt.plot(r, twist - np.rad2deg((vi) / (omega * r)))
-            plt.title(f'Effective angle of attack distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Effective angle of attack [deg]')
-            plt.grid()
-            plt.show()
-
-
-            print(f"\nResults for RPM = {rpm}:")
-            print(f"Tip loss % {100 * (T_ideal - T) / T_ideal:.2f}")
-            print(f"Thrust: {T:.2f} N")
-            print(f"Disk loading: {T / (np.pi * R ** 2):.2f} N/m^2")
-            print(f"Torque: {Q:.2f} Nm")
-            print(f"Power: {P:.2f} W")
-
-            plt.clf()
-
-    plt.plot(rpm_values, total_thrust_values)
-    plt.title('Total Thrust vs RPM')
-    plt.xlabel('RPM')
-    plt.ylabel('Total Thrust (N)')
-    plt.grid()
+    rho = const.rho0
+    R = 0.5
+    r = np.linspace(0.1, R, 1000)
+    N = 2
+    omega = (5000*2*np.pi) / 60  # 5000 rpm
+    Vtip = omega * R
+    print(f'Tip speed: {Vtip:.2f} m/s')
+    A = np.pi * R**2
+    chord = chord_dist(r)
+    print(f'Solidity: {solidity(R, r, chord, N=N):.2f}')
+    twist = twist_dist(r)
+    # twist = 3 / r
+    dT = solve_dT_dr(r, omega, chord, twist, N=N)
+    vi = vi_bem(r, dT)
+    dD = dD_bem(r, dT, omega, chord, twist, N=N)
+    plt.plot(r, dT/dD)
     plt.show()
+    dQ = dD * r
+
+    plt.plot(r, dT)
+    # to account for tip losses we integrate only to 0.97 R
+    T = np.trapz(np.where(r<=0.97*R, dT, 0), r)
+    T_ideal = np.trapz(dT, r)
+    print(f"tip loss % {100*(T_ideal-T)/T_ideal:.2f}")
+    print(f"thrust: {T:.2f} N")
+    print(f"Disk loading: {T / (np.pi * R**2):.2f} N/m^2")
+    plt.show()
+
+    plt.plot(r, vi)
+    plt.show()
+
+    Q = np.trapz(dQ, r)
+    P = Q * omega
+    print(f"Torque: {Q:.2f} Nm")
+    print(f"Power: {P:.2f} W")
+    print(f"Power loading {P /T:.2f} W/N")
+    
+    CT = T / (rho * A * Vtip**2)
+    CP = P / (rho * A * Vtip**3)
+    M = CT / CP * np.sqrt(CT/2)
+    print(f"CT: {CT:.2f}")
+    print(f"figure of merit: {M:.2f}")
+
+
+    # plt.plot(r, twist - np.rad2deg((vi) / (omega * r)))
+    # plt.show()
+        
     

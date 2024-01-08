@@ -121,12 +121,24 @@ def run_Wf_endurance():
     CL, CD = dragpolar_dual(b, S, CL_start=0.1, CL_end=1.2, CL_step=int(1e4))
     P_max = 40e3
     P_aux = 1000
+    OEW = 100 * const.g0
+    Payload = 20 * const.g0
+    Wf_max = const.MTOW - OEW - Payload
     
-    t, W = Wf_endurance_mission(CL, CD, S, eta, SFC, P_max, P_aux)
+    R, t, W = T_endurance_mission(Wf_max, CL, CD, S, eta, SFC, P_max, P_aux)
 
-    plt.plot(t/3600, W/const.g0)
-    plt.xlabel('Time [h]')
-    plt.ylabel('Weight [kg]')
+     # W is 2d array with R on columns and t on rows
+    plt.figure(figsize=plot_setting.set_size(plot_setting.slidewidth/2, plot_setting.slideheight/2))
+    plt.grid(False)
+    plt.contourf(R/1e3, t/3600, W/const.g0, 200)
+    c = plt.colorbar()
+    c.set_label('Fuel Mass [kg]')
+    plt.contour(R/1e3, t/3600, W/const.g0, levels=[Wf_max/const.g0], colors='black')
+    plt.scatter([const.R_cruise/1e3], [const.T_loiter_end/3600], marker='x', color='black', label='VFS requirement')
+    plt.legend()
+    plt.xlabel('Range [km]')
+    plt.ylabel('Time [h]')
+    plt.title('Fuel used as a function of range and loiter time')
     plt.show()
 
 def run_payload_range_diagram():
@@ -139,7 +151,7 @@ def run_payload_range_diagram():
     P_aux = 1000
     Wf_max = 20 * const.g0
     Payload_max = 70 * const.g0
-    OEW = 80 * const.g0
+    OEW = 100 * const.g0
     payload_range_diagram(OEW, Wf_max, Payload_max, CL, CD, S, eta, SFC, P_max, P_aux)
 
 
@@ -148,6 +160,7 @@ if __name__ == '__main__':
     # run_Wf_loiter()
     # run_Wf_cruise()
     # run_Wf_payload()
-    # run_Wf_endurance()
+    plt.rcParams.update(plot_setting.report_tex)
+    run_Wf_endurance()
     run_payload_range_diagram()
     # pytest.main(["-s"])

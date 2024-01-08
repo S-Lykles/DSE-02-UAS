@@ -10,15 +10,16 @@ def distance_stability():
     "All the X distance are measured from the datum point, the most forward point of the 6x6 ground surface"
     "All the Z distances are measured from the datum point, the center of the nose heigth"
 
-    l_fr  = Xcg - Xfr   #'Xfr is the distance of the front rotor'
-    l_aft = Xaft - Xcg  #'Xaft is the distance of the aft rotor'
-    l_acw = Xcg - Xac  #'Xacw is the distance of the aerodynamic center of the wing'
-    l_h   = Xh - Xcg    #'Xh is the distance of the aerodynamic center of the horizontal tail'
-    h_p   = Zp - Zcg    #'Zp is the position of the propellor'
-    h_acw = Zac - Zcg
-    h_h   = Zh - Zcg
+    l_fr  = Xcg - Xfr   # Xfr is the distance of the front rotor
+    l_aft = Xaft - Xcg  # Xaft is the distance of the aft rotor
+    l_acw = Xcg - Xac   # Xacw is the distance of the aerodynamic center of the wing
+    l_h   = Xh - Xcg    # Xh is the distance of the aerodynamic center of the horizontal tail
+    h_p   = Zp - Zcg    # Zp is the position of the propellor
+    h_acw = Zac - Zcg   # Zac is the position of the aerodynamic centre of the wing
+    h_h   = Zh - Zcg    # Zh is the position of the horizontal tail
+    z_h   = Zh - Zac
 
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h
+    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h
 
 
 def EoM():
@@ -27,7 +28,6 @@ def EoM():
     "T_p = the propellor thrust"
     "T_fr = the rotor thrust of the front two rotors"
     "T_aft = the rotor thrust of the aft two rotors"
-    deg2rad = const.deg2rad
     #Force equations
     F_x = T_p + (L_w + L_h + L_fus)*np.sin(alpha* deg2rad) - (D_w + D_h + D_fus)*np.cos(alpha* deg2rad) - W*np.sin(theta)
     F_z = -T_fr_left - T_fr_right - T_aft_left - T_aft_right - (L_w + L_h + L_fus)*np.cos(alpha* deg2rad) + (D_w + D_h + D_fus)*np.sin(alpha* deg2rad) + W*np.cos(theta)
@@ -55,6 +55,8 @@ def rotation_matrix(theta, psy, phi, deg2rad):
                   [0,0,0,0,np.cos(r_phi) , -1*np.sin(r_phi)],
                   [0,0,0,0,np.sin(r_phi)/np.cos(r_theta)]])
     return R
+
+
 
 def inertial_matrix(mass):
     """Yet another matrix! We blessed!
