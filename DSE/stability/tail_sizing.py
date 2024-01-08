@@ -12,11 +12,11 @@ def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_n
 
     SM = 0.05 #PLACEHOLDER
 
-    if tail_config == 'uselage-mounted':
+    if tail_config == 'fuselage-mounted':
         Vh_V_2 = 0.85
-    elif tail_config == 'uselage-mounted':
+    elif tail_config == 'fin-mounted':
         Vh_V_2 = 0.95
-    elif tail_config == 'uselage-mounted'
+    elif tail_config == 't-tail';
         Vh_V_2 = 1
     else:
         print('Check the values of tail configuration')
