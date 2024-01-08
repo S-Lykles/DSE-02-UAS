@@ -49,10 +49,10 @@ def load_distribution(start, stop, step, m1, m2, type, point_range):
     if type == 'linear':
         load_array = np.zeros([len(point_range)])
         a = (m2 - m1)/(stop - start)
-        points = np.arange(0, stop - start + step, step)
+        points = np.arange(0, stop - start, step)
         distribution = a * points + m1
-        load_array[start_i:stop_i + 1] = distribution
-        return load_array
+        load_array[start_i:stop_i] = distribution
+        return load_array*step
 
 
 def point_load(point, magnitude, point_range):
@@ -70,11 +70,11 @@ def combined_loading(beam_start, beam_stop, step):
     point_range = np.arange(beam_start, beam_stop + step, step)
 
     load1 = load_distribution(0, 4, step, 4, -3, 'linear', point_range)
-    load2 = load_distribution(2, 5, step, -2, 3, 'linear', point_range)
-    load3 = distribution_from_aero_data(0.2, beam_stop, step, 'wing_data.txt', point_range)
-    load4 = point_load(1, 800, point_range)
+    load2 = load_distribution(1, 2, step, 400, 400, 'linear', point_range)
+    load3 = 0 * distribution_from_aero_data(0.2, beam_stop, step, 'wing_data.txt', point_range)
+    load4 = point_load(2, 800, point_range)
 
-    loading_distribution = load3 + load4
+    loading_distribution = load2 + load4
     plt.plot(point_range, loading_distribution)
     plt.show()
     return loading_distribution, point_range
@@ -85,12 +85,17 @@ loads, point_range = combined_loading(0, 3, 0.01)
 
 def moment_distr_from_load_distr(load_distribution, point_range, step):
     moment_distribution = np.array([])
+
+    # cumulative load distribution
     for i in np.arange(0, len(point_range), 1):
-        points = point_range[i:]
+        distances = point_range - point_range[i]
+        distances = distances[i:]
         loads = load_distribution[i:]
-        moment = np.trapz(loads, points, step)
-        moment_distribution = np.append(moment_distribution, moment)
-    print(point_range)
+        print(loads)
+        moment = np.trapz(loads * distances, distances, step)
+        print(moment)
+        moment_distribution = np.append(moment_distribution, moment/step)
+    print(moment_distribution[0])
     plt.plot(point_range, moment_distribution)
     plt.show()
 
