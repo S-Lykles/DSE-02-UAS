@@ -36,12 +36,16 @@ def vi_bem(r, dT_dr, rho=const.rho0):
 
 def solve_dT_dr(r, omega, chord, twist, N=2, Cl_func=Cl_func_clarky, max_iter=100, tol=1e-6):
     """twist in deg"""
-    vi = np.zeros_like(r)
+    vi1 = np.full_like(r, 0.1)
 
     for _ in range(max_iter):
-        dT1 = dT_dr_bem(r, omega, chord, twist, vi, N=N, Cl_func=Cl_func)
-        vi = vi_bem(r, dT1)
+        dT1 = dT_dr_bem(r, omega, chord, twist, vi1, N=N, Cl_func=Cl_func)
+        # alpha1 = twist - np.rad2deg(np.arctan((vi1) / (omega * r)))
+        vi2 = vi_bem(r, dT1)
+        # alpha2 = twist - np.rad2deg(np.arctan((vi2) / (omega * r)))
+        vi = (vi1 + vi2) / 2
         dT2 = dT_dr_bem(r, omega, chord, twist, vi, N=N, Cl_func=Cl_func)
+        vi1 = vi
         if np.linalg.norm(dT1 - dT2)/len(r) < tol:
             break
         dT1 = dT2
