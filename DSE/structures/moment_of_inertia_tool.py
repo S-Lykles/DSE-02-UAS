@@ -21,13 +21,13 @@ def moment_of_inertia_rectangle_y_axis(width, height):
     return I_yy
 
 #Function computing the moment of inertia of a solid circular section
-def moment_of_inertia_solid_circular_section(diameter)
+def moment_of_inertia_solid_circular_section(diameter):
     I = np.pi * diameter**4 / 64
 
     return I
 
 #Function computing the moment of inertia of a thin-walled circular section
-def moment_of_inertia_thin_walled_circular_section(diameter, thickness)
+def moment_of_inertia_thin_walled_circular_section(diameter, thickness):
     I = np.pi * thickness * diameter**3 / 8
 
     return I
@@ -158,7 +158,7 @@ def compute_torsion(T, rho, J, G, t, A_m, s):
 
     return tau_circ, dtheta_dz_circ, tau_thin_circ, dtheta_dz_thin_circ, tau_max_thin_plate, dtheta_dz_thin_plate
 
-def compute_buckling(E, Ixx, buckling, L, v, t, b)
+def compute_buckling(E, Ixx, buckling, L, v, t, b):
     # Specify buckling type
     if buckling == 'Fixed-Fixed':
         L_e = L /2
