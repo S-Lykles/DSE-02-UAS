@@ -66,8 +66,8 @@ def vertical_tail_size_1(tail_config='t-tail'):
     Bp =    3     # number of blades of the pusher propellor
     lp =  locations()[4]      # the height difference between propellor and c.g.
     Dp =    2*0.5    # Diameter of the propellor
-    lf =        # length of the fuselage
-    hf_max =    # the maximum height of the fuselage
+    lf =   2     # length of the fuselage
+    hf_max = 0.9   # the maximum height of the fuselage
     hf1 =       # height of the fuselage at 25% length
     hf2 =       # height of the fuselage at 75% length
     bf1 =       # width of the fuselage at 25% length
@@ -96,10 +96,11 @@ def vertical_tail_surface(V_tail_volume=0.055):
     S =  #aero import
     b =  #aero import
     c_h_tip = # import horizontal tail surface.
+    AR_v = 1.25 #current base from lit review (Sadraey, M., Aircraft Design: A Systems Engineering Approach, 2012) #import
 
     Sv = V_tail_volume *S*b/lv /2
     cv = c_h_tip
-    bv = Sv/(2*cv)
+    bv = np.sqrt(AR_v*Sv)
     return Sv, cv, bv
 
 

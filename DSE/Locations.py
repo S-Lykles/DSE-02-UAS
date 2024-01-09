@@ -20,6 +20,6 @@ def locations():
     h_acw = Zac - Zcg   # Zac is the position of the aerodynamic centre of the wing
     h_h   = Zh - Zcg    # Zh is the position of the horizontal tail
     z_h   = Zh - Zac
-    l_h_v = Xac_v - Xcg  # Xac_v is the distance of the aerodynamic center of the vertical tail
 
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,l_h_v
+
+    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h
