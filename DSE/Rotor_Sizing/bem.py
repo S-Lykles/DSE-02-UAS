@@ -69,7 +69,7 @@ if __name__ == "__main__":
     for i, rpm in enumerate(rpm_range):
         R = 0.5
         r = np.linspace(0.1, R, 1000)
-        N = 4
+        N = 8
         omega = (rpm*2*np.pi) / 60
         chord = chord_dist(r)
         twist = twist_dist(r)

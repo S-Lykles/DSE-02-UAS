@@ -22,4 +22,3 @@ sigma_for_two_blades = find_sigma_for_two_blades(R_value)
 
 print(f"For R={R_value}, sigma={sigma_for_two_blades} results in number_of_blades=2.")
 
-
