@@ -130,7 +130,7 @@ def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
 
         # Including the parallel axis theorem
 
-        # Moment of inertia for tips of spar
+        # Moment of inertia for the spars
         I_front_center = parallel_axis_theorem(I_front_center, h_front_center * w_front_center, d)
         I_front_tips = parallel_axis_theorem(I_front_tips, h_front_tip * w_front_tip, d)
         I_rear_center = parallel_axis_theorem(I_rear_center, h_rear_center * w_rear_center, d)
