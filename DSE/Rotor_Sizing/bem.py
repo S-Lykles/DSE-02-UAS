@@ -17,6 +17,9 @@ Cd_func_clarky = lambda a: np.interp(a, alpha_clarky, cd_clarky)
 def chord_dist(r, a=0.03, b=-0.02):
     return a + b*r
 
+def solidity(R, r, chord, N=2):
+    return N * np.trapz(chord, r) / (np.pi * R**2)
+
 def twist_dist(r, a=14, b=-22):
     return a + b*r
 
@@ -44,11 +47,12 @@ def solve_dT_dr(r, omega, chord, twist, N=2, Cl_func=Cl_func_clarky, max_iter=10
 
     return dT2
 
-def dQ_bem(r, dT, omega, chord, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_func_clarky):
+def dD_bem(r, dT, omega, chord, twist, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_func_clarky):
     vi = vi_bem(r, dT)
     alpha = twist - np.rad2deg((Vc + vi) / (omega * r))
-    dD = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
-    return (dT * (Vc + vi) / (omega * r) + dD) * r
+    dDp = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
+    return (dT * (Vc + vi) / (omega * r) + dDp)
+
 
 if __name__ == "__main__":
     rpm_range = np.arange(1000, 6100, 100)
@@ -68,7 +72,8 @@ if __name__ == "__main__":
 
         dT = solve_dT_dr(r, omega, chord, twist, N=N)
         vi = vi_bem(r, dT)
-        dQ = dQ_bem(r, dT, omega, chord, N=N)
+        dD = dD_bem(r, dT, omega, chord, twist, N=N)
+        dQ = dD * r
 
         # to account for tip losses we integrate only to 0.97 R
         T = np.trapz(np.where(r<=0.97*R, dT, 0), r)
