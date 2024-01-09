@@ -1,6 +1,6 @@
 from DSE import const
 
-def distance_stability():
+def locations():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
     "at the botum of the main fuselage of the UAV"
     " l  is the distance between force and centre of gravity in the x-direction"

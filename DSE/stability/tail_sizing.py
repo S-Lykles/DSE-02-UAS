@@ -1,6 +1,7 @@
 import numpy as np
 from DSE import const
 from DSE.stability.EoM import distance_stability
+from DSE.Locations import locations
 
 # default values
 T = 288.15
@@ -9,9 +10,9 @@ T = 288.15
 eta = 0.95
 # A_h = b_h/S_h
 
-def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, V, R, gamma, T, rho, tail_config= 't-tail'):
-    l_h  = distance_stability()[3]
-    dz_h = distance_stability()[7]
+def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, hf_max, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, V, R, gamma, T, rho, tail_config= 't-tail'):
+    l_h  = locations()[3]
+    dz_h = locations()[7]
     SM = 0.05 #PLACEHOLDER
 
     if tail_config == 'fuselage-mounted':
@@ -45,7 +46,7 @@ def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14
     CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_015_Ch_rad)**2/beta**2)))
     CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
 
-    x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*h_f*l_fn/(S*c_bar)
+    x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
     c_g = S/b
     lambd = c_tip/c_root
     x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_14_c_rad)
@@ -62,9 +63,9 @@ def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14
 def vertical_tail_size_1(tail_config='t-tail'):
     'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
 
-    Bp =        # number of blades of the pusher propellor
-    lp =  distance_stability()[4]      # the height difference between propellor and c.g.
-    Dp =        # Diameter of the propellor
+    Bp =    3     # number of blades of the pusher propellor
+    lp =  locations()[4]      # the height difference between propellor and c.g.
+    Dp =    2*0.5    # Diameter of the propellor
     lf =        # length of the fuselage
     hf_max =     # the maximum height of the fuselage
     hf1 =       # height of the fuselage at 25% length
@@ -90,8 +91,8 @@ def vertical_tail_size_1(tail_config='t-tail'):
     return C_eta_beta
 
 def vertical_tail_surface(V_tail_volume=0.055):
-
-    lv = distance_stability()[8]
+    print('first run "vertical_tail_surface_1".')
+    lv = locations()[8]
     S =  #aero import
     b =  #aero import
 
@@ -112,7 +113,7 @@ def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha
     Vh_V_2 = horizontal_tail_sizing()[3]
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
-    l_h = distance_stability()[3]
+    l_h = locations()[3]
 
     Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
     Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh_be) * 1/Sh_S * c_bar/l_h * (1/Vh_V_2)**2
