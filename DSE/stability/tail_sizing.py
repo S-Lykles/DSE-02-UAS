@@ -7,9 +7,8 @@ T = 288.15
 #gamma = 1.4
 #R = 287
 eta = 0.95
-
 # A_h = b_h/S_h
-def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
+def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho, tail_config= 't-tail'):
     l_h  = distance_stability()[3]
     dz_h = distance_stability()[7]
     SM = 0.05 #PLACEHOLDER
@@ -62,19 +61,44 @@ def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_n
 
     return Sh_S, x_np_bar, x_cg_bar
 
+def vertical_tail_size():
+    'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
 
-def elevator_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,Sh_S=0.3,vtrans=34,uh=31):
+    Bp =        # number of blades of the pusher propellor
+    lp =  distance_stability()[4]      # the height difference between propellor and c.g.
+    Dp =        # Diameter of the propellor
+    lf =        # length of the fuselage
+    hf_max =     # the maximum height of the fuselage
+    hf1 =       # height of the fuselage at 25% length
+    hf2 =       # height of the fuselage at 75% length
+    bf1 =       # width of the fuselage at 25% length
+    bf2 =       # width of the fuselage at 75% length
+    lcg =       # distance from nose to cg
+    Sfy =       # side surface area of the fuselage
+
+    if tail_config == 'fuselage-mounted':
+        C_eta_beta_i =  0.024
+    elif tail_config == 'fin-mounted':
+        C_eta_beta_i =  0.012
+    elif tail_config == 't-tail':
+        C_eta_beta_i = -0.017
+
+    k_beta = 0.3 * (lcg/lf) + 0.75* hf_max/lf -0.105
+    Sv_bv = -1*k_beta * (Sfy*lf)/C_eta_beta_i * np.sqrt(hf1/hf2)* np.sqrt(bf2/bf1) - 0.053/C_eta_beta_i * Bp*lp* Dp**2
+    Sv1_bv1 = Sv_bv/4
+    return Sv_bv, Sv1_bv1
+
+def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,Sh_S=0.3,Vh_V_2=1,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
 
     #possible import ?  Cm_0 = Cm_ac - CL_alpha_h*(alhpa_0 - i_h)* x_h/c* (S_h/s)* (u_h/u)**2
     #possilbe import ?  Cm_alpha = d_Cm / d_CL * CL_alpha
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
-    u = vtrans
     l_h = distance_stability()[3]
 
     Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
-    Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh/be) * 1/Sh_S * c_bar/l_h * (u/uh)**2
+    Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh_be) * 1/Sh_S * c_bar/l_h * (1/Vh_V_2)**2
 
     return Tau_el, Cm_delta_el
 
