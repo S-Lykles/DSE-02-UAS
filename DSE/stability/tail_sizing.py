@@ -67,7 +67,7 @@ def vertical_tail_size_1(tail_config='t-tail'):
     lp =  locations()[4]      # the height difference between propellor and c.g.
     Dp =    2*0.5    # Diameter of the propellor
     lf =        # length of the fuselage
-    hf_max =     # the maximum height of the fuselage
+    hf_max =    # the maximum height of the fuselage
     hf1 =       # height of the fuselage at 25% length
     hf2 =       # height of the fuselage at 75% length
     bf1 =       # width of the fuselage at 25% length
@@ -95,20 +95,23 @@ def vertical_tail_surface(V_tail_volume=0.055):
     lv = locations()[8]
     S =  #aero import
     b =  #aero import
+    c_h_tip = # import horizontal tail surface.
 
-    Sv = V_tail_volume *S*b/lv
-    return Sv
+    Sv = V_tail_volume *S*b/lv /2
+    cv = c_h_tip
+    bv = Sv/(2*cv)
+    return Sv, cv, bv
 
 
-def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
+def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
 
-    # c_bar =
-    # Cm_0 =
-    # Cm_alpha =
-    # alpha =
-    # alpha_0 =
-    # CL_alpha_h =
+    # c_bar =       # aero import
+    # Cm_0 =        # aero import
+    # Cm_alpha =    # aero import
+    # alpha =       # general list
+    # alpha_0 =     # aero import
+    # CL_alpha_h =  # aero import
     Sh_S = horizontal_tail_sizing()[0]
     Vh_V_2 = horizontal_tail_sizing()[3]
 
@@ -120,3 +123,14 @@ def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha
 
     return Tau_el, Cm_delta_el
 
+def rudder_surface_sizing():
+
+
+
+    return
+
+def aileron_surface_sizing():
+
+
+
+    return
