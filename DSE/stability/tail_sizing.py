@@ -8,6 +8,7 @@ T = 288.15
 #R = 287
 eta = 0.95
 # A_h = b_h/S_h
+
 def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, V, R, gamma, T, rho, tail_config= 't-tail'):
     l_h  = distance_stability()[3]
     dz_h = distance_stability()[7]
@@ -37,9 +38,6 @@ def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14
     K_ev0 = 0.1124/r**2+0.1024/r+2
 
     de_da = K_ev/K_ev0 * (r/(r**2+m_tv**2)*0.4876/np.sqrt(r**2+0.6319+m_tv**2)+(1+(r**2/(r**2+0.7915+5.0734*m_tv**2))**0.3113)*(1-np.sqrt(m_tv**2/(1+m_tv**2))))*CL_alpha_w/(np.pi*A)
-
-
-
     V_h = np.sqrt(Vh_V_2)*V
     a = np.sqrt(R*gamma*T)
     M = V_h/a
