@@ -1,4 +1,5 @@
 from DSE import const
+from DSE.structures.center_of_gravity import class_two_cg_estimation
 
 def locations():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
@@ -7,6 +8,9 @@ def locations():
     " h  is the distance between force and centre of gravity in the z-direction"
     "All the X distance are measured from the datum point, the most forward point of the 6x6 ground surface"
     "All the Z distances are measured from the datum point, the center of the nose heigth"
+    Xcg = class_two_cg_estimation()[1][0]
+    Zcg = class_two_cg_estimation()[1][2]
+
 
     l_fr  = Xcg - Xfr   # Xfr is the distance of the front rotor
     l_aft = Xaft - Xcg  # Xaft is the distance of the aft rotor
