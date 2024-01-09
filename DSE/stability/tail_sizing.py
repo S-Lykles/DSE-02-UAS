@@ -8,7 +8,7 @@ T = 288.15
 #R = 287
 eta = 0.95
 # A_h = b_h/S_h
-def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho, tail_config= 't-tail'):
+def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_alpha_w, S_net, eta, A_h, sweep_ang_015_Ch_rad, c_root, c_tip, V, R, gamma, T, rho, tail_config= 't-tail'):
     l_h  = distance_stability()[3]
     dz_h = distance_stability()[7]
     SM = 0.05 #PLACEHOLDER
@@ -59,9 +59,9 @@ def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, h_f, l_fn, sweep_ang_14
     x_np_bar = x_ac_bar +CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
     x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h*(1-de_da)*Sh_S*l_h/c_bar*Vh_V_2-SM
 
-    return Sh_S, x_np_bar, x_cg_bar
+    return Sh_S, x_np_bar, x_cg_bar,Vh_V_2
 
-def vertical_tail_size():
+def vertical_tail_size_1(tail_config='t-tail'):
     'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
 
     Bp =        # number of blades of the pusher propellor
@@ -84,15 +84,34 @@ def vertical_tail_size():
         C_eta_beta_i = -0.017
 
     k_beta = 0.3 * (lcg/lf) + 0.75* hf_max/lf -0.105
-    Sv_bv = -1*k_beta * (Sfy*lf)/C_eta_beta_i * np.sqrt(hf1/hf2)* np.sqrt(bf2/bf1) - 0.053/C_eta_beta_i * Bp*lp* Dp**2
-    Sv1_bv1 = Sv_bv/4
-    return Sv_bv, Sv1_bv1
+    C_eta_beta_fuse = -1*k_beta * (Sfy*lf)/(S*b)* np.sqrt(hf1/hf2) * (bf2/bf1)**(1/3)
+    C_eta_beta_prop = -0.053 *Bp *(lp*Dp**2)/(S*b)
+    C_eta_beta = C_eta_beta_fuse +C_eta_beta_prop + C_eta_beta_i
+    print ('the value of C_eta_beta is:', C_eta_beta)
+    print ('In order to determine the vertical tail surface, the tail volume of the tail has to be found from the graph using C_eta_beta')
+    return C_eta_beta
 
-def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,Sh_S=0.3,Vh_V_2=1,bh_be=1):
+def vertical_tail_surface(V_tail_volume=0.055):
+
+    lv = distance_stability()[8]
+    S =  #aero import
+    b =  #aero import
+
+    Sv = V_tail_volume *S*b/lv
+    return Sv
+
+
+def control_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
 
-    #possible import ?  Cm_0 = Cm_ac - CL_alpha_h*(alhpa_0 - i_h)* x_h/c* (S_h/s)* (u_h/u)**2
-    #possilbe import ?  Cm_alpha = d_Cm / d_CL * CL_alpha
+    # c_bar =
+    # Cm_0 =
+    # Cm_alpha =
+    # alpha =
+    # alpha_0 =
+    # CL_alpha_h =
+    Sh_S = horizontal_tail_sizing()[0]
+    Vh_V_2 = horizontal_tail_sizing()[3]
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
     l_h = distance_stability()[3]
