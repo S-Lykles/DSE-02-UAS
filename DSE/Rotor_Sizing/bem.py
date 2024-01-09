@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from DSE import const
+from DSE.power_curves import rotor_tool
 from matplotlib import pyplot as plt
 
 file_dir = Path(__file__).parent
@@ -52,7 +53,6 @@ def dD_bem(r, dT, omega, chord, twist, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_fun
     alpha = twist - np.rad2deg((Vc + vi) / (omega * r))
     dDp = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
     return (dT * (Vc + vi) / (omega * r) + dDp)
-
 
 if __name__ == "__main__":
     rpm_range = np.arange(1000, 6100, 100)
@@ -132,4 +132,4 @@ if __name__ == "__main__":
     plt.ylabel('Total Thrust (N)')
     plt.grid()
     plt.show()
-    
+

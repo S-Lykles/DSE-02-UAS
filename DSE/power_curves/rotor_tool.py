@@ -115,7 +115,7 @@ def P_induced(v, DL, W, k=1.15, k_dl=1.04):
 
 def generate_number_of_blades(R, sigma):
     # We assume that we can integrate between 2-20 blades per rotor
-    possible_number_blades = np.arange(2, 20, 1)
+    possible_number_blades = np.arange(2, 11, 1)
 
     # The chord formula follows from the slides from Marilena
     # This assumes a constant chord!
@@ -124,10 +124,10 @@ def generate_number_of_blades(R, sigma):
 
     # For a certain number of blades, the aspect ratio is found.
     # This is constrained between 14<AR<20 as in de slides
-    AR_contrained = AR[(AR > 14) & (AR < 20)]  # The aspect ratio as based on the AR constraint
+    AR_constrained = AR[(AR > 14) & (AR < 20)]  # The aspect ratio as based on the AR constraint
     # The following connects the possible AR to the number of blades based on index
-    number_of_blades = possible_number_blades[np.in1d(AR, AR_contrained).nonzero()[0]]
-    print('Number of blades:', number_of_blades)
+    number_of_blades = possible_number_blades[np.in1d(AR, AR_constrained).nonzero()[0]]
+    return number_of_blades
 
 
 def generate_power_versus_disk_loading(P_hover_array, DL_array):
