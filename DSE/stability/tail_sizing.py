@@ -1,8 +1,8 @@
 import numpy as np
 from DSE import const
-from DSE.stability.EoM import distance_stability
 from DSE.Locations import locations
 from DSE.stability.Loaddiag import load_diagram_plot
+from DSE.structures.center_of_gravity import class_two_cg_estimation
 
 # default values
 T = 288.15
@@ -62,30 +62,32 @@ def horizontal_tail_sizing(S=3.5, b=6, c_bar=0.619, b_f, hf_max, l_fn, sweep_ang
     return Sh_S, x_np_bar, x_cg_bar,Vh_V_2
 
 def vertical_tail_size():
-    # base imports.
-    deg2rad = np.pi / 180
-    b = 6
-    S = 3.5
-    l_fus = 6
-    eta = 0.9
-    b_max = 0.7
-    Cl_alpha = 1.0  # the cl_alpha of the vertical tail at transitional velocity
-    CL = 1.3  # at transitional velocity
-    Xcg = 3.5147906877402817
-    AR_w = b ** 2 / S
+    'Assumptions made in this code: (Cl_alpha=1.0, CL_w=1.3,  Taper ratio=1/0.4, The outputs where generated on 10-1-2024 becarefull. '
 
-    # initial starting values
+    # base imports.
+    deg2rad = const.deg2rad
+    b =  #aero import
+    S =  #aero import
+    l_fus =  #struct import
+    eta = 0.95 # vertical tail efficiency
+    b_max = # struct import maximum width
+    Cl_alpha = 1.0  # the cl_alpha of the vertical tail at cruise speed
+    CL_w =  1.3 # CL of the wing tail at cruise speed
+    Xcg  = class_two_cg_estimation()[1][0] #locations import
+    AR_w = b**2 / S
+    Vtrans = # The transition velocity
+    v_v =  # the maximum perpendicual gust velocity
+
+    # initial starting values these are assumtions
     lv = 3
-    tail_volume = 0.055
-    C_eta_beta = 0.058
-    taper_v = 1 / 0.40
-    step_size = 50
+    tail_volume = 0.055    # This tail volume is based on literature study for single small propellor aircraft.
+    C_eta_beta = 0.058     # This moment coefficient is based on literature study for single small propellor aircraft, this is coupled to the tail volume.
+    taper_v = 1 / 0.40     ### This is a assumption
 
     # intergration space
     AR_v = np.arange(0.5, 2, 0.1)
-    beta = 30
+    beta = 30  # this should still be changed to   np.atan(v_v / Vtrans) * const.rad2deg
     sweep_v = np.arange(0, 45, 1)
-    aa = np.linspace(0, l_fus, num=step_size)
 
     # Empty list set
     Surface = []
@@ -114,7 +116,7 @@ def vertical_tail_size():
                 Cl_v_alpha = (Cl_alpha * AR_w) / (2 + np.sqrt(4 + (AR_v[p] * beta * deg2rad / eta) * (
                             1 + (np.tan(sweep_05_cord_v * deg2rad) / (beta * deg2rad)) ** 2)))
 
-                C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                C_eta_beta_w = CL_w ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
                 new = (np.pi * l_fus * b_max ** 2) / 3
                 C_eta_beta_fuse = -2 / (S * b) * new
 
@@ -133,7 +135,7 @@ def vertical_tail_size():
     if plot == True:
         fig, (ax, ay, az) = plt.subplots(1, 3)
         cp = ax.contourf(sweep_v, AR_v, Surface)
-        fig.colorbar(cp)  # Add a colorbar to a plot
+        fig.colorbar(cp)
         ax.set_title('Vertical tail surface (Sv)')
         ax.set_xlabel('Sweep angle vertical tail')
         ax.set_ylabel('Aspect ratio vertical tail')
@@ -150,6 +152,13 @@ def vertical_tail_size():
         az.set_xlabel('Sweep angle vertical tail')
         az.set_ylabel('Aspect ratio vertical tail')
 
+    # Values for now just so there is a output!!
+    Sv_1 = 0.625
+    bv_1 = 0.6
+    lv_1 = 2.3
+    AR_v_1 = 1.125
+    Sweep_v_1 = 30 #deg
+    return Sv_1, bv_1, lv_1, AR_v_1, Sweep_v_1,taper_v
 
 def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
