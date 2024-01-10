@@ -3,12 +3,12 @@ from math import pi, atan
 
 # def aero_values():
 c_bar = 0.598
-cm_0 = cm_23012[10]
+Cm_0_airfoil= cm_23012[10]
 Cm_alpha = (cm_23012[20]-cm_23012[0])/(alpha_23012[20]-alpha_23012[0])*pi/180
 alpha_0 = 0
 sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = 0*pi/180
-Cl_alpha_wing = (cl_23012[20]-cl_23012[0])/(alpha_23012[20]-alpha_23012[0])*pi/180
+CL_alpha_wing = (cl_23012[20]-cl_23012[0])/(alpha_23012[20]-alpha_23012[0])*pi/180
 # Cl_alpha_h
 CL_max = max(cl_23012)
 CL_0 = cl_23012[10]
@@ -18,8 +18,8 @@ CL_cruise = cl_23012[9]
 b = 6
 S = 3.5
 Cl_alpha_v = (cl_0012[20]-cl_0012[0])/(alpha_0012[20]-alpha_0012[0])*pi/180
-# Cl_alpha_h =
-# sweep_ang_rad =
+Cl_alpha_h = Cl_alpha_v
+sweep_ang_rad = atan(0.125/3*pi/180)
 # Cm_0_airfoil =
 # sweep_ang_14_c_rad =
 # CL_alpha_w =
