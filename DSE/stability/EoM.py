@@ -27,7 +27,28 @@ def EoM():
 
     return F_x, F_z, M_x, M_y
 
+def EoM_hover(m, trans_vel, rot_vel, ext_forces, ext_moments, pitch_roll):
 
+    u, v, w = trans_vel
+    p, q, r = rot_vel
+    X, Y, Z = ext_forces
+    L, M, N = ext_moments
+    theta, phi = pitch_roll
+    I_xx, I_yy, I_zz = class_two_cg_estimation()[3]
+
+    u_dot = -q*w + r*v + X/m
+    v_dot = -r*u + p*w +Y/m
+    w_dot = -p*v + q*u +Z/m
+
+    p_dot = q*r*(I_yy-I_zz)/I_xx + L/I_xx
+    q_dot = p*r*(I_zz-I_xx)/I_yy + M/I_yy
+    r_dot = p*q*(I_xx-I_yy)/I_zz + N/I_zz
+
+    phi_dot = p + q*np.sin(np.radians(phi))*np.theta(np.radians(theta)) + r*np.cos(np.radians(phi))*np.tan(np.radians(theta))
+    theta_dot = q*np.cos(np.radians(phi)) - r*np.sin(np.radians(phi))
+    psi_dot = q*np.sin(np.radians(phi))/np.cos(np.radians(theta)) - r*np.cos(np.radians(phi))/np.cos(np.radians(theta))
+
+    return u_dot, v_dot, w_dot, p_dot, q_dot, r_dot, phi_dot, theta_dot, psi_dot
 
 def rotation_matrix(theta, psy, phi, deg2rad):
     "A very nice matrix that converts the body axis angles into the earth axis -(0_0)- "
