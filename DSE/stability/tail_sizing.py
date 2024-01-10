@@ -123,17 +123,17 @@ def vertical_tail_size():
 
     # base imports.
     deg2rad = const.deg2rad
-    b =  #aero import
-    S =  #aero import
-    l_fus =  #struct import
+    # b =  #aero import
+    # S =  #aero import
+    # l_fus =  #struct import
     eta = 0.95 # vertical tail efficiency
-    b_max = # struct import maximum width
+    # b_max = # struct import maximum width
     Cl_alpha = 1.0  # the cl_alpha of the vertical tail at cruise speed
     CL_w =  1.3 # CL of the wing tail at cruise speed
     Xcg  = class_two_cg_estimation()[1][0] #locations import
     AR_w = b**2 / S
-    Vtrans = # The transition velocity
-    v_v =  # the maximum perpendicual gust velocity
+    # Vtrans = # The transition velocity
+    # v_v =  # the maximum perpendicual gust velocity
 
     # initial starting values these are assumtions
     lv = 3
