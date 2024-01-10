@@ -134,11 +134,11 @@ def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  C
     return  sr
 
 
-t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
-print('test,', t)
+#t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
+#print('test,', t)
 
 
-def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.Cl_alpha_wing,Xcg=class_two_cg_estimation()[1][0]):
+def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.Cl_alpha_wing,Xcg=class_two_cg_estimation(True, False, False,  False[1][0]):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
 
     # base imports.
@@ -245,7 +245,7 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing(C_L_v_alpha = 0.1, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, S = aero_constants.S, b = aero_constants.b, l_v = vertical_tail_size()[2], S_v = vertical_tail_size()[0], V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max):
+#def rudder_surface_sizing(C_L_v_alpha = 0.1, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, S = aero_constants.S, b = aero_constants.b, l_v = vertical_tail_size()[2], S_v = vertical_tail_size()[0], V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!
