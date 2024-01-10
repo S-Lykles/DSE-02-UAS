@@ -2,6 +2,7 @@ import numpy as np
 from DSE import const
 from DSE.stability.EoM import distance_stability
 from DSE.Locations import locations
+from DSE.stability.Loaddiag import load_diagram_plot
 
 # default values
 T = 288.15
@@ -124,11 +125,27 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
 
     return Tau_el, Cm_delta_el
 
-def rudder_surface_sizing():
-    # Possible method?
-    Rat_br_bv = np.linspace(0.7,1.0,500) # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
-    Rat_cr_cv = np.linspace(0.15,0.40,500) # Ratio of rudder (mean aerodynamic) chord to total elevator (mean aerodynamic) chord
-    Tau_rudder = 1.129 * Rat_cr_cv**0.4044 - 0.1772 # O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
+def rudder_surface_sizing(C_L_v_alpha = 0.1, S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_d_y = 0.8):
+    # Method from: O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
+
+    # Typical Cn_Beta values 0.04-0.11/rad for subsonic single engine aircraft (SEAD lecture 9)
+    Rat_br_bv = np.linspace(0.7, 1.0, 500)  # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
+
+    # Determining crosswind force first
+    C_g_fwd, C_g_aft = min(load_diagram_plot()[1]), max(load_diagram_plot()[1])
+    V_total = np.sqrt(V_trans**2 + V_cross**2)
+    Fus_dist_fwd, Fus_dist_aft = X_AreaCent_fus - C_g_fwd, X_AreaCent_fus - C_g_aft
+    F_crosswind = 0.5 * rho * V_cross**2 * S_fus_side * C_d_y
+    Sideslip_ang = np.arctan(V_cross/V_trans)
+    C_n_Beta =
+    C_y_Beta =
+    Rat_cr_cv = np.linspace(0.15, 0.40, 500)  # Ratio of rudder (mean aerodynamic) chord to total elevator (mean aerodynamic) chord
+    Tau_rudder = 1.129 * Rat_cr_cv ** 0.4044 - 0.1772  # O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
+    # If Tau_rudder is larger than 1, redesign required
+    C_n_delta_r = -1 * C_L_v_alpha * ((S_v * l_v) / (S * b)) * Tau_rudder * Rat_br_bv  # Same source
+    C_y_delta_r = C_L_v_alpha * eta_v * Tau_rudder * Rat_cr_cv * (S_v/S)
+
+
     return
 
 def aileron_surface_sizing():
