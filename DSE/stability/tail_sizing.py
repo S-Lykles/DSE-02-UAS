@@ -39,10 +39,10 @@ c_tip = aero_constants.c_tip
 
 
 # ATTENTION!!!!!  CL_alpha are represented in 1/radians
-# def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_12_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
-# def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_14_c_rad=0, CL_alpha_w=5.787, sweep_ang_12_Ch_rad=0, c_root=0.6, c_tip=0.5):
+# def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_25_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_50_c_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
+# def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_25_c_rad=0, CL_alpha_w=5.787, sweep_ang_50_c_rad=0, c_root=0.6, c_tip=0.5):
 
-def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  CL_max, l_f, CL_0, sweep_ang_rad, Cm_0_airfoil, b_f, hf_max, l_fn, sweep_ang_14_c_rad, CL_alpha_w, sweep_ang_12_Ch_rad, c_root, c_tip):
+def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
     SM = 0.05 #PLACEHOLDER
@@ -64,7 +64,7 @@ def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  C
     m_tv = 2*dz_h/b
     r = 2*l_h/b
 
-    K_ev = (0.1124+0.1265*sweep_ang_14_c_rad+0.1766*sweep_ang_14_c_rad**2)/r**2+0.1024/r+2
+    K_ev = (0.1124+0.1265*sweep_ang_25_c_rad+0.1766*sweep_ang_25_c_rad**2)/r**2+0.1024/r+2
     K_ev0 = 0.1124/r**2+0.1024/r+2
 
     de_da = K_ev/K_ev0 * (r/(r**2+m_tv**2)*0.4876/np.sqrt(r**2+0.6319+m_tv**2)+(1+(r**2/(r**2+0.7915+5.0734*m_tv**2))**0.3113)*(1-np.sqrt(m_tv**2/(1+m_tv**2))))*CL_alpha_w/(np.pi*A)
@@ -75,13 +75,13 @@ def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  C
     i = 'True'
     if i=='True':
         # Cl_alpha_h is taken as 2pi, but it should be an input from aero
-        CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_12_Ch_rad)**2/beta**2)))
+        CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
         CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
         i = 'False'
         x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
         c_g = S/b
         lambd = c_tip/c_root
-        x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_14_c_rad)
+        x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
 
         x_ac_w = 0.3  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
         x_ac_bar = x_ac_w + x_ac_fc1 + x_ac_fc2
@@ -134,11 +134,12 @@ def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  C
     return  sr
 
 
-t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
+t = horizontal_tail_sizing()#eta, V, R, gamma, T, rho)
 print('test,', t)
 
 
-def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.Cl_alpha_wing,Xcg=class_two_cg_estimation()[1][0]):
+def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.CL_alpha_wing,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0]):
+def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.Cl_alpha_wing,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0]):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
 
     # base imports.
@@ -155,7 +156,6 @@ def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
     AR_v = np.arange(0.5, 2, 0.1)
     beta = 30
     sweep_v = np.arange(0, 45, 1)
-    aa = np.linspace(0, l_fus, num=step_size)
 
     # Empty list set
     Surface = []
@@ -222,30 +222,31 @@ def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
 
     #return
 
+def vertical_tail_size():
+    """Preliminary vertical tail size, it can change ask Bas before using. Last update 10/01/24."""
+    Sv = 1.250/2
+    bv = 1.2
+    lv = 2.3
+    AR_v = 1.125
+    Sweep_angle_v = 30 #deg
+    taper_v = 1/0.4
 
+    return Sv,bv,lv,AR_v,Sweep_angle_v,taper_v
 
-def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
+def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.cm_0,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
-
-    # c_bar =       # aero import
-    # Cm_0 =        # aero import
-    # Cm_alpha =    # aero import
-    # alpha =       # general list
-    # alpha_0 =     # aero import
-    # CL_alpha_h =  # aero import
     Sh_S = horizontal_tail_sizing()[0]
     Vh_V_2 = horizontal_tail_sizing()[3]
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
-    l_h = locations()[3]
 
-    Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
+    Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / delta
     Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh_be) * 1/Sh_S * c_bar/l_h * (1/Vh_V_2)**2
 
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing(C_L_v_alpha = 0.1, S_v = vertical_tail_surface(), l_v, S = aero_values()[13], b = aero_values()[12], V_cross, V_trans, S_fus_side, X_AreaCent, rho, C_d_y = 0.8, V_max, dsigma_dbeta = 0.0, eta_v = 0.95):
+def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 0.1, S_v = vertical_tail_surface(), S = aero_values()[13], b = aero_values()[12], C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!
