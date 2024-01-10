@@ -198,7 +198,7 @@ def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
         span.append(span_k)
         Moment_arm.append(moment_arm_k)
 
-    plot = True
+    plot = False
     if plot == True:
         fig, (ax, ay, az) = plt.subplots(1, 3)
         cp = ax.contourf(sweep_v, AR_v, Surface)
