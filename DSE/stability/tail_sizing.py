@@ -107,24 +107,21 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
         CL_A_h = 1.1 #INCORRECT VALUE, it is an input, currently just an assumtion
 
+        delta_f_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may not be any flaps
+        delta_nac_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may
+
+        delta_fus_Cm_ac = -1.8 * (1 - 2.5 * b_f / l_f) * np.pi * b_f * hf_max * l_f / (
+                    4 * S * c_bar) * CL_0 / CL_alpha_A_h
+        Cm_ac_w = Cm_0_airfoil * (A * np.cos(sweep_ang_rad) ** 2 / (A + 2 * np.cos(sweep_ang_rad)))
+
+        Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
+
+        x_cg_bar_c = x_ac_bar_x - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
         sr =[]
         for element in range(len(x_cg_bar)):
 
             x_cg_bar_sel =  x_cg_bar[element] #double check this codeline
             x_np_bar_sel = x_np_bar[x_cg_bar==x_cg_bar_sel] #double check this codeline
-
-            delta_f_Cm_ac = 0 #INCORRECT VALUE, it is assumed 0 as there may not be any flaps
-            delta_nac_Cm_ac = 0 #INCORRECT VALUE, it is assumed 0 as there may
-
-            delta_fus_Cm_ac = -1.8*(1-2.5*b_f/l_f)*np.pi*b_f*hf_max*l_f/(4*S*c_bar)*CL_0/CL_alpha_A_h
-            Cm_ac_w = Cm_0_airfoil * (A*np.cos(sweep_ang_rad)**2/(A+2*np.cos(sweep_ang_rad)))
-
-
-            Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
-
-
-            x_cg_bar_c = x_ac_bar_x - Cm_ac/CL_A_h + CL_h/CL_A_h *Sh_S*l_h/c_bar*Vh_V_2
-
 
             delta_x_cg_bar =np.abs(x_cg_bar[element] - x_cg_bar_c[element])
             surface_ratio = ((delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
