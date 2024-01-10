@@ -155,7 +155,6 @@ def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
     AR_v = np.arange(0.5, 2, 0.1)
     beta = 30
     sweep_v = np.arange(0, 45, 1)
-    aa = np.linspace(0, l_fus, num=step_size)
 
     # Empty list set
     Surface = []
@@ -222,7 +221,16 @@ def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
 
     #return
 
-
+def vertical_tail_size():
+    """Preliminary vertical tail size, it can change ask Bas before using. Last update 10/01/24."""
+    Sv = 1.250/2
+    bv = 1.2
+    lv = 2.3
+    AR_v = 1.125
+    Sweep_angle_v = 30 #deg
+    taper_v = 1/0.4
+    
+    return Sv,bv,lv,AR_v,Sweep_angle_v,taper_v
 
 def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
