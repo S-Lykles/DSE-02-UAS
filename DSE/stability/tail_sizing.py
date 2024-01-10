@@ -235,7 +235,7 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
 
 # def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
 # def rudder_surface_sizing( l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho,  V_max,C_d_y = 0.8, C_L_v_alpha = 0.1, S_v = vertical_tail_surface()):
-def rudder_surface_sizing(l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, V_max, C_d_y=0.8,
+def rudder_surface_sizing( S, b, l_v, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, V_max, C_d_y=0.8,
                               C_L_v_alpha=0.1, S_v=1.3):
 
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
