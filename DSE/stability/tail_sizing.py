@@ -4,7 +4,8 @@ from DSE import const
 from DSE.Locations import locations
 from DSE.stability.Loaddiag import load_diagram_plot
 from DSE.structures.center_of_gravity import class_two_cg_estimation
-from DSE.aero.aero_constants import aero_values
+from DSE.aero import aero_constants
+import matplotlib.pyplot as plt
 
 # default values
 T = const.T0
@@ -16,6 +17,7 @@ eta = 0.95 #airfoil efficiency
 z_t = 0.5 #PLACEHOLDER, please change it ASAP
 z_w = 0 #PLACEHOLDER, please change it ASAP
 dz_h = z_t-z_w
+S = aero_constants.S
 
 
 # ATTENTION!!!!!  CL_alpha are represented in 1/radians
@@ -207,7 +209,7 @@ def vertical_tail_size_1():
         az.set_xlabel('Sweep angle vertical tail')
         az.set_ylabel('Aspect ratio vertical tail')
 
-    return
+    # return
 
 
 
@@ -231,8 +233,11 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
 
     return Tau_el, Cm_delta_el
 
-#def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing(C_L_v_alpha = 0.1, S_v = vertical_tail_surface(), l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_d_y = 0.8, V_max):
+# def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
+# def rudder_surface_sizing( l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho,  V_max,C_d_y = 0.8, C_L_v_alpha = 0.1, S_v = vertical_tail_surface()):
+def rudder_surface_sizing(l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, V_max, C_d_y=0.8,
+                              C_L_v_alpha=0.1, S_v=1.3):
+
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     Imports respectively vertical tail lift curve slope, vertical tail surface area, moment arm for vertical tail, wing surface area, wing span, max cross wind speed,
