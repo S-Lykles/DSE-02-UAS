@@ -248,14 +248,9 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
 def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 0.1, S_v = vertical_tail_size()[0], S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
-    !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!
-
-    Imports respectively vertical tail lift curve slope, vertical tail surface area, moment arm for vertical tail, wing surface area, wing span, max cross wind speed,
-    transition airspeed, fuselage side area, area center of airplane, air density, fuselage sideways drag coefficient (assumed to be 0.8), max airspeed (necessary for the max tail load),
-    vertical tail sidewash gradient which is assumed to be zero for now, vertical tail efficiency factor assumed to be 0.95 by default"""
+    !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
 
     # Method from: O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
-    # Still need Cno
 
     # Typical Cn_Beta values 0.04-0.11/rad for subsonic single engine aircraft (SEAD lecture 9)
     Rat_br_bv = 0.9  # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
@@ -279,19 +274,23 @@ def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, 
     C_y_delta_r = C_L_v_alpha * eta_v * Tau_rudder * Rat_cr_cv * (S_v/S)
 
     # Solving equations 22 and 23 from the method source
-    sigma = np.linspace(0, np.pi, 500)
-    delta_r = np.linspace(0, np.pi, 500)
-    eqn_22 = 0.5 * rho * V_total**2 * S * b * (C_n_0 + C_n_Beta * (beta - sigma) + C_n_delta_r * delta_r) + F_crosswind * d_c * np.cos(sigma)
+    sigma = np.linspace(0, np.pi/2, 500)
+    delta_r = np.linspace(0, np.pi/6, 500)
+    eqn_22 = q * S * b * (C_n_0 + C_n_Beta * (beta - sigma) + C_n_delta_r * delta_r) + F_crosswind * d_c * np.cos(sigma)
     eqn_23 = F_crosswind - q * S * (C_y_0 + C_y_Beta * (beta - sigma) + C_y_delta_r * delta_r)
 
-    int_func = F_crosswind * (1 + Fus_dist_aft * np.cos(sigma)) + q * S * (b * C_n_0 - C_y_0 + (b * C_n_Beta - C_y_Beta)*(beta - sigma) + (b * C_n_delta_r - C_y_delta_r) * delta_r)
+    eqn_22_abs = abs(eqn_22)
+    eqn_23_abs = abs(eqn_23)
 
 
-    C_l_v = C_l_v_0 + C_l_v_Beta * beta + C_l_v_delta_r * delta_r
-    L_v = q * S_v * C_l_v
-    Rudder_load = l_v * L_v
+    # int_func = F_crosswind * (1 + Fus_dist_aft * np.cos(sigma)) + q * S * (b * C_n_0 - C_y_0 + (b * C_n_Beta - C_y_Beta)*(beta - sigma) + (b * C_n_delta_r - C_y_delta_r) * delta_r)
 
-    return delta_r, Rat_cr_cv, Rudder_load
+
+    # C_l_v = C_l_v_0 + C_l_v_Beta * beta + C_l_v_delta_r * delta_r
+    # L_v = q * S_v * C_l_v
+    # Rudder_load = l_v * L_v
+
+    return delta_r_final, Rat_cr_cv_final # , Rudder_load
 
 def aileron_surface_sizing():
 
