@@ -138,7 +138,7 @@ t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
 print('test,', t)
 
 
-def vertical_tail_size_1():
+def vertical_tail_size_1(l_fus=6,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.Cl_alpha_wing,Xcg=class_two_cg_estimation()[1][0]):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
 
     # base imports.
