@@ -18,12 +18,32 @@ z_t = 0.5 #PLACEHOLDER, please change it ASAP
 z_w = 0 #PLACEHOLDER, please change it ASAP
 dz_h = z_t-z_w
 S = aero_constants.S
+b = aero_constants.b
+c_bar = aero_constants.c_bar
+# Cl_alpha_h = aero_constants.Cl_alpha_h
+CL_max = aero_constants.CL_max
+# l_f = aero_constants.l_f
+CL_0 = aero_constants.CL_0
+# sweep_ang_rad = aero_constants.sweep_ang_rad
+# Cm_0_airfoil = aero_constants.Cm_0_airfoil
+# b_f = aero_constants.b_f
+# hf_max = aero_constants.hf_max
+# l_fn = aero_constants.l_fn
+# sweep_ang_14_c_rad = aero_constants.sweep_ang_14_c_rad
+# CL_alpha_w = aero_constants.CL_alpha_w
+# sweep_ang_12_Ch_rad = aero_constants.sweep_ang_12_Ch_rad
+c_root = aero_constants.c_root
+c_tip = aero_constants.c_tip
+c_tip = aero_constants.c_tip
+c_tip = aero_constants.c_tip
+c_tip = aero_constants.c_tip
 
 
 # ATTENTION!!!!!  CL_alpha are represented in 1/radians
 # def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_12_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
+# def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_14_c_rad=0, CL_alpha_w=5.787, sweep_ang_12_Ch_rad=0, c_root=0.6, c_tip=0.5):
 
-def horizontal_tail_sizing( eta, V, R, gamma, T, rho, S=3.5, b=6, c_bar=0.619, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_14_c_rad=0, CL_alpha_w=5.787, sweep_ang_12_Ch_rad=0, c_root=0.6, c_tip=0.5):
+def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h,  CL_max, l_f, CL_0, sweep_ang_rad, Cm_0_airfoil, b_f, hf_max, l_fn, sweep_ang_14_c_rad, CL_alpha_w, sweep_ang_12_Ch_rad, c_root, c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
     SM = 0.05 #PLACEHOLDER
