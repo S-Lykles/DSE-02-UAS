@@ -13,12 +13,18 @@ file_dir = Path(__file__).parent
 
 # Construct the path to the text file
 data_23012 = np.loadtxt(file_dir/r"T1-42_0 m_s-LLT.txt", skiprows=8)
+data_0012 = np.loadtxt(file_dir/r"naca0012.txt", skiprows=12)
 
 # Extract columns
 alpha_23012 = data_23012[:, 0]    # Angle of attack
 cl_23012 = data_23012[:, 2]       # Lift coefficient
 cd_23012 = data_23012[:, 5]       # Drag coefficient
 cm_23012 = data_23012[:, 8]       # Moment coefficient
+
+alpha_0012 = data_0012[:, 0]    # Angle of attack
+cl_0012 = data_0012[:, 1]       # Lift coefficient
+cd_00012 = data_0012[:, 2]       # Drag coefficient
+cm_0012 = data_0012[:, 4]       # Moment coefficient
 
 
 # Plot the data Dual Phase
@@ -29,6 +35,7 @@ if __name__ == "__main__":
     plt.figure(figsize=(10, 6))
     plt.subplot(1,3,1)
     plt.plot(alpha_23012, cl_23012, label='NACA 23012')
+    plt.plot(alpha_0012, cl_0012, label='NACA 0012')
     plt.title('Xfoil Data - $C_l$ vs alpha')
     plt.xlabel('Angle of Attack (degrees)')
     plt.ylabel('Lift Coefficient ($C_l$)')
