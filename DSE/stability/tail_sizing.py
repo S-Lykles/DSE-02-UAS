@@ -22,7 +22,7 @@ S = aero_constants.S
 # ATTENTION!!!!!  CL_alpha are represented in 1/radians
 # def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_14_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_12_Ch_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
 
-def horizontal_tail_sizing( eta, V, R, gamma, T, rho, S=3.5, b=6, c_bar=0.619, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_14_c_rad=0, CL_alpha_w=5.787, sweep_ang_12_Ch_rad=0, c_root=0.6, c_tip=0.5):
+def horizontal_tail_sizing( eta, V, R, gamma, T, rho, S=aero_constants.S, b=6, c_bar=0.619, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_14_c_rad=0, CL_alpha_w=5.787, sweep_ang_12_Ch_rad=0, c_root=0.6, c_tip=0.5):
     l_h  = locations()[3]
     dz_h = locations()[7]
     SM = 0.05 #PLACEHOLDER
@@ -118,19 +118,10 @@ t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
 print('test,', t)
 
 
-def vertical_tail_size_1():
+def vertical_tail_size_1(b_max=0.7,eta = 0.95,l_fus = 6,CL_w=aero_constants.CL_max, Cl_alpha=aero_constants.Cl_alpha_wing,b=aero_constants.b, S=aero_constants.S,deg2rad=const.deg2rad,Xcg=class_two_cg_estimation()[1][0]):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
 
     # base imports.
-    deg2rad = const.deg2rad
-    b = 6
-    S = 3.5
-    l_fus = 6
-    eta = 0.9
-    b_max = 0.7
-    Cl_alpha = 1  # the cl_alpha of the wing at transitional velocity
-    CL = 1.3  # at transitional velocity
-    Xcg = class_two_cg_estimation()[1][0]
     AR_w = b ** 2 / S
 
     # initial starting values
@@ -173,7 +164,7 @@ def vertical_tail_size_1():
                 Cl_v_alpha = (Cl_alpha * AR_w) / (2 + np.sqrt(4 + (AR_v[p] * beta * deg2rad / eta) * (
                             1 + (np.tan(sweep_05_cord_v * deg2rad) / (beta * deg2rad)) ** 2)))
 
-                C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                C_eta_beta_w = CL_w ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
                 new = (np.pi * l_fus * b_max ** 2) / 3
                 C_eta_beta_fuse = -2 / (S * b) * new
 
