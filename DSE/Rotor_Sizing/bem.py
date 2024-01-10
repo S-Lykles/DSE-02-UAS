@@ -2,108 +2,181 @@ import numpy as np
 from pathlib import Path
 from DSE import const
 from matplotlib import pyplot as plt
+from scipy.optimize import minimize
+from DSE.Rotor_Sizing.chord import chord_dist, P_bounds, P0
+from DSE.Rotor_Sizing.airfoil import Cl_func_clarky, Cd_func_clarky, Cp_func_clarky
 
-file_dir = Path(__file__).parent
-data = np.genfromtxt(file_dir / r"clarky.csv", delimiter=",", skip_header=1)
-alpha_clarky = data[:, 0]
-cl_clarky = data[:, 1]
-cd_clarky = data[:, 2]
-Cl_func_clarky = lambda a: np.interp(a, alpha_clarky, cl_clarky, left=0, right=0)
-Cd_func_clarky = lambda a: np.interp(a, alpha_clarky, cd_clarky)
+# file_dir = Path(__file__).parent
+# data = np.genfromtxt(file_dir / r"clarky.csv", delimiter=",", skip_header=1)
+# alpha_clarky = data[:, 0]
+# cl_clarky = data[:, 1]
+# cd_clarky = data[:, 2]
+# Cl_func_clarky = lambda a: np.interp(a, alpha_clarky, cl_clarky, right=0)
+# Cd_func_clarky = lambda a: np.interp(a, alpha_clarky, cd_clarky)
 
-# r = np.linspace(0, 0.5, 1000)
-# omega = (5000*2*np.pi) / 60  # 5000 rpm
 
-def chord_dist(r, a=0.03*2, b=-0.02):
-    return a + b*r
 
 def solidity(R, r, chord, N=2):
     return N * np.trapz(chord, r) / (np.pi * R**2)
 
-def twist_dist(r, a=14, b=-22):
-    return a + b*r
+
+def twist_dist(r, t_start=14, t_end=3):
+    # return np.deg2rad(np.linspace(t_start, t_end, len(r)))
+    R = r[-1]
+    a = R / (1/t_end - 1/t_start)
+    b = -a / t_start
+    return np.deg2rad(a / r + b)
+
 
 def dT_vi(r, vi, rho=const.rho0):
     return 4 * np.pi * rho * vi**2 * r
 
-def dT_dr_bem(r, omega, chord, twist, vi, N=2, Vc=0, rho=const.rho0, Cl_func=Cl_func_clarky):
-    alpha = twist - np.rad2deg((Vc + vi) / (omega * r))
-    return 0.5 * rho * (omega * r)**2 * chord * Cl_func(alpha) * N
 
-def vi_bem(r, dT_dr, rho=const.rho0):
-    return np.sqrt(dT_dr / (4 * np.pi * rho * r))
+def dT_dr_bem(r, omega, chord, twist, vi, Vc=0, rho=const.rho0, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky):
+    theta = np.arctan((Vc + vi) / (omega * r))
+    alpha = twist - theta
+    M = (omega * r) / const.a
+    Cpfrac = (1 + (const.gamma-1)/2*M**2) / (1 + (const.gamma-1)/2)
+    Cp_crit = 2 / const.gamma/M**2 * (Cpfrac**(const.gamma/(const.gamma-1))-1)
+    cp_min = Cp_func_clarky(M, np.rad2deg(alpha))
+    if np.any(cp_min < Cp_crit):
+        raise ValueError("Cp_min < Cp_crit")
+    dL = 0.5 * rho * (omega*r)**2 * chord * Cl_func(M, np.rad2deg(alpha))
+    dD = 0.5 * rho * (omega*r)**2 * chord * Cd_func(M, np.rad2deg(alpha))
+    dT = dL * np.cos(theta) - dD * np.sin(theta)
+    dQ = (dL * np.sin(theta) + dD * np.cos(theta)) * r
+    return dT, dQ
 
-def solve_dT_dr(r, omega, chord, twist, N=2, Cl_func=Cl_func_clarky, max_iter=100, tol=1e-6):
-    """twist in deg"""
-    vi1 = np.full_like(r, 0.1)
+
+def vi_bem(r, dT_dr, N, rho=const.rho0):
+    return np.sqrt(dT_dr * N / (4 * np.pi * rho * r))
+
+
+def solve_dT_dr(r, omega, chord, twist, N, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky, max_iter=100, tol=1e-6):
+    vi1 = np.zeros_like(r)
 
     for _ in range(max_iter):
-        dT1 = dT_dr_bem(r, omega, chord, twist, vi1, N=N, Cl_func=Cl_func)
-        # alpha1 = twist - np.rad2deg(np.arctan((vi1) / (omega * r)))
-        vi2 = vi_bem(r, dT1)
-        # alpha2 = twist - np.rad2deg(np.arctan((vi2) / (omega * r)))
-        vi = (vi1 + vi2) / 2
-        dT2 = dT_dr_bem(r, omega, chord, twist, vi, N=N, Cl_func=Cl_func)
-        vi1 = vi
+        dT1, dQ = dT_dr_bem(r, omega, chord, twist, vi1, Cl_func=Cl_func, Cd_func=Cd_func)
+        vi2 = vi_bem(r, dT1, N)
+        vi = (vi1*2 + vi2) / 3
+        dT2, dQ = dT_dr_bem(r, omega, chord, twist, vi, Cl_func=Cl_func, Cd_func=Cd_func)
         if np.linalg.norm(dT1 - dT2)/len(r) < tol:
             break
+        vi1 = vi
         dT1 = dT2
+    else:
+        raise ValueError("Failed to converge")
+    return dT2, dQ
 
-    return dT2
 
-def dD_bem(r, dT, omega, chord, twist, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_func_clarky):
-    vi = vi_bem(r, dT)
-    alpha = twist - np.rad2deg((Vc + vi) / (omega * r))
-    dDp = 0.5 * const.rho0 * (omega*r)**2 * chord * Cd_func(alpha) * N
-    return (dT * (Vc + vi) / (omega * r) + dDp)
+def solve_omega(r, omega, chord, twist, N, T_req=const.MTOW/4, tip_frac=0.97, max_iter=100, tol=1e-6):
+    for _ in range(max_iter):
+        dT, _ = solve_dT_dr(r, omega, chord, twist, N)
+        # T = np.trapz(np.where(r<=tip_frac*R, dT, 0), r)
+        T = np.trapz(dT, r) * 0.9 * N
+        if np.abs((T - T_req)/T_req) < tol:
+            break
+        omega = omega * (1 + T_req/T) / 2
+    else:
+        raise ValueError("Failed to converge")
+    return omega
+
+
+def figure_of_merit(x, N=2, T_req=const.MTOW/4, rpm0=4000, tip_frac=0.97, max_iter=1000, tol=1e-4, optim=False):
+    R = x[0]
+    t_start = x[1]
+    t_end = x[2]
+    P_bes = x[3:]
+    r = np.linspace(0.1, R, 1000)
+    omega = (rpm0*2*np.pi) / 60
+    A = np.pi * R**2
+    Vtip = omega * R
+    chord = chord_dist(r, P_bes)
+    twist = twist_dist(r, t_start, t_end)
+
+    omega = solve_omega(r, omega, chord, twist, N, T_req=T_req, tip_frac=tip_frac, max_iter=max_iter, tol=tol)
+    dT, dQ = solve_dT_dr(r, omega, chord, twist, N)
+    # T = np.trapz(np.where(r<=tip_frac*R, dT, 0), r)
+    T = np.trapz(dT, r) * 0.9 * N
+
+    Q = np.trapz(dQ, r) * N
+    P = Q * omega
+    Ct = T / (const.rho0 * A * Vtip**2)
+    Cp = P / (const.rho0 * A * Vtip**3)
+    M = Ct / Cp * np.sqrt(Ct/2)
+    return M
 
 
 if __name__ == "__main__":
     rho = const.rho0
     R = 0.5
-    r = np.linspace(0.1, R, 1000)
-    N = 2
-    omega = (5000*2*np.pi) / 60  # 5000 rpm
-    Vtip = omega * R
-    print(f'Tip speed: {Vtip:.2f} m/s')
     A = np.pi * R**2
-    chord = chord_dist(r)
-    print(f'Solidity: {solidity(R, r, chord, N=N):.2f}')
-    twist = twist_dist(r)
-    # twist = 3 / r
-    dT = solve_dT_dr(r, omega, chord, twist, N=N)
-    vi = vi_bem(r, dT)
-    dD = dD_bem(r, dT, omega, chord, twist, N=N)
-    plt.plot(r, dT/dD)
-    plt.show()
-    dQ = dD * r
+    r = np.linspace(0.1, R, 100)
+    N = 4
 
-    plt.plot(r, dT)
-    # to account for tip losses we integrate only to 0.97 R
-    T = np.trapz(np.where(r<=0.97*R, dT, 0), r)
-    T_ideal = np.trapz(dT, r)
-    print(f"tip loss % {100*(T_ideal-T)/T_ideal:.2f}")
-    print(f"thrust: {T:.2f} N")
-    print(f"Disk loading: {T / (np.pi * R**2):.2f} N/m^2")
-    plt.show()
+    x0 = np.array([0.5, 14, 0, *P0])
+    M = figure_of_merit(x0, N=N, T_req=const.MTOW/4, rpm0=4000, tip_frac=0.97, max_iter=1000)
+    print(f"figure of merit: {M:.3f}")
 
-    plt.plot(r, vi)
-    plt.show()
-
-    Q = np.trapz(dQ, r)
-    P = Q * omega
-    print(f"Torque: {Q:.2f} Nm")
-    print(f"Power: {P:.2f} W")
-    print(f"Power loading {P /T:.2f} W/N")
+    bounds = [(0.5, 0.5), (10, 20), (0, 0), *P_bounds]
+    func = lambda x: -figure_of_merit(x, N=N, optim=True)
+    res = minimize(func, x0, bounds=bounds, method='Nelder-Mead', options={'maxiter':10000})
+    print(res)
+    R = res.x[0]
+    t_start = res.x[1]
+    t_end = res.x[2]
+    P_bes = res.x[3:]
+    r = np.linspace(0.1, R, 100)
+    A = np.pi * R**2
     
-    CT = T / (rho * A * Vtip**2)
-    CP = P / (rho * A * Vtip**3)
-    M = CT / CP * np.sqrt(CT/2)
-    print(f"CT: {CT:.2f}")
-    print(f"figure of merit: {M:.2f}")
+    chord = chord_dist(r, P_bes)
+    S = np.trapz(chord, r)
+    print(f'Aspect ratio: {R**2/S:.3f}')
+    print(f'twist start: {t_start:.3f}')
+    print(f'twist end: {t_end:.3f}')
+    twist = twist_dist(r, t_start, t_end)
+
+    omega = solve_omega(r, 4000*2*np.pi/60, chord, twist, N=N, T_req=const.MTOW/4, tip_frac=0.97, max_iter=1000)
+    Vtip = omega * R
+    print(f"Mtip = {Vtip/const.a:.3f}")
+    print(f"rpm: {omega*60/(2*np.pi):.3f}")
+    dT, dQ = solve_dT_dr(r, omega, chord, twist, N)
+    # T = np.trapz(np.where(r<=0.97*R, dT, 0), r)
+    T = np.trapz(dT, r) * 0.9 * N
+    print(f'Disk loading [N/m^2]: {T/A:.3f}')
+    vi = vi_bem(r, dT, N)
+    plt.plot(r, vi)
+    plt.xlabel('r [m]')
+    plt.ylabel('vi [m/s]')
+    plt.ylim(bottom=0)
+    plt.show()
+    Q = np.trapz(dQ, r) * N
+    P = Q * omega
+    Ct = T / (const.rho0 * A * Vtip**2)
+    Cp = P / (const.rho0 * A * Vtip**3)
+    M = Ct / Cp * np.sqrt(Ct/2)
+    print(f'Ct: {Ct:.5f}') 
+    print(f"figure of merit: {M:.3f}")
+    print(f"R: {R:.3f}")
+
+    r = np.linspace(0., R, 100)
+    chord = chord_dist(r, P_bes)
+    print(f'Solidity: {solidity(R, r, chord, N):.5f}')
+
+    P_bounds_upper, P_bounds_lower = zip(*P_bounds)
+    P_bounds_upper = np.array(P_bounds_upper) * R
+    P_bounds_lower = np.array(P_bounds_lower) * R
+    xp = np.linspace(0, R, 7)
+    plt.plot(r, chord)
+    plt.scatter(xp, P_bounds_lower)
+    plt.scatter(xp, P_bounds_upper)
+    plt.scatter(xp, P_bes*R)
 
 
-    # plt.plot(r, twist - np.rad2deg((vi) / (omega * r)))
-    # plt.show()
-        
+    plt.xlabel('r [m]')
+    plt.ylabel('chord [m]')
+    plt.ylim(bottom=0)
+    # set aspect ratio to same scale
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
     
