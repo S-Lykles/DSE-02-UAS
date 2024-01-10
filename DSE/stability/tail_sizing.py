@@ -125,9 +125,10 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
     return Tau_el, Cm_delta_el
 
 def rudder_surface_sizing():
-
-
-
+    # Possible method?
+    Rat_br_bv = np.linspace(0.7,1.0,500) # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
+    Rat_cr_cv = np.linspace(0.15,0.40,500) # Ratio of rudder (mean aerodynamic) chord to total elevator (mean aerodynamic) chord
+    Tau_rudder = 1.129 * Rat_cr_cv**0.4044 - 0.1772 # O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
     return
 
 def aileron_surface_sizing():
