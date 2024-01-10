@@ -268,8 +268,12 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 
     return P_cr, sigma_cr
 
+print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
+                                                                          0.06, 0,0,0,
+                                                                          0,0,0,0,
+                                                                          0,0,0,0, 0, 1))
 
-#print("Test run moment of inertia computation:", I_yy_wing_box(0.5, .1, .1,
-                                                                         # .5, 0.5,0.1,0.1,
-                                                                         # 0.5,0.5,0.1,0.1,
-                                                                         # 0.5,0.005,1,0.005, 1, 1, 0))
+print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
+                                                                          0.04, 0,0,0,
+                                                                          0,0,0,0,
+                                                                          0,0,0,0, 0, 1))
