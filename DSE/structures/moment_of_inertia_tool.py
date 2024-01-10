@@ -20,13 +20,13 @@ def moment_of_inertia_rectangle_y_axis(width, height):
 
     return I_yy
 
-#Function computing the moment of inertia of a solid circular section
+# Function computing the moment of inertia of a solid circular section
 def moment_of_inertia_solid_circular_section(diameter):
     I = np.pi * diameter**4 / 64
 
     return I
 
-#Function computing the moment of inertia of a thin-walled circular section
+# Function computing the moment of inertia of a thin-walled circular section
 def moment_of_inertia_thin_walled_circular_section(diameter, thickness):
     I = np.pi * thickness * diameter**3 / 8
 
@@ -54,7 +54,8 @@ def parallel_axis_theorem(inertia, mass, distance):
 # d = Distance between the neutral line (y-axis) and the center of the spars
 
 def I_xx_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
-                            w_rear_center, h_rear_tip, w_rear_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars):
+                            w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
+                            w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars):
     if number_of_spars == 1:
 
         # Moment of inertia of various rectangles in the wing box
@@ -102,11 +103,44 @@ def I_xx_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
         # Adding various components to get the total moment of inertia of the wing box around the x-axis
         I_xx = I_front_center + 2 * I_front_tips + I_rear_center + 2 * I_rear_tips + I_top_sheet + I_bottom_sheet
 
+    elif number_of_spars == 3:
+        # Moment of inertia of various rectangles in the wing box
+        I_front_center = moment_of_inertia_rectangle_x_axis(w_front_center, h_front_center)
+        I_front_tips = moment_of_inertia_rectangle_x_axis(w_front_tip, h_front_tip)
+        I_center_center = moment_of_inertia_rectangle_x_axis(w_center_center, h_center_center)
+        I_center_tips = moment_of_inertia_rectangle_x_axis(w_center_tip, h_center_tip)
+        I_rear_center = moment_of_inertia_rectangle_x_axis(w_rear_center, h_rear_center)
+        I_rear_tips = moment_of_inertia_rectangle_x_axis(w_rear_tip, h_rear_tip)
+        I_top_sheet = moment_of_inertia_rectangle_x_axis(l_top, t_top)
+        I_bottom_sheet = moment_of_inertia_rectangle_x_axis(l_bottom, t_bottom)
+
+        # Including the parallel axis theorem
+
+        # Moment of inertia for tips of spar
+        I_front_tips = parallel_axis_theorem(I_front_tips, h_front_tip * w_front_tip,
+                                             0.5 * h_front_center + 0.5 * h_front_tip)
+        I_center_tips = parallel_axis_theorem(I_center_tips, h_center_tip * w_center_tip,
+                                             0.5 * h_center_center + 0.5 * h_center_tip)
+        I_rear_tips = parallel_axis_theorem(I_rear_tips, h_rear_tip * w_rear_tip,
+                                            0.5 * h_rear_center + 0.5 * h_rear_tip)
+
+        # Moment of inertia top and bottom sheet
+        I_top_sheet = parallel_axis_theorem(I_top_sheet, t_top * l_top, (
+                0.5 * h_front_center + h_front_tip + t_top + 0.5 * h_rear_center + h_rear_tip) / 2)
+        I_bottom_sheet = parallel_axis_theorem(I_bottom_sheet, t_bottom * l_bottom,
+                                               (0.5 * h_front_center + h_front_tip + 1.5 * t_bottom + 0.5 * h_rear_center
+                                                + h_rear_tip + h_center_tip + h_center_center) / 3)
+
+        # Adding various components to get the total moment of inertia of the wing box around the x-axis
+        I_xx = (I_front_center + 2 * I_front_tips + I_center_center + 2 * I_center_tips  +I_rear_center + 2 * I_rear_tips
+                + I_top_sheet + I_bottom_sheet)
+
     return I_xx
 
 
-def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
-                            w_rear_center, h_rear_tip, w_rear_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
+def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_center_center, w_center_center,
+                            h_center_tip, w_center_tip, h_rear_center, w_rear_center, h_rear_tip, w_rear_tip,
+                            t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
     if number_of_spars == 1:
 
         # Moment of inertia of various rectangles in the wing box
@@ -139,6 +173,29 @@ def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
 
         # Adding various components to get the total moment of inertia of the wing box around the x-axis
         I_yy = I_front_center + 2 * I_front_tips + I_rear_center + 2 * I_rear_tips + I_top_sheet + I_bottom_sheet
+
+    elif number_of_spars == 3:
+        # Moment of inertia of various rectangles in the wing box
+        I_front_center = moment_of_inertia_rectangle_y_axis(w_front_center, h_front_center)
+        I_front_tips = moment_of_inertia_rectangle_y_axis(w_front_tip, h_front_tip)
+        I_center_center = moment_of_inertia_rectangle_y_axis(w_center_center, h_center_center)
+        I_center_tips = moment_of_inertia_rectangle_y_axis(w_center_tip, h_center_tip)
+        I_rear_center = moment_of_inertia_rectangle_y_axis(w_rear_center, h_rear_center)
+        I_rear_tips = moment_of_inertia_rectangle_y_axis(w_rear_tip, h_rear_tip)
+        I_top_sheet = moment_of_inertia_rectangle_y_axis(l_top, t_top)
+        I_bottom_sheet = moment_of_inertia_rectangle_y_axis(l_bottom, t_bottom)
+
+        # Including the parallel axis theorem
+
+        # Moment of inertia for the spars
+        I_front_center = parallel_axis_theorem(I_front_center, h_front_center * w_front_center, d)
+        I_front_tips = parallel_axis_theorem(I_front_tips, h_front_tip * w_front_tip, d)
+        I_rear_center = parallel_axis_theorem(I_rear_center, h_rear_center * w_rear_center, d)
+        I_rear_tips = parallel_axis_theorem(I_rear_tips, h_rear_tip * w_rear_tip, d)
+
+        # Adding various components to get the total moment of inertia of the wing box around the x-axis
+        I_yy = (I_front_center + 2 * I_front_tips + I_center_center + 2 * I_center_tips + I_rear_center + 2 * I_rear_tips
+                + I_top_sheet + I_bottom_sheet)
 
     return I_yy
 
