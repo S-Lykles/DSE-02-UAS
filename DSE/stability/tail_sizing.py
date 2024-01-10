@@ -253,7 +253,7 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing(C_L_v_alpha = 0.1, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, S = aero_constants.S, b = aero_constants.b, l_v = vertical_tail_size()[2], S_v = vertical_tail_size()[0], V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max):
+def rudder_surface_sizing(C_L_v_alpha = 0.1, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0, S = aero_constants.S, b = aero_constants.b, l_v = vertical_tail_size()[2], S_v = vertical_tail_size()[0], V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!
@@ -292,7 +292,7 @@ def rudder_surface_sizing(C_L_v_alpha = 0.1, C_d_y = 0.8, dsigma_dbeta = 0.0, et
     eqn_22 = 0.5 * rho * V_total**2 * S * b * (C_n_0 + C_n_Beta * (beta - sigma) + C_n_delta_r * delta_r) + F_crosswind * d_c * np.cos(sigma)
     eqn_23 = F_crosswind - q * S * (C_y_0 + C_y_Beta * (beta - sigma) + C_y_delta_r * delta_r)
 
-    int_func = F_crosswind * (1 + Fus_dist_aft * np.cos(sigma)) + q * S * (b * C_n_0 - C_y_0 + (b * C_n_Beta - C_y_Beta)*(beta - sigma) + (b * C_n_delta_r - C_y_delta_r) * delta_r)
+    # int_func = F_crosswind * (1 + Fus_dist_aft * np.cos(sigma)) + q * S * (b * C_n_0 - C_y_0 + (b * C_n_Beta - C_y_Beta)*(beta - sigma) + (b * C_n_delta_r - C_y_delta_r) * delta_r)
 
 
     C_l_v = C_l_v_0 + C_l_v_Beta * beta + C_l_v_delta_r * delta_r
