@@ -33,8 +33,8 @@ def moment_of_inertia_thin_walled_circular_section(diameter, thickness):
     return I
 
 # Parallel axis theorem
-def parallel_axis_theorem(inertia, mass, distance):
-    I = inertia + mass*distance**2
+def parallel_axis_theorem(inertia, area, distance):
+    I = inertia + area*distance**2
 
     return I
 
@@ -53,9 +53,9 @@ def parallel_axis_theorem(inertia, mass, distance):
 # l_bottom = Length of the bottom sheet
 # d = Distance between the neutral line (y-axis) and the center of the spars
 
-def I_xx_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
-                            w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
-                            w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars):
+def I_xx_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
+                  w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
+                  w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars):
     if number_of_spars == 1:
 
         # Moment of inertia of various rectangles in the wing box
@@ -138,9 +138,9 @@ def I_xx_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
     return I_xx
 
 
-def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
-                            w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
-                            w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
+def I_yy_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
+                  w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
+                  w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
     if number_of_spars == 1:
 
         # Moment of inertia of various rectangles in the wing box
@@ -199,7 +199,39 @@ def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
 
     return I_yy
 
+# Tool to compute the moment of inertia around the x-axis along the rectangular section of the fuselage
+def I_xx_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bottom):
+    # Moment of inertia for the various rectangles:
+    I_sides = moment_of_inertia_rectangle_x_axis(w_side, h_side)
+    I_top = moment_of_inertia_rectangle_x_axis(w_top, h_top)
+    I_bottom = moment_of_inertia_rectangle_x_axis(w_bottom, h_bottom)
 
+    # Including the parallel axis theorem:
+    I_top = parallel_axis_theorem(I_top, w_top * h_top, 0.5 * h_side + 0.5 * h_top)
+    I_bottom = parallel_axis_theorem(I_bottom, w_bottom * h_bottom, 0.5 * h_side + 0.5 * h_bottom)
+
+    # Adding various contributions to the total moment of inertia for the fuselage cross-section
+    I_xx = 2 * I_sides + I_top + I_bottom
+
+    return I_xx
+
+
+# Tool to compute the moment of inertia around the y-axis along the rectangular section of the fuselage
+def I_yy_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bottom):
+    # Moment of inertia for the various rectangles:
+    I_sides = moment_of_inertia_rectangle_y_axis(w_side, h_side)
+    I_top = moment_of_inertia_rectangle_y_axis(w_top, h_top)
+    I_bottom = moment_of_inertia_rectangle_y_axis(w_bottom, h_bottom)
+
+    # Including the parallel axis theorem:
+    I_sides = parallel_axis_theorem(I_sides, h_side*w_side, 0.5 * w_top - 0.5 * w_side)
+
+    # Adding various contributions to the total moment of inertia for the fuselage cross-section
+    I_yy = 2 * I_sides + I_top + I_bottom
+
+    return I_yy
+
+# Torsion calculator for a beam with a certain geometrical cross-section
 def compute_torsion(T, rho, J, G, t, A_m, s):
     #Torsion and twist cirucular section
     tau_circ = T * rho / J
@@ -215,6 +247,7 @@ def compute_torsion(T, rho, J, G, t, A_m, s):
 
     return tau_circ, dtheta_dz_circ, tau_thin_circ, dtheta_dz_thin_circ, tau_max_thin_plate, dtheta_dz_thin_plate
 
+# Buckling calculator for a beam with a certain geometrical cross-section
 def compute_buckling(E, Ixx, buckling, L, v, t, b):
     # Specify buckling type
     if buckling == 'Fixed-Fixed':
@@ -235,8 +268,12 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 
     return P_cr, sigma_cr
 
+print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
+                                                                          0.06, 0,0,0,
+                                                                          0,0,0,0,
+                                                                          0,0,0,0, 0, 1))
 
-#print("Test run moment of inertia computation:", I_yy_wing_box_two_spars(0.5, .1, .1,
-                                                                         # .5, 0.5,0.1,0.1,
-                                                                         # 0.5,0.5,0.1,0.1,
-                                                                         # 0.5,0.005,1,0.005, 1, 1, 0))
+print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
+                                                                          0.04, 0,0,0,
+                                                                          0,0,0,0,
+                                                                          0,0,0,0, 0, 1))
