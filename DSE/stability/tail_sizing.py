@@ -117,97 +117,98 @@ t = horizontal_tail_sizing(eta, V, R, gamma, T, rho)
 print('test,', t)
 
 
-# def vertical_tail_size_1(tail_config='t-tail'):
-#     # 'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
-# base imports.
-deg2rad = np.pi / 180
-b = 6
-S = 3.5
-l_fus = 6
-eta = 0.9
-b_max = 0.7
-Cl_alpha = 1  # the cl_alpha of the wing at transitional velocity
-CL = 1.3  # at transitional velocity
-Xcg = 3.5147906877402817
-AR_w = b ** 2 / S
+def vertical_tail_size_1():
+    #     # 'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+    # base imports.
+    deg2rad = np.pi / 180
+    b = 6
+    S = 3.5
+    l_fus = 6
+    eta = 0.9
+    b_max = 0.7
+    Cl_alpha = 1  # the cl_alpha of the wing at transitional velocity
+    CL = 1.3  # at transitional velocity
+    Xcg = 3.5147906877402817
+    AR_w = b ** 2 / S
 
-# initial starting values
-lv = 3
-tail_volume = 0.055
-C_eta_beta = 0.058
-taper_v = 1 / 0.40
-step_size = 50
+    # initial starting values
+    lv = 3
+    tail_volume = 0.055
+    C_eta_beta = 0.058
+    taper_v = 1 / 0.40
+    step_size = 50
 
-# intergration space
-AR_v = np.arange(0.5, 2, 0.1)
-beta = 30
-sweep_v = np.arange(0, 45, 1)
-aa = np.linspace(0, l_fus, num=step_size)
+    # intergration space
+    AR_v = np.arange(0.5, 2, 0.1)
+    beta = 30
+    sweep_v = np.arange(0, 45, 1)
+    aa = np.linspace(0, l_fus, num=step_size)
 
-# Empty list set
-Surface = []
-span = []
-Moment_arm = []
+    # Empty list set
+    Surface = []
+    span = []
+    Moment_arm = []
 
-Sv = tail_volume * S * b / lv
+    Sv = tail_volume * S * b / lv
 
-for p in range(len(AR_v)):
-    Surface_k = []
-    span_k = []
-    moment_arm_k = []
-    for j in range(len(sweep_v)):
-        for k in range(100):
-            bv = np.sqrt(AR_v[p] * Sv)
+    for p in range(len(AR_v)):
+        Surface_k = []
+        span_k = []
+        moment_arm_k = []
+        for j in range(len(sweep_v)):
+            for k in range(100):
+                bv = np.sqrt(AR_v[p] * Sv)
 
-            Cv = 2 / (1 + taper_v) * Sv / bv
-            Cv_bar = 2 / 3 * Cv * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
+                Cv = 2 / (1 + taper_v) * Sv / bv
+                Cv_bar = 2 / 3 * Cv * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
 
-            # Updated values
-            X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
-            lv = 6 - Xcg - Cv + X_LEMAC_v + 0.25 * Cv_bar
+                # Updated values
+                X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
+                lv = 6 - Xcg - Cv + X_LEMAC_v + 0.25 * Cv_bar
 
-            # Update C_eta_beta
-            sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
-            Cl_v_alpha = (Cl_alpha * AR_w) / (2 + np.sqrt(4 + (AR_v[p] * beta * deg2rad / eta) * (
-                        1 + (np.tan(sweep_05_cord_v * deg2rad) / (beta * deg2rad)) ** 2)))
+                # Update C_eta_beta
+                sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
+                Cl_v_alpha = (Cl_alpha * AR_w) / (2 + np.sqrt(4 + (AR_v[p] * beta * deg2rad / eta) * (
+                            1 + (np.tan(sweep_05_cord_v * deg2rad) / (beta * deg2rad)) ** 2)))
 
-            C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
-            new = (np.pi * l_fus * b_max ** 2) / 3
-            C_eta_beta_fuse = -2 / (S * b) * new
+                C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                new = (np.pi * l_fus * b_max ** 2) / 3
+                C_eta_beta_fuse = -2 / (S * b) * new
 
-            # Update tail surface
-            Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / Cl_v_alpha * (S * b) / lv
+                # Update tail surface
+                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / Cl_v_alpha * (S * b) / lv
 
-            # List of all values
-        Surface_k.append(Sv)
-        span_k.append(bv)
-        moment_arm_k.append(lv)
-    Surface.append(Surface_k)
-    span.append(span_k)
-    Moment_arm.append(moment_arm_k)
+                # List of all values
+            Surface_k.append(Sv)
+            span_k.append(bv)
+            moment_arm_k.append(lv)
+        Surface.append(Surface_k)
+        span.append(span_k)
+        Moment_arm.append(moment_arm_k)
 
-plot = True
-if plot == True:
-    fig, (ax, ay, az) = plt.subplots(1, 3)
-    cp = ax.contourf(sweep_v, AR_v, Surface)
-    fig.colorbar(cp)  # Add a colorbar to a plot
-    ax.set_title('Vertical tail surface (Sv)')
-    ax.set_xlabel('Sweep angle vertical tail')
-    ax.set_ylabel('Aspect ratio vertical tail')
+    plot = True
+    if plot == True:
+        fig, (ax, ay, az) = plt.subplots(1, 3)
+        cp = ax.contourf(sweep_v, AR_v, Surface)
+        fig.colorbar(cp)  # Add a colorbar to a plot
+        ax.set_title('Vertical tail surface (Sv)')
+        ax.set_xlabel('Sweep angle vertical tail')
+        ax.set_ylabel('Aspect ratio vertical tail')
 
-    cy = ay.contourf(sweep_v, AR_v, span)
-    fig.colorbar(cy)
-    ay.set_title('Span of a single vertical tail plaine (bv)')
-    ay.set_xlabel('Sweep angle vertical tail')
-    ay.set_ylabel('Aspect ratio vertical tail')
+        cy = ay.contourf(sweep_v, AR_v, span)
+        fig.colorbar(cy)
+        ay.set_title('Span of a single vertical tail plaine (bv)')
+        ay.set_xlabel('Sweep angle vertical tail')
+        ay.set_ylabel('Aspect ratio vertical tail')
 
-    cz = az.contourf(sweep_v, AR_v, Moment_arm)
-    fig.colorbar(cz)
-    az.set_title('Moment arm of the vertical tail plaine (lv)')
-    az.set_xlabel('Sweep angle vertical tail')
-    az.set_ylabel('Aspect ratio vertical tail')
+        cz = az.contourf(sweep_v, AR_v, Moment_arm)
+        fig.colorbar(cz)
+        az.set_title('Moment arm of the vertical tail plaine (lv)')
+        az.set_xlabel('Sweep angle vertical tail')
+        az.set_ylabel('Aspect ratio vertical tail')
 
     return
+
 
 
 def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
@@ -230,7 +231,7 @@ def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alph
 
     return Tau_el, Cm_delta_el
 
-def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
+#def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
 def rudder_surface_sizing(C_L_v_alpha = 0.1, S_v = vertical_tail_surface(), l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_d_y = 0.8, V_max):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
