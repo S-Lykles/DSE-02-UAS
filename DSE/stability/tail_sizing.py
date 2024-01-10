@@ -232,22 +232,14 @@ def vertical_tail_size():
     
     return Sv,bv,lv,AR_v,Sweep_angle_v,taper_v
 
-def elevator_surface_sizing(c_bar=0.619,Cm_0=-0.111,Cm_alpha=-0.029,alpha=0,alpha_0=0,CL_alpha_h= 0.12,bh_be=1):
+def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.cm_0,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
-
-    # c_bar =       # aero import
-    # Cm_0 =        # aero import
-    # Cm_alpha =    # aero import
-    # alpha =       # general list
-    # alpha_0 =     # aero import
-    # CL_alpha_h =  # aero import
     Sh_S = horizontal_tail_sizing()[0]
     Vh_V_2 = horizontal_tail_sizing()[3]
 
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
-    l_h = locations()[3]
 
-    Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / (delta)
+    Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / delta
     Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh_be) * 1/Sh_S * c_bar/l_h * (1/Vh_V_2)**2
 
     return Tau_el, Cm_delta_el
