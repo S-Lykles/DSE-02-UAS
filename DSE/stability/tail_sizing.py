@@ -119,7 +119,7 @@ print('test,', t)
 
 
 def vertical_tail_size_1():
-    'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
 
     # base imports.
     deg2rad = const.deg2rad
