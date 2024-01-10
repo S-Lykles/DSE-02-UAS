@@ -132,15 +132,15 @@ def I_xx_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front
                                                 + h_rear_tip + h_center_tip + h_center_center) / 3)
 
         # Adding various components to get the total moment of inertia of the wing box around the x-axis
-        I_xx = (I_front_center + 2 * I_front_tips + I_center_center + 2 * I_center_tips  +I_rear_center + 2 * I_rear_tips
+        I_xx = (I_front_center + 2 * I_front_tips + I_center_center + 2 * I_center_tips  + I_rear_center + 2 * I_rear_tips
                 + I_top_sheet + I_bottom_sheet)
 
     return I_xx
 
 
-def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_center_center, w_center_center,
-                            h_center_tip, w_center_tip, h_rear_center, w_rear_center, h_rear_tip, w_rear_tip,
-                            t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
+def I_yy_wing_box_two_spars(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
+                            w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
+                            w_center_tip, t_top, l_top, t_bottom, l_bottom, number_of_spars, d):
     if number_of_spars == 1:
 
         # Moment of inertia of various rectangles in the wing box
@@ -235,3 +235,8 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 
     return P_cr, sigma_cr
 
+
+#print("Test run moment of inertia computation:", I_yy_wing_box_two_spars(0.5, .1, .1,
+                                                                         # .5, 0.5,0.1,0.1,
+                                                                         # 0.5,0.5,0.1,0.1,
+                                                                         # 0.5,0.005,1,0.005, 1, 1, 0))
