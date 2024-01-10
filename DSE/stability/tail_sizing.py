@@ -1,6 +1,5 @@
 import numpy as np
 from DSE import const
-# from DSE.stability.EoM import distance_stability
 from DSE.Locations import locations
 from DSE.stability.Loaddiag import load_diagram_plot
 from DSE.structures.center_of_gravity import class_two_cg_estimation
@@ -118,9 +117,10 @@ print('test,', t)
 
 
 def vertical_tail_size_1():
-    #     # 'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+    'Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+
     # base imports.
-    deg2rad = np.pi / 180
+    deg2rad = const.deg2rad
     b = 6
     S = 3.5
     l_fus = 6
@@ -128,7 +128,7 @@ def vertical_tail_size_1():
     b_max = 0.7
     Cl_alpha = 1  # the cl_alpha of the wing at transitional velocity
     CL = 1.3  # at transitional velocity
-    Xcg = 3.5147906877402817
+    Xcg = class_two_cg_estimation()[1][0]
     AR_w = b ** 2 / S
 
     # initial starting values
