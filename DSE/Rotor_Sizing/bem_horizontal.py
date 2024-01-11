@@ -12,9 +12,6 @@ cd_clarky = data[:, 2]
 Cl_func_clarky = lambda a: np.interp(a, alpha_clarky, cl_clarky, left=0, right=0)
 Cd_func_clarky = lambda a: np.interp(a, alpha_clarky, cd_clarky)
 
-# r = np.linspace(0, 0.5, 1000)
-# omega = (5000*2*np.pi) / 60  # 5000 rpm
-
 def chord_dist(r, a=0.03, b=-0.02):
     return a + b*r
 
@@ -59,20 +56,21 @@ def dD_bem(r, dT, omega, chord, twist, N=2, Vc=0, rho=const.rho0, Cd_func=Cd_fun
     return (dT * (Vc + vi) / (omega * r) + dDp)
 
 if __name__ == "__main__":
-    rpm_range = np.arange(1000, 6100, 100)
+    pitch_range = np.arange(-5, 11, 0.1)
+    #pitch_range = np.zeros_like(pitch_range, dtype=float)
+    total_thrust_values = np.zeros_like(pitch_range, dtype=float)
 
-    rpm_values = np.zeros_like(rpm_range, dtype=float)
-    total_thrust_values = np.zeros_like(rpm_range, dtype=float)
+    target_rpm = 4500
 
-    target_rpm = 4000
+    plt.figure()
 
-    for i, rpm in enumerate(rpm_range):
+    for i, pitch in enumerate(pitch_range):
         R = 0.5
         r = np.linspace(0.1, R, 1000)
-        N = 8
-        omega = (rpm*2*np.pi) / 60
+        N = 4
+        omega = (target_rpm*2*np.pi) / 60
         chord = chord_dist(r)
-        twist = twist_dist(r)
+        twist = twist_dist(r) + pitch
 
         dT = solve_dT_dr(r, omega, chord, twist, N=N)
         vi = vi_bem(r, dT)
@@ -87,52 +85,53 @@ if __name__ == "__main__":
         P = Q * omega
 
         T_total = np.trapz(np.where(r <= 0.97 * R, dT, 0), r)
-        rpm_values[i] = rpm
+        #pitch_range[i] = pitch
         total_thrust_values[i] = T_total
 
-        if rpm == target_rpm:
-            plt.plot(r, dT)
-            plt.fill_between(r, 0, dT, alpha=0.2)
-            plt.title(f"Thrust distribution at rpm = {rpm}")
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Thurst [N]')
-            plt.grid()
-            plt.show()
+        # if pitch == 0:
+        #     plt.figure()
+        #
+        #     plt.plot(r, dT)
+        #     plt.fill_between(r, 0, dT, alpha=0.2)
+        #     #plt.title(f"Thrust distribution at rpm = {rpm}")
+        #     plt.xlabel('Radius [m]')
+        #     plt.ylabel('Thurst [N]')
+        #     plt.grid()
+        #     plt.show()
+        #
+        #     # plt.plot(r, vi)
+        #     # #plt.title(f'Induced velocity distribution at rpm = {rpm}')
+        #     # plt.xlabel('Radius [m]')
+        #     # plt.ylabel('Indiced velocity [m/s]')
+        #     # plt.grid()
+        #     # plt.show()
+        #     #
+        #     # plt.plot(r, dQ)
+        #     # #plt.title(f'Torque distribution at rpm = {rpm}')
+        #     # plt.xlabel('Radius [m]')
+        #     # plt.ylabel('Torque [N/m]')
+        #     # plt.grid()
+        #     # plt.show()
+        #     #
+        #     # plt.plot(r, twist - np.rad2deg((vi) / (omega * r)))
+        #     # #plt.title(f'Effective angle of attack distribution at rpm = {rpm}')
+        #     # plt.xlabel('Radius [m]')
+        #     # plt.ylabel('Effective angle of attack [deg]')
+        #     # plt.grid()
+        #     # plt.show()
+        #
+        #     # print(f"\nResults for RPM = {rpm}:")
+        #     # print(f"Tip loss % {100 * (T_ideal - T) / T_ideal:.2f}")
+        #     # print(f"Thrust: {T:.2f} N")
+        #     # print(f"Disk loading: {T / (np.pi * R ** 2):.2f} N/m^2")
+        #     # print(f"Torque: {Q:.2f} Nm")
+        #     # print(f"Power: {P:.2f} W")
+        #
+        #     plt.clf()
 
-            plt.plot(r, vi)
-            plt.title(f'Induced velocity distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Indiced velocity [m/s]')
-            plt.grid()
-            plt.show()
-
-            plt.plot(r, dQ)
-            plt.title(f'Torque distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Torque [N/m]')
-            plt.grid()
-            plt.show()
-
-            plt.plot(r, twist - np.rad2deg((vi) / (omega * r)))
-            plt.title(f'Effective angle of attack distribution at rpm = {rpm}')
-            plt.xlabel('Radius [m]')
-            plt.ylabel('Effective angle of attack [deg]')
-            plt.grid()
-            plt.show()
-
-
-            print(f"\nResults for RPM = {rpm}:")
-            print(f"Tip loss % {100 * (T_ideal - T) / T_ideal:.2f}")
-            print(f"Thrust: {T:.2f} N")
-            print(f"Disk loading: {T / (np.pi * R ** 2):.2f} N/m^2")
-            print(f"Torque: {Q:.2f} Nm")
-            print(f"Power: {P:.2f} W")
-
-            plt.clf()
-
-    plt.plot(rpm_values, total_thrust_values)
-    plt.title('Total Thrust vs RPM')
-    plt.xlabel('RPM')
+    plt.plot(pitch_range, total_thrust_values)
+    plt.title('Total Thrust vs Pitch Angle')
+    plt.xlabel('Pitch Angle (degrees)')
     plt.ylabel('Total Thrust (N)')
     plt.grid()
     plt.show()
