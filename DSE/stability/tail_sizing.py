@@ -136,17 +136,25 @@ print('test,', t)
 
 
 def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.CL_alpha_wing,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
-    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections. Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections."""
+    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
+     Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+     Assumptions made during these calculations:
+     Currently there is no interaction between the wing,body,horizontal tail and vertical tail (d_sigma / d_beta = 0)
+     The induced velocity interaction between the tail-less aircraft and vertical tail is assumed to be 1=( V_hv / V)**2
+     The location of the CG and fuselage length where assumed on 10/01/24 and can therefore differ from the current design.
+     The tail volume and Yawing moment coefficient used in this calculation where based on a literature study on small single propellor aircraft.
+     A small taper ratio was used during the sizing this was based on a literature study regression.
+     The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     # base imports.
     AR_w = b ** 2 / S
 
     # initial starting values
     lv = 3
-    tail_volume = 0.055
-    C_eta_beta = 0.058
-    taper_v = 1 / 0.40
-    step_size = 50
+    tail_volume = 0.055   # Literature study regression coupled to C_eta_beta
+    C_eta_beta = 0.058    # Literature study regression coupled to tail volume
+    taper_v = 1 / 0.40    # Literature study regression on small propellor aircraft.
+
 
     # intergration space
     AR_v = np.arange(0.5, 2, 0.1)
