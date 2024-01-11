@@ -227,7 +227,7 @@ def vertical_tail_size():
     bv = 1.2
     lv = 2.3
     AR_v = 1.125
-    Sweep_angle_v = 30 #deg
+    Sweep_angle_v = 30 #deg LE
     taper_v = 1/0.4
 
     return Sv,bv,lv,AR_v,Sweep_angle_v,taper_v
