@@ -33,106 +33,103 @@ CL_0 = aero_constants.CL_0
 # sweep_ang_12_Ch_rad = aero_constants.sweep_ang_12_Ch_rad
 c_root = aero_constants.c_root
 c_tip = aero_constants.c_tip
-c_tip = aero_constants.c_tip
-c_tip = aero_constants.c_tip
-c_tip = aero_constants.c_tip
-
 
 # ATTENTION!!!!!  CL_alpha are represented in 1/radians
 # def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_25_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_50_c_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
 # def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_25_c_rad=0, CL_alpha_w=5.787, sweep_ang_50_c_rad=0, c_root=0.6, c_tip=0.5):
 
-def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
+def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
+    print('lift rate',Cl_alpha_h)
     SM = 0.05 #PLACEHOLDER
     A = b**2/S
     S_net = S - b_f*c_root
     A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
 
-    # if tail_config == 'fuselage-mounted':
-    #     Vh_V_2 = 0.85
-    # elif tail_config == 'fin-mounted':
-    #     Vh_V_2 = 0.95
-    # elif tail_config == 't-tail':
-    #     Vh_V_2 = 1
-    # else:
-    #     print('Check the values of tail configuration')
-
-    Vh_V_2 = 1
+    Vh_V_2 = 1 # tail configuration is assumed to be t-tail
 
     m_tv = 2*dz_h/b
     r = 2*l_h/b
-
     K_ev = (0.1124+0.1265*sweep_ang_25_c_rad+0.1766*sweep_ang_25_c_rad**2)/r**2+0.1024/r+2
     K_ev0 = 0.1124/r**2+0.1024/r+2
 
     de_da = K_ev/K_ev0 * (r/(r**2+m_tv**2)*0.4876/np.sqrt(r**2+0.6319+m_tv**2)+(1+(r**2/(r**2+0.7915+5.0734*m_tv**2))**0.3113)*(1-np.sqrt(m_tv**2/(1+m_tv**2))))*CL_alpha_w/(np.pi*A)
+
+    # de_da = de_da*1000
+
     V_h = np.sqrt(Vh_V_2)*V
     a = np.sqrt(R*gamma*T)
     M = V_h/a
     beta = np.sqrt(1-M**2)
-    i = 'True'
-    if i=='True':
-        # Cl_alpha_h is taken as 2pi, but it should be an input from aero
-        CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
-        CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
-        i = 'False'
-        x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
-        c_g = S/b
-        lambd = c_tip/c_root
-        x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
+    # Cl_alpha_h is taken as 2pi, but it should be an input from aero
+    # CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
+    CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
+    # CL_alpha_h =CL_alpha_h/10
 
-        x_ac_w = 0.3  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
-        x_ac_bar = x_ac_w + x_ac_fc1 + x_ac_fc2
+    CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
 
-        Sh_S = np.arange(0, 1.1, 0.1)
-        x_np_bar = x_ac_bar +CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
-        x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h*(1-de_da)*Sh_S*l_h/c_bar*Vh_V_2-SM
+    x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
+    c_g = S/b # mean geometric chord
+    lambd = c_root/c_tip
+    x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
+    # x_ac_w = 0.3  #PLACEHOLDER,. the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
+    x_ac_w = 0.3+l_fn/c_bar  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
+    x_ac_bar = x_ac_w + x_ac_fc1 + x_ac_fc2
 
-
-        # controllability
-
-        # if tail_ability == 'full moving tail':
-        #     CL_h = -1
-        # elif tail_ability == 'adjustable tail':
-        #     CL_h = -0.8
-        # elif tail_ability == 'fixed tail':
-        #     CL_h = -0.35*A_h**(1/3)
-        # else:
-        #     print('Check the values of tail ability')
-
-        CL_h = -0.35 * A_h ** (1 / 3)
-        x_ac_bar_x = x_ac_bar #PLACEHOLDER
-
-        CL_A_h = 1.1 #INCORRECT VALUE, it is an input, currently just an assumtion
-
-        delta_f_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may not be any flaps
-        delta_nac_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may
-
-        delta_fus_Cm_ac = -1.8 * (1 - 2.5 * b_f / l_f) * np.pi * b_f * hf_max * l_f / (
-                    4 * S * c_bar) * CL_0 / CL_alpha_A_h
-        Cm_ac_w = Cm_0_airfoil * (A * np.cos(sweep_ang_rad) ** 2 / (A + 2 * np.cos(sweep_ang_rad)))
-
-        Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
-
-        x_cg_bar_c = x_ac_bar_x - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
-        sr =[]
-        for element in range(len(x_cg_bar)):
-
-            x_cg_bar_sel =  x_cg_bar[element] #double check this codeline
-            x_np_bar_sel = x_np_bar[x_cg_bar==x_cg_bar_sel] #double check this codeline
-
-            delta_x_cg_bar =np.abs(x_cg_bar[element] - x_cg_bar_c[element])
-            surface_ratio = ((delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
-            # print(x_np_bar_sel-x_cg_bar_sel, delta_x_cg_bar)
-
-            sr.append(surface_ratio)
-    return  sr
+    Sh_S = np.arange(0, 0.8, 0.1)
+    x_np_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
+    x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2 - SM
 
 
-t = horizontal_tail_sizing()#eta, V, R, gamma, T, rho)
-print('test,', t)
+    # return x_cg_bar, x_np_bar, x_ac_bar
+# def horizontal_tail_contrallability(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
+
+    CL_h = -0.35 * A_h ** (1 / 3) # It is assumed that tail_ability is 'fixed tail'
+
+    CL_A_h = 0.3 #INCORRECT VALUE, it is an input, currently just an assumption (aircraft less tail lift coefficient)
+
+    delta_f_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may not be any flaps
+    delta_nac_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there is no engine mounted in the wing
+
+    delta_fus_Cm_ac = -1.8 * (1 - 2.5 * b_f / l_f) * np.pi * b_f * hf_max * l_f / (
+                4 * S * c_bar) * CL_0 / CL_alpha_A_h
+    Cm_ac_w = Cm_0_airfoil * (A * np.cos(sweep_ang_rad) ** 2 / (A + 2 * np.cos(sweep_ang_rad)))
+
+    Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
+
+    x_cg_bar_c = x_ac_bar - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
+
+    # sr =[]
+    # for element in range(len(x_cg_bar)):
+    element=5
+    x_cg_bar_sel =  x_cg_bar[element] #double check this codeline
+    x_np_bar_sel = x_np_bar[x_cg_bar==x_cg_bar_sel] #double check this codeline
+
+    delta_x_cg_bar =np.abs(x_cg_bar[element] - x_cg_bar_c[element])
+    surface_ratio = ((delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
+    a = (delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max)
+    b =((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar)
+
+    plt.plot(x_cg_bar, Sh_S, label ='stab')
+    # plt.plot(x_np_bar, Sh_S, label ='neutral')
+    plt.plot(x_cg_bar_c, Sh_S, label ='cont')
+    plt.xlim(0,1)
+    plt.ylim(0,0.1)
+    plt.ylabel('Sh/S')
+    plt.xlabel('% Xcg of MAC')
+    plt.title('Horizontal tail')
+    plt.legend()
+    plt.show()
+
+    return x_cg_bar, x_cg_bar_c, Sh_S,surface_ratio
+
+a, b, c, d = horizontal_tail_sizing()
+# print('test 1', a)
+# print('test 2', b)
+# print('test 3', c)
+# print('test 4', d)
+
 
 
 def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
