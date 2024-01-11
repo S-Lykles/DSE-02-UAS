@@ -135,7 +135,7 @@ t = horizontal_tail_sizing()#eta, V, R, gamma, T, rho)
 print('test,', t)
 
 
-def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL_w=aero_constants.CL_max,Cl_alpha=aero_constants.CL_alpha_wing,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
+def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
@@ -146,99 +146,136 @@ def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
      A small taper ratio was used during the sizing this was based on a literature study regression.
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
+    PRINT = False  # for values set to true
+    l_boom_o = 5
     # base imports.
     AR_w = b ** 2 / S
+    M = 0.12  # at cruise speed
 
     # initial starting values
-    lv = 3
-    tail_volume = 0.055   # Literature study regression coupled to C_eta_beta
-    C_eta_beta = 0.058    # Literature study regression coupled to tail volume
-    taper_v = 1 / 0.40    # Literature study regression on small propellor aircraft.
-
+    number_vertical_tail = 2
+    tail_volume = 0.055 / number_vertical_tail
+    C_eta_beta = 0.058 / number_vertical_tail
+    taper_v = 0.70
 
     # intergration space
-    AR_v = np.arange(0.5, 2, 0.1)
-    beta = 30
+    AR_v = np.arange(1, 2, 0.05)
     sweep_v = np.arange(0, 45, 1)
 
     # Empty list set
     Surface = []
-    span = []
+    Span = []
     Moment_arm = []
-
-    Sv = tail_volume * S * b / lv
+    root_cord = []
 
     for p in range(len(AR_v)):
         Surface_k = []
         span_k = []
         moment_arm_k = []
+        Cv_r_k = []
         for j in range(len(sweep_v)):
-            for k in range(100):
+
+            lv = 2
+            Sv = tail_volume * S * b / lv
+
+            for k in range(1000):
+                if Sv < 0:
+                    print(Sv)
                 bv = np.sqrt(AR_v[p] * Sv)
 
-                Cv = 2 / (1 + taper_v) * Sv / bv
-                Cv_bar = 2 / 3 * Cv * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
+                Cv_r = 2 / (1 + taper_v) * (Sv / bv)
+                Cv_bar = 2 / 3 * Cv_r * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
 
                 # Updated values
                 X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
-                lv = 6 - Xcg - Cv + X_LEMAC_v + 0.25 * Cv_bar
+                lv = l_boom_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
 
                 # Update C_eta_beta
                 sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
-                Cl_v_alpha = (Cl_alpha * AR_w) / (2 + np.sqrt(4 + (AR_v[p] * beta * deg2rad / eta) * (
-                            1 + (np.tan(sweep_05_cord_v * deg2rad) / (beta * deg2rad)) ** 2)))
+                Beta = np.sqrt(1 - M ** 2)
+                CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
+                    4 + (AR_v[p] * Beta / eta) ** 2 * ((np.tan(sweep_05_cord_v * deg2rad) / Beta) ** 2) + 1))
 
-                C_eta_beta_w = CL_w ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                C_eta_beta_w = CL ** 2 / (
+                            4 * np.pi * AR_w) * 1 / number_vertical_tail  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
                 new = (np.pi * l_fus * b_max ** 2) / 3
-                C_eta_beta_fuse = -2 / (S * b) * new
+                C_eta_beta_fuse = -2 / (S * b) * new * 1 / number_vertical_tail
 
                 # Update tail surface
-                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / Cl_v_alpha * (S * b) / lv
+                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
 
                 # List of all values
+            Cv_r_k.append(Cv_r)
             Surface_k.append(Sv)
             span_k.append(bv)
             moment_arm_k.append(lv)
+        root_cord.append(Cv_r_k)
         Surface.append(Surface_k)
-        span.append(span_k)
+        Span.append(span_k)
         Moment_arm.append(moment_arm_k)
 
-    plot = True
-    if plot == True:
-        N = 75  # Resolution
+    plot = False
 
+    N = 50  # Resolution
+    optimal_sweep_v = 30
+    optimal_AR_v = 1.375
+
+    BB = 0
+    BBB = 0
+    for i in range(len(AR_v)):
+        if AR_v[i] >= optimal_AR_v:
+            if AR_v[i - 1] <= optimal_AR_v:
+                BB = i - 1
+    for i in range(len(sweep_v)):
+        if sweep_v[i] >= optimal_sweep_v:
+            if sweep_v[i - 1] <= optimal_sweep_v:
+                BBB = i - 1
+    optimal_surface_v = Surface[BB][BBB]
+    optimal_span_v = Span[BB][BBB]
+    optimal_moment_arm = Moment_arm[BB][BBB]
+    optimal_root_cord = root_cord[BB][BBB]
+
+    if PRINT == True:
+        print('The optimal values for a single vertical tail are:')
+        print('Surface area :', optimal_surface_v, 'm^2')
+        print('Span :', optimal_span_v, 'm')
+        print('Moment arm :', optimal_moment_arm, 'm')
+        print('Root cord :', optimal_root_cord, 'm')
+
+    if plot == True:
         fig, (ax, ay, az) = plt.subplots(1, 3)
         cp = ax.contourf(sweep_v, AR_v, Surface, N)
         fig.colorbar(cp)  # Add a colorbar to a plot
         ax.set_title('Vertical tail surface (Sv)')
         ax.set_xlabel('Sweep angle vertical tail')
         ax.set_ylabel('Aspect ratio vertical tail')
+        ax.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
 
-        cy = ay.contourf(sweep_v, AR_v, span, N)
-        CS = ay.contour(sweep_v, AR_v, span, levels=[1.2])
-        ay.clabel(CS, inline=True, fontsize=10)
+        cy = ay.contourf(sweep_v, AR_v, Span, N)
+        Cy = ay.contour(sweep_v, AR_v, Span, levels=[0.6], colors=('white'))
+        ay.clabel(Cy, inline=True, fontsize=10)
         fig.colorbar(cy)
         ay.set_title('Span of a single vertical tail plaine (bv)')
         ay.set_xlabel('Sweep angle vertical tail')
         ay.set_ylabel('Aspect ratio vertical tail')
+        ay.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
 
         cz = az.contourf(sweep_v, AR_v, Moment_arm, N)
         fig.colorbar(cz)
         az.set_title('Moment arm of the vertical tail plaine (lv)')
         az.set_xlabel('Sweep angle vertical tail')
         az.set_ylabel('Aspect ratio vertical tail')
-    #return
+        az.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
 
-def vertical_tail_size():
-    """Preliminary vertical tail size, it can change ask Bas before using. Last update 10/01/24."""
-    Sv = 1.250/2
-    bv = 1.2
-    l_v = 2.3
-    AR_v = 1.125
-    Sweep_angle_v = 30 #deg
-    taper_v = 1/0.4
-    print('These values can be subject to change and where last updated on 10/01/24. Before using ask Bas, if there are any changes due to changing design parameters.')
-    return Sv,bv,l_v,AR_v,Sweep_angle_v,taper_v
+    Sv = optimal_surface_v
+    bv = optimal_span_v
+    l_v = optimal_moment_arm
+    AR_v = optimal_AR_v
+    root_cord_v = optimal_root_cord
+    Sweep_v = optimal_sweep_v
+
+    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v
+
 
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
