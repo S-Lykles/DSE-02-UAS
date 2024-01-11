@@ -356,7 +356,7 @@ def aileron_surface_sizing():
     # S_a_S (aileron area to wing area) 0.05 - 0.1
     # b_a_b (aileron span to wing span) 0.2 - 0.3
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
-    # delta_a_max (aileron max deflection) 30 deg
+    # delta_a_max (aileron max deflection) 30 deg or 25 deg
 
     b_2 =
     b_1 =
