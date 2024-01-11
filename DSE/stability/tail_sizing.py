@@ -132,7 +132,7 @@ a, b, c, d = horizontal_tail_sizing()
 
 
 
-def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
+def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
@@ -175,9 +175,7 @@ def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
             lv = 2
             Sv = tail_volume * S * b / lv
 
-            for k in range(1000):
-                if Sv < 0:
-                    print(Sv)
+            for k in range(100):
                 bv = np.sqrt(AR_v[p] * Sv)
 
                 Cv_r = 2 / (1 + taper_v) * (Sv / bv)
@@ -360,9 +358,23 @@ def aileron_surface_sizing():
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
     # delta_a_max (aileron max deflection) 30 deg
 
-    def tau_a(S_a_S):
-        tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-        return tau_a
+    b_2 =
+    b_1 =
+    b_a = b_2 - b_1
+    S =
+    b =
+    Ca_t =
+    Ca_r =
+    CL_alpha =
+    C_r =
+    taper_w =
+    CL_alpha =
+    Cd_0 =
+
+    S_a_S =  b_a/ S * (Ca_t + Ca_r)
+    tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
+    C_lroll_aileron = -1* ( (CL_alpha * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3))
+    C_lroll = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 - 3* taper_w)
 
 
-    return
+    #return
