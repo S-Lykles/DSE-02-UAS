@@ -277,7 +277,7 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 # Moment at that particular location along the span
 # Max sheet height from point in which moment acts
 
-def stringer_computation(K_c, L, t, E, M, h):
+def number_of_stringers_computation(K_c, L, t, E, M, h):
     # Compute the maximum compressive force acting on the wing box section
     F_cr = M / h
 
