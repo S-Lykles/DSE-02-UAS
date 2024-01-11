@@ -269,11 +269,19 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
     return P_cr, sigma_cr
 
 print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
-                                                                          0.06, 0,0,0,
-                                                                          0,0,0,0,
-                                                                          0,0,0,0, 0, 1))
+                                                                          0.06, 0.085,0.004,0.0025,
+                                                                          0.06,0,0,0,
+                                                                          0,0.0001,0.06,0.0001, 0.04, 2))
 
 print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
-                                                                          0.04, 0,0,0,
-                                                                          0,0,0,0,
-                                                                          0,0,0,0, 0, 1))
+                                                                          0.04, 0.036,0.002,0.001,
+                                                                          0.04,0,0,0,
+                                                                          0,0.0001,0.1,0.0001, 0.1,2))
+
+print("The moment of inertia of the fuselage around the x-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
+                                                                                                      0.7, 0.05,
+                                                                                                      0.05, 0.8))
+
+print("The moment of inertia of the fuselage around the y-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
+                                                                                                      0.7, 0.05,
+                                                                                                      0.05, 0.8))
