@@ -203,27 +203,30 @@ def vertical_tail_size_1(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_co
         span.append(span_k)
         Moment_arm.append(moment_arm_k)
 
-    plot = False
+    plot = True
     if plot == True:
+        N = 75  # Resolution
+
         fig, (ax, ay, az) = plt.subplots(1, 3)
-        cp = ax.contourf(sweep_v, AR_v, Surface)
+        cp = ax.contourf(sweep_v, AR_v, Surface, N)
         fig.colorbar(cp)  # Add a colorbar to a plot
         ax.set_title('Vertical tail surface (Sv)')
         ax.set_xlabel('Sweep angle vertical tail')
         ax.set_ylabel('Aspect ratio vertical tail')
 
-        cy = ay.contourf(sweep_v, AR_v, span)
+        cy = ay.contourf(sweep_v, AR_v, span, N)
+        CS = ay.contour(sweep_v, AR_v, span, levels=[1.2])
+        ay.clabel(CS, inline=True, fontsize=10)
         fig.colorbar(cy)
         ay.set_title('Span of a single vertical tail plaine (bv)')
         ay.set_xlabel('Sweep angle vertical tail')
         ay.set_ylabel('Aspect ratio vertical tail')
 
-        cz = az.contourf(sweep_v, AR_v, Moment_arm)
+        cz = az.contourf(sweep_v, AR_v, Moment_arm, N)
         fig.colorbar(cz)
         az.set_title('Moment arm of the vertical tail plaine (lv)')
         az.set_xlabel('Sweep angle vertical tail')
         az.set_ylabel('Aspect ratio vertical tail')
-
     #return
 
 def vertical_tail_size():
