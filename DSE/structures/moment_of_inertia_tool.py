@@ -1,5 +1,6 @@
 from DSE import const
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from pathlib import Path
 
@@ -268,20 +269,43 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 
     return P_cr, sigma_cr
 
-print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
-                                                                          0.06, 0.085,0.004,0.0025,
-                                                                          0.06,0,0,0,
-                                                                          0,0.0001,0.06,0.0001, 0.04, 2))
+# Number of stringers calculator given:
+# Spar spacing
+# Fixed or free moving
+# sheet thickness
+# Young modulus for the skin
+# Moment at that particular location along the span
+# Max sheet height from point in which moment acts
 
-print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
-                                                                          0.04, 0.036,0.002,0.001,
-                                                                          0.04,0,0,0,
-                                                                          0,0.0001,0.1,0.0001, 0.1,2))
+def stringer_computation(K_c, L, t, E, M, h):
+    # Compute the maximum compressive force acting on the wing box section
+    F_cr = M / h
 
-print("The moment of inertia of the fuselage around the x-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
-                                                                                                      0.7, 0.05,
-                                                                                                      0.05, 0.8))
+    # Compute the maximum spacing between stringers
+    b_max = t / np.sqrt(F_cr / K_c / E)
 
-print("The moment of inertia of the fuselage around the y-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
-                                                                                                      0.7, 0.05,
-                                                                                                      0.05, 0.8))
+    # Derive the number of stringers at a certain location along the span
+    N_stringers = math.ceil(L/b_max)
+
+
+    return N_stringers
+
+
+#
+# print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
+#                                                                           0.06, 0.085,0.004,0.0025,
+#                                                                           0.06,0,0,0,
+#                                                                           0,0.0001,0.06,0.0001, 0.04, 2))
+#
+# print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
+#                                                                           0.04, 0.036,0.002,0.001,
+#                                                                           0.04,0,0,0,
+#                                                                           0,0.0001,0.1,0.0001, 0.1,2))
+#
+# print("The moment of inertia of the fuselage around the x-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
+#                                                                                                       0.7, 0.05,
+#                                                                                                       0.05, 0.8))
+#
+# print("The moment of inertia of the fuselage around the y-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
+#                                                                                                       0.7, 0.05,
+#                                                                                                       0.05, 0.8))
