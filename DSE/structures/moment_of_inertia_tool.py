@@ -270,6 +270,7 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
     return P_cr, sigma_cr
 
 # Number of stringers calculator given:
+# Source: Airframe structural design, practical design information and data on aircraft structures Michael c. y. Niu
 # Spar spacing
 # Fixed or free moving
 # sheet thickness
@@ -290,6 +291,8 @@ def number_of_stringers_computation(K_c, L, t, E, M, h):
 
     return N_stringers
 
+print("Compute number of stringers at the root", number_of_stringers_computation(3.62, 0.52, 0.001, 71*10**9
+                                                                                 ,8700, 0.048))
 
 #
 # print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
