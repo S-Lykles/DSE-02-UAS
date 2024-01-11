@@ -226,7 +226,7 @@ def vertical_tail_size():
     AR_v = 1.125
     Sweep_angle_v = 30 #deg
     taper_v = 1/0.4
-
+    print('These values can be subject to change and where last updated on 10/01/24. Before using ask Bas, if there are any changes due to changing design parameters.')
     return Sv,bv,lv,AR_v,Sweep_angle_v,taper_v
 
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
