@@ -278,18 +278,23 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 # Moment at that particular location along the span
 # Max sheet height from point in which moment acts
 
+
 def number_of_stringers_computation(K_c, L, t, E, M, h):
+    E = E * 0.000145037738
+    t = t * 39.3700787
+    N = np.arange(1, 10, 1)
+    L = L * 39.3700787 / N
+    print(N, 'N')
+    h = h * 39.3700787
+    M = M * 8.85074579
     # Compute the maximum compressive force acting on the wing box section
-    F_cr = M / h
-
+    Fmax = M / h
+    sigma_cr = Fmax / (t * L)
+    L_check = t / np.sqrt(sigma_cr/(K_c * E))
     # Compute the maximum spacing between stringers
-    b_max = t / np.sqrt(F_cr / K_c / E)
-
-    # Derive the number of stringers at a certain location along the span
-    N_stringers = math.ceil(L/b_max)
-
-
-    return N_stringers
+    N_req = L/L_check
+    print(N_req, "Nreq")
+    # return N_stringers
 
 print("Compute number of stringers at the root", number_of_stringers_computation(3.62, 0.52, 0.001, 71*10**9
                                                                                  ,8700, 0.048))

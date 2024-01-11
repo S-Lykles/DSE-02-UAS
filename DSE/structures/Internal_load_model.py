@@ -16,8 +16,6 @@ def aero_data_to_numpy(file_name):
     return y, chord, cl
 
 
-
-
 def find_nearest_point(point, array):
     difference_array = array - point
     index = np.argmin(abs(difference_array))
@@ -30,6 +28,7 @@ def distribution_from_aero_data(start, stop, step, data_name, point_range):
     cl_distribution = np.interp(point_range, y, cl)
     chord_distribution = np.interp(point_range, y, chord)
     max_th = 0.12*chord_distribution
+    print(const.v_cruise)
     lift_distribution = cl_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
     # Lift only for the start and stop caps
     i_start = find_nearest_point(start, point_range)[1]
@@ -69,15 +68,23 @@ def point_load(point, magnitude, point_range):
     return load_lst
 
 
-def combined_loading(beam_start, beam_stop, step):
+def combined_loading(beam_start, beam_stop, step, VTOL):
+    """
+    For the WING !
+    """
     point_range = np.arange(beam_start, beam_stop + step, step)
+    lift_distribution, max_th = distribution_from_aero_data(0.2, beam_stop, step, 'wing_data.txt', point_range)
+    Boom_from_centerline = 1
+    load_factor_vtol = 1.1
+    Upwards_load = (load_factor_vtol * const.MTOW) / 2
+    Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
 
-    load1 = load_distribution(0, 4, step, 4, -3, 'linear', point_range)
-    load2 = load_distribution(1, 2, step, 400, 400, 'linear', point_range)
-    load3, max_th =  distribution_from_aero_data(0.2, beam_stop, step, 'wing_data.txt', point_range)
-    load4 = point_load(1, 1000, point_range)
+    if VTOL:
+        loading_distribution = Upwards_pointload
+    else:
+        load_factor_manouvre = 3.8
+        loading_distribution = load_factor_manouvre * lift_distribution
 
-    loading_distribution = 4.5*(load3 + load4)
     plt.plot(point_range, loading_distribution)
     plt.xlabel('semi-spanwise location (m)')
     plt.ylabel('internal force (N)')
@@ -85,8 +92,7 @@ def combined_loading(beam_start, beam_stop, step):
     return loading_distribution, point_range, max_th
 
 
-
-loads, point_range, max_th = combined_loading(0, 3, 0.01)
+loads, point_range, max_th = combined_loading(0, 3, 0.01, False)
 
 
 def moment_distr_from_load_distr(load_distribution, point_range, step):
@@ -97,7 +103,6 @@ def moment_distr_from_load_distr(load_distribution, point_range, step):
         distances = point_range - point_range[i]
         distances = distances[i:]
         loads = load_distribution[i:]
-        #print(loads)
         moment = np.trapz(loads * distances, distances, step)
         print(moment)
         moment_distribution = np.append(moment_distribution, moment/step)
@@ -107,6 +112,7 @@ def moment_distr_from_load_distr(load_distribution, point_range, step):
     plt.ylabel('Internal moment (Nm)')
     plt.show()
     return moment_distribution, point_range
+
 
 def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step):
     Ixxreq = abs(moment_distribution)*max_th/sigmacrit
@@ -137,9 +143,7 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step)
     print(mbox)
 
 
-
-
 moment_distribution, point_range = moment_distr_from_load_distr(loads, point_range, 0.01)
 
-Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
+#Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
 
