@@ -253,7 +253,7 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 0.1, S_v = vertical_tail_size()[0], S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0):
+def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 0.1, S_v = vertical_tail_size()[0], l_v = vertical_tail_size()[2], S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4, plots = False):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
@@ -263,11 +263,16 @@ def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, 
     # Typical Cn_Beta values 0.04-0.11/rad for subsonic single engine aircraft (SEAD lecture 9)
     Rat_br_bv = 0.9  # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
     S_v_total = 2 * S_v # Correction for having 2 vertical stabilisers
+    No_values = 500
+    Tolerance = 5e-5
+    # K_f_1 between 0.65 and 0.75 for typical aircraft
+    # K_f_2 between 1.3 and 1.4 for typical aircraft
 
     # Determining crosswind force first
     C_g_fwd, C_g_aft = min(load_diagram_plot()[1]), max(load_diagram_plot()[1])
     V_total = np.sqrt(V_trans**2 + V_cross**2)
-    Fus_dist_fwd, Fus_dist_aft = X_AreaCent - C_g_fwd, X_AreaCent - C_g_aft
+    Fus_dist_fwd, Fus_dist_aft = abs(X_AreaCent - C_g_fwd), abs(X_AreaCent - C_g_aft)
+    d_c = max(Fus_dist_fwd, Fus_dist_aft)
     F_crosswind = 0.5 * rho * V_cross**2 * S_fus_side * C_d_y
     beta = np.arctan(V_cross/V_trans)
     q = 0.5 * rho * V_total**2
@@ -275,22 +280,34 @@ def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, 
     # Determining control derivatives
     C_n_Beta = K_f_2 * C_L_v_alpha * (1 - dsigma_dbeta) * eta_v * ((l_v * S_v_total)/(b * S))
     C_y_Beta = -1 * K_f_1 * C_L_v_alpha * (1 - dsigma_dbeta) * eta_v * (S_v_total/S)
-    Rat_cr_cv = np.linspace(0.15, 0.40, 500)  # Ratio of rudder (mean aerodynamic) chord to total elevator (mean aerodynamic) chord
+    Rat_cr_cv = np.linspace(0.15, 0.40, No_values)  # Ratio of rudder (mean aerodynamic) chord to total elevator (mean aerodynamic) chord
     Tau_rudder = 1.129 * Rat_cr_cv ** 0.4044 - 0.1772  # O., A.-S., R., A., and H. S., H., “An Educational Rudder Sizing Algorithm for Utilization in Aircraft Design Software,” Tech. Rep. 10, 2018
-    # If Tau_rudder is larger than 1, redesign required
+    # If Tau_rudder is larger than 1, redesign required, should not happen with given range for chord ratios
+
     C_n_delta_r = -1 * C_L_v_alpha * ((S_v * l_v) / (S * b)) * Tau_rudder * Rat_br_bv  # Same source
     C_y_delta_r = C_L_v_alpha * eta_v * Tau_rudder * Rat_cr_cv * (S_v/S)
 
+
     # Solving equations 22 and 23 from the method source
-    sigma = np.linspace(0, np.pi/2, 500)
-    delta_r = np.linspace(0, np.pi/6, 500)
-    eqn_22 = q * S * b * (C_n_0 + C_n_Beta * (beta - sigma) + C_n_delta_r * delta_r) + F_crosswind * d_c * np.cos(sigma)
-    eqn_23 = F_crosswind - q * S * (C_y_0 + C_y_Beta * (beta - sigma) + C_y_delta_r * delta_r)
+    delta_r = np.linspace(0, np.pi/3, No_values)
+    deflections = np.zeros(No_values)
 
-    eqn_22_abs = abs(eqn_22)
-    eqn_23_abs = abs(eqn_23)
+    for i in range(No_values):
+        sigma = (C_y_0/C_y_Beta) + beta + ((C_y_delta_r[i]/C_y_Beta) * delta_r) - (F_crosswind / (q * S * C_y_Beta))
+        eqn_22 = q * S * b * (C_n_0 + C_n_Beta * (beta - sigma) + C_n_delta_r[i] * delta_r) + F_crosswind * d_c * np.cos(sigma)
+        # eqn_23 = F_crosswind - q * S * (C_y_0 + C_y_Beta * (beta - sigma) + C_y_delta_r[i] * delta_r[j])
+
+        deflections[i] = const.rad2deg(min(delta_r[np.where(abs(eqn_22 < Tolerance))]))
+
+    if plots == True:
+        plt.plot(Rat_cr_cv, deflections)
+        plt.title('Required rudder deflection vs the rudder-vertical stabiliser chord ratio')
+        plt.xlabel('rudder chord to vertical stabiliser chord ratio')
+        plt.ylabel('rudder deflection')
+        plt.show()
 
 
+    Rat_cr_cv_final = min(Rat_cr_cv[np.where(deflections < 30)])
     # int_func = F_crosswind * (1 + Fus_dist_aft * np.cos(sigma)) + q * S * (b * C_n_0 - C_y_0 + (b * C_n_Beta - C_y_Beta)*(beta - sigma) + (b * C_n_delta_r - C_y_delta_r) * delta_r)
 
 
@@ -298,7 +315,7 @@ def rudder_surface_sizing( l_v,  V_cross, V_trans, S_fus_side, X_AreaCent, rho, 
     # L_v = q * S_v * C_l_v
     # Rudder_load = l_v * L_v
 
-    return delta_r_final, Rat_cr_cv_final # , Rudder_load
+    return Rat_cr_cv_final # , Rudder_load
 
 def aileron_surface_sizing():
 
