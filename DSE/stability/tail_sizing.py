@@ -318,7 +318,15 @@ def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max,
     return Rat_cr_cv_final # , Rudder_load
 
 def aileron_surface_sizing():
+    # Let's do this! давай!
 
+    # Typical values:
+    # S_a_S (aileron area to wing area) 0.05 - 0.1
+    # b_a_b (aileron span to wing span) 0.2 - 0.3
+    # C_a_C (aileron chord to wing chord) 0.15 - 0.25
+    # delta_a_max (aileron max deflection) 30 deg
+
+    # max
 
 
     return
