@@ -379,7 +379,7 @@ def aileron_surface_sizing():
     C_lroll_aileron = -1* ( (CL_alpha * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3))
     C_lroll = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
 
-    C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 - 3* taper_w)
+    C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
     p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
 
     #return
