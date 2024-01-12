@@ -368,28 +368,64 @@ def aileron_surface_sizing():
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
     # delta_a_max (aileron max deflection) 30 deg or 25 deg
 
-    b_2 =
-    b_1 =
-    b_a = b_2 - b_1
-    S =
+    # b_2 = 2
+    # b_1 =1
+    # b_a = b_2 - b_1
+    # S = 1
+    # b = 1
+    # Ca_t =  1
+    # Ca_r =  1
+    # CL_alpha =  1
+    # C_r =  1
+    # taper_w =  1
+    # Cl_alpha_w = 1
+    # Cd_0 = 1
+    # Vtrans =  32
+    # deflection_aileron =  12
+    # deg2rad=const.deg2rad
+    #
+    # S_a_S =  b_a/ S * (Ca_t + Ca_r)
+    # tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
+    # C_lroll_aileron = -1* ( (CL_alpha_w * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3)) # Factor 2(be) or not (2 be)
+    # C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
+    # p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
+
+    roll_rate =
     b =
-    Ca_t =
-    Ca_r =
-    CL_alpha =
-    C_r =
-    taper_w =
-    Cl_alpha =
+    V =
+    Cl_alpha_w =
     Cd_0 =
-    Vtrans =
-    deflection_aileron =
-    deg2rad=const.deg2rad
+    taper_w =
+    C_root =
+    span_wise_inner_frac =
+    span_wise_outer_frac  =
+    aileron_chord_frac =
+    span_wise_inner, span_wise_outer = span_wise_inner_frac * (b / 2), span_wise_outer_frac * (b / 2)
+    b_a = span_wise_outer - span_wise_inner
+    aileron_deflection_up =
+    aileron_deflection_down =
+    deflection_aileron = 0.5 * (aileron_deflection_up + aileron_deflection_down)
 
-    S_a_S =  b_a/ S * (Ca_t + Ca_r)
+    C_lp = -1 * ((Cl_alpha_w + Cd_0) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
+    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V * deflection_aileron))
+    Ca_inner = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_inner)
+    Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
+    S_a_S = b_a / S * (Ca_inner + Ca_outer)
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-    C_lroll_aileron = -1* ( (CL_alpha * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3))
-    C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
-    p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
+    Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
 
+    while Cl_delta_A < Cl_delta_A_req:
+        span_wise_outer_frac += 0.01
+        span_wise_outer = span_wise_outer_frac * (b / 2)
+        Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
+        S_a_S = b_a / S * (Ca_inner + Ca_outer)
+        tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
+        Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
+
+    span_wise_outer_final = span_wise_outer
+    S_a_final = S_a_S * S
+
+    return(span_wise_inner, span_wise_outer_final, S_a_final)
     #return
 
 def stab_con_int_structure():
