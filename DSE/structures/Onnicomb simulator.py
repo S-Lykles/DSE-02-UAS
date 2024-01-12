@@ -36,16 +36,15 @@ def calculate_bending_stress(pos_x, pos_y, Mx, My, Ixx, Iyy):
     return stress_z
 
 def place_booms(N_bottom, N_curve, R):
-    curve_boom_co_arr = np.array([])
-    for i in range(N_curve):
-        curve_boom_xco = R*np.cos(i*np.pi / (N_curve-1))
-        curve_boom_yco = R*np.sin(i*np.pi / (N_curve-1))
-        curve_boom_co = np.array([curve_boom_xco, curve_boom_yco])
-        curve_boom_co_arr = np.append([curve_boom_co_arr, curve_boom_co], axis = 0)
-    print(curve_boom_co_arr)
-    return curve_boom_co_arr
+    angles = np.linspace(np.pi/(N_curve-1), np.pi*(N_curve-2)/(N_curve-1), N_curve-2)
+    curve_boom_co_arr = np.column_stack((R * np.cos(angles), R * np.sin(angles)))
 
-a = place_booms(0, 5, 1)
+    bottom_boom_xco = np.linspace(-R, R, N_bottom)
+    bottom_boom_yco = np.zeros(N_bottom)
+    bottom_boom_co_arr = np.column_stack((bottom_boom_xco, bottom_boom_yco))
+
+    boom_co_arr = np.vstack((curve_boom_co_arr, bottom_boom_co_arr))
+    return boom_co_arr
 
 
 def calculate_shear_stress(shear_force, shear_area):
