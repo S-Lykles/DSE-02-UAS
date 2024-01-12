@@ -148,16 +148,16 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     PRINT = False  # for values set to true
-    l_boom_o = 4  # the distance from cg to trailing edge of the tail
-    # base imports.
-    AR_w = b ** 2 / S
-    M = 0.12  # at cruise speed
-
+    l_boom_o = 4.5  # the distance from cg to trailing edge of the tail
     # initial starting values
     number_vertical_tail = 2
     tail_volume = 0.055 / number_vertical_tail
-    C_eta_beta = 0.058 / number_vertical_tail
+    C_eta_beta = 0.058
     taper_v = 0.70
+    SS = S/number_vertical_tail
+    bb = b/number_vertical_tail
+    AR_w = bb ** 2 / SS
+    M = 0.12  # at cruise speed
 
     # intergration space
     AR_v = np.arange(1, 2, 0.05)
@@ -179,7 +179,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
         for j in range(len(sweep_v)):
 
             lv = 2
-            Sv = tail_volume * S * b / lv
+            Sv = tail_volume * SS * bb / lv
 
             for k in range(100):
                 bv = np.sqrt(AR_v[p] * Sv)
@@ -197,13 +197,13 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
                 CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
                     4 + (AR_v[p] * Beta / eta) ** 2 * ((np.tan(sweep_05_cord_v * deg2rad) / Beta) ** 2) + 1))
 
-                C_eta_beta_w = CL ** 2 / (
-                            4 * np.pi * AR_w) * 1 / number_vertical_tail  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
-                new = (np.pi * l_fus * b_max ** 2) / 3
-                C_eta_beta_fuse = -2 / (S * b) * new * 1 / number_vertical_tail
+                C_eta_beta_w = (CL/number_vertical_tail) ** 2 / (
+                            4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                new = 4/3 *np.pi * l_fus/2 * (b_max/2)**2
+                C_eta_beta_fuse = -2 / (SS * bb) * new
 
                 # Update tail surface
-                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
+                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (SS * bb) / lv
 
                 # List of all values
             X_LEMAC_k.append(X_LEMAC_v)
@@ -401,7 +401,7 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0
 
     return(span_wise_inner, span_wise_outer_final, S_a_final)
 
-def stab_con_int_structure():
+#def stab_con_int_structure():
     """Keep in mind that these values are all subject to change due to interations"""
     print('!!! Carefull when using this Data, it will be subject to change due to shifts in Xcg and rotor placement. !!!')
 
@@ -410,7 +410,7 @@ def stab_con_int_structure():
     b_vert = vertical_tail_size()[1]
     cord_root_vert = vertical_tail_size()[4]
     cord_tip_vert = vertical_tail_size()[6]*cord_root_vert
-    Dist_X_leading_vert = vertical_tail_size()[2] - 0.25 vertical_tail_size()[4] - vertical_tail_size()[7]
+    Dist_X_leading_vert = vertical_tail_size()[2] - 0.25* vertical_tail_size()[4] - vertical_tail_size()[7]
     Sweep_angle_vert = vertical_tail_size()[5]
 
     # rudder dimensions
@@ -442,4 +442,4 @@ def stab_con_int_structure():
     Fz_tail = S_vert*rho*15**2 # extreem assumption
     Fx_tail = S_hori*rho*V**2
 
-    return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
+   # return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
