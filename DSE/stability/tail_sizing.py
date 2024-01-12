@@ -148,15 +148,13 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     PRINT = False  # for values set to true
-    l_boom_o = 4.5  # the distance from cg to trailing edge of the tail
+    l_o = 4.15 # distance value
     # initial starting values
     number_vertical_tail = 2
     tail_volume = 0.055 / number_vertical_tail
     C_eta_beta = 0.058
-    taper_v = 0.70
-    SS = S/number_vertical_tail
-    bb = b/number_vertical_tail
-    AR_w = bb ** 2 / SS
+    taper_v = 0.7
+    AR_w = b ** 2 / S
     M = 0.12  # at cruise speed
 
     # intergration space
@@ -179,7 +177,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
         for j in range(len(sweep_v)):
 
             lv = 2
-            Sv = tail_volume * SS * bb / lv
+            Sv = tail_volume * S * b / lv
 
             for k in range(100):
                 bv = np.sqrt(AR_v[p] * Sv)
@@ -189,7 +187,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
 
                 # Updated values
                 X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
-                lv = l_boom_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
+                lv = l_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
 
                 # Update C_eta_beta
                 sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
@@ -197,13 +195,13 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
                 CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
                     4 + (AR_v[p] * Beta / eta) ** 2 * ((np.tan(sweep_05_cord_v * deg2rad) / Beta) ** 2) + 1))
 
-                C_eta_beta_w = (CL/number_vertical_tail) ** 2 / (
+                C_eta_beta_w = CL ** 2 / (
                             4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
                 new = 4/3 *np.pi * l_fus/2 * (b_max/2)**2
-                C_eta_beta_fuse = -2 / (SS * bb) * new
+                C_eta_beta_fuse = -2 / (S * b) * new
 
                 # Update tail surface
-                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (SS * bb) / lv
+                Sv = 1/number_vertical_tail* (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
 
                 # List of all values
             X_LEMAC_k.append(X_LEMAC_v)
