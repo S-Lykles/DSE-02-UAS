@@ -1,22 +1,51 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-#INPUTS
-#------
-import math
+def calculate_inertia(R, r):
+    """
+    Calculates moments of inertia of a half-circle shell around axis which are located at the flat surface in the middle
 
-def calculate_bending_stress(moment, section_modulus):
+    :param R: Outer radius in m
+    :param r: Inner radius in m
+    :return Ixx: Moment of inertia around x axis
+    :return Iyy: Moment of inertia around y axis
+    """
+    Ixx = np.pi*(R**4-r**4)/8
+    Iyy = Ixx
+    return Ixx, Iyy
+
+
+def calculate_bending_stress(pos_x, pos_y, Mx, My, Ixx, Iyy):
     """
     Calculate bending stress.
 
     Parameters:
-    - moment: Bending moment (Nm)
-    - section_modulus: Section modulus of the cross-section (m^3)
+    - pos_x = x coordinates of the postion where the stress is computed
+    - pos_y = y coordinates ofthe position where the stress is computed
+    - Fz = Force along the z axis
+    - Mx = Moment around x axis
+    - My = Moment around y axis
+    - Ixx = moment of inertia about x axis
+    - Iyy = moment of inertia about y axis
 
     Returns:
-    - Bending stress (Pa)
+    - stress_z = axial stress along z-axis
     """
-    return moment / section_modulus
+
+    stress_z = Mx*Iyy*pos_y/Ixx + My*Ixx*pos_x/Iyy
+    return stress_z
+
+def place_booms(N_bottom, N_curve, R):
+    angles = np.linspace(np.pi/(N_curve-1), np.pi*(N_curve-2)/(N_curve-1), N_curve-2)
+    curve_boom_co_arr = np.column_stack((R * np.cos(angles), R * np.sin(angles)))
+
+    bottom_boom_xco = np.linspace(-R, R, N_bottom)
+    bottom_boom_yco = np.zeros(N_bottom)
+    bottom_boom_co_arr = np.column_stack((bottom_boom_xco, bottom_boom_yco))
+
+    boom_co_arr = np.vstack((curve_boom_co_arr, bottom_boom_co_arr))
+    return boom_co_arr
+
 
 def calculate_shear_stress(shear_force, shear_area):
     """
@@ -44,25 +73,5 @@ def calculate_normal_stress(axial_force, area):
     """
     return axial_force / area
 
-def main():
-    # Example input values (replace with your specific values)
-    bending_moment = 1000.0  # Nm
-    shear_force = 500.0  # N
-    axial_force = 2000.0  # N
-    section_modulus = 0.005  # m^3
-    shear_area = 0.002  # m^2
-    cross_section_area = 0.01  # m^2
 
-    # Calculate stresses
-    bending_stress = calculate_bending_stress(bending_moment, section_modulus)
-    shear_stress = calculate_shear_stress(shear_force, shear_area)
-    normal_stress = calculate_normal_stress(axial_force, cross_section_area)
-
-    # Print results
-    print(f"Bending Stress: {bending_stress} Pa")
-    print(f"Shear Stress: {shear_stress} Pa")
-    print(f"Normal Stress: {normal_stress} Pa")
-
-if __name__ == "__main__":
-    main()
 
