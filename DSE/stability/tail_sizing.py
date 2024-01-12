@@ -359,7 +359,8 @@ def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max,
 
     return Rat_cr_cv_final, Rat_br_bv  # , Rudder_load
 
-def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0.5, aileron_chord_frac = 0.27, deflection_up = 20.0, deflection_down = 20.0, b = aero_constants.b, CL_alpha_w = aero_constants.CL_alpha_wing, CD_0_wing = , taper_w = aero_constants.c_tip / aero_constants.c_root, C_root = aero_constants.c_root, S = aero_constants.S):
+def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0.5, aileron_chord_frac = 0.27, deflection_up = 20.0, deflection_down = 20.0, b = aero_constants.b, CL_alpha_w = aero_constants.CL_alpha_wing, CD_0_wing = aero_constants.CD0_wing, taper_w = aero_constants.c_tip / aero_constants.c_root, C_root = aero_constants.c_root, S = aero_constants.S):
+    """Aileron sizing for roll rate requirement, assumes a roll rate now, assumes that the aileron starts immediately beyond the propeller projection on the wing, deflects no more than 20 degrees, does not cause adverse yaw and takes up 27% of wing chord. Can all be changed if required"""
     # Let's do this! давай!
 
     # Typical values:
