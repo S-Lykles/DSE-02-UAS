@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 def calculate_inertia(R, r):
     """
@@ -41,25 +42,34 @@ def place_booms(N_bottom, N_curve, R):
         curve_boom_xco = R*np.cos(i*np.pi / (N_curve-1))
         curve_boom_yco = R*np.sin(i*np.pi / (N_curve-1))
         curve_boom_co = np.array([curve_boom_xco, curve_boom_yco])
-        curve_boom_co_arr = np.append([curve_boom_co_arr, curve_boom_co], axis = 0)
-    print(curve_boom_co_arr)
-    return curve_boom_co_arr
+        curve_boom_co_arr = np.append(curve_boom_co_arr, [curve_boom_co], axis=0)
 
-a = place_booms(0, 5, 1)
+    return curve_boom_co_arr, curve_boom_co
 
+def boom_coor(N_bottom, N_curve, R):
+    boom_co = np.empty((N_curve // 2 + 1, 2))
+    dt = np.pi / N_curve
+    t = 0
+    for i in range(N_curve // 2 + 1):
+        x = R * np.cos(t)
+        y = R * np.sin(t)
+        boom_co[i] = [x, y]
+        t = t + dt
+    return boom_co
 
-def calculate_shear_stress(shear_force, shear_area):
-    """
-    Calculate shear stress.
+def calculate_shear_stress(Sy, Ixx, coordinates, booms):
+    c = -Sy / Ixx
+    delta_q = np.array([])
+    for i, y in enumerate(coordinates[:, 1]):
+        dq = booms[i] * y
+        delta_q = np.append(delta_q, [dq*c])
+    q_tot = sum(delta_q)
+    return delta_q, q_tot
 
-    Parameters:
-    - shear_force: Shear force (N)
-    - shear_area: Shear area of the cross-section (m^2)
+booms = np.array([100, 100, 200])
 
-    Returns:
-    - Shear stress (Pa)
-    """
-    return shear_force / shear_area
+delta, tot = calculate_shear_stress(100, 10000, boom_coor(0, 5, 1), booms)
+print(tot)
 
 def calculate_normal_stress(axial_force, area):
     """
@@ -76,3 +86,7 @@ def calculate_normal_stress(axial_force, area):
 
 
 
+# def shear(Sy, dx, ixx, iyy, ixy, qs0):
+#     c = -Sy/ixx
+#     for boom in booms:
+#         q =
