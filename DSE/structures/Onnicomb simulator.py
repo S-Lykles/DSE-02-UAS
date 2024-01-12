@@ -9,13 +9,10 @@ def calculate_centroid(R, r, t):
     A_bottom = 2*R*t
     Cy = (Cy_halftube*A_halftube + Cy_bottom*A_bottom) / (A_halftube+A_bottom)
     print(Cy_halftube, Cy_bottom)
-    return Cy
-
-Cy = calculate_centroid(1, 0.99, 0.01)
-print(Cy)
+    return Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom
 
 
-def calculate_inertia(R, r):
+def calculate_inertia(R, r, t):
     """
     Calculates moments of inertia of a half-circle shell around axis which are located at the flat surface in the middle
 
@@ -24,8 +21,16 @@ def calculate_inertia(R, r):
     :return Ixx: Moment of inertia around x axis
     :return Iyy: Moment of inertia around y axis
     """
-    Ixx = np.pi*(R**4-r**4)/8
-    Iyy = Ixx
+    Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom = calculate_centroid(R, r, t)
+
+    Ixx_halftube = np.pi*(R**4-r**4)/8 + A_halftube*(Cy-Cy_halftube)**2
+    Ixx_bottom = 2*R*t**3/12 + A_bottom*(Cy-Cy_bottom)**2
+    Ixx = Ixx_halftube + Ixx_bottom
+
+    Iyy_halftube = np.pi*(R**4-r**4)/8
+    Iyy_bottom = (2*R)**3*t/12
+    Iyy = Iyy_halftube + Iyy_bottom
+
     return Ixx, Iyy
 
 
@@ -60,13 +65,18 @@ def place_booms(N_bottom, N_curve, R):
     boom_co_arr = np.vstack((curve_boom_co_arr, bottom_boom_co_arr))
     return boom_co_arr[:,0], boom_co_arr[:,1]
 
-Ixx, Iyy = calculate_inertia(1, 0.99)
-boom_co_arr = place_booms(50, 150, 1)
-stress_z = calculate_bending_stress(boom_co_arr, 100, 100, Ixx, Iyy)
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
+
+R = 1
+r = 0.99
+t = 0.01
+Mx = 50
+My = 50
+
+
+Ixx, Iyy = calculate_inertia(R, r, t)
+boom_co_arr = place_booms(50, 150, R)
+stress_z = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
 
 # Plot the 3D curve
 plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_z, cmap='viridis', label='Axial Stress')
