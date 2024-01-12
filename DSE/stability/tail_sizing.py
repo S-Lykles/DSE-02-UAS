@@ -218,8 +218,8 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     plot = False
 
     N = 50  # Resolution
-    optimal_sweep_v = 30
-    optimal_AR_v = 1.375
+    optimal_sweep_v = 10
+    optimal_AR_v = 1.025
 
     BB = 0
     BBB = 0
