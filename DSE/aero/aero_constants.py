@@ -9,6 +9,7 @@ alpha_0 = 0
 sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = -2.386*pi/180
 CL_alpha_wing = (cl_23012[20]-cl_23012[0])/((alpha_23012[20]-alpha_23012[0])*pi/180)
+CD0_wing = 0.0077
 # Cl_alpha_h
 CL_max = max(cl_23012)
 CL_0 = cl_23012[10]
