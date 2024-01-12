@@ -100,31 +100,5 @@ plt.title('3D Curve with Axial Stress')
 plt.show()
 
 
-def calculate_shear_stress(shear_force, shear_area):
-    """
-    Calculate shear stress.
-
-    Parameters:
-    - shear_force: Shear force (N)
-    - shear_area: Shear area of the cross-section (m^2)
-
-    Returns:
-    - Shear stress (Pa)
-    """
-    return shear_force / shear_area
-
-def calculate_normal_stress(axial_force, area):
-    """
-    Calculate normal stress.
-
-    Parameters:
-    - axial_force: Axial force (N)
-    - area: Cross-sectional area (m^2)
-
-    Returns:
-    - Normal stress (Pa)
-    """
-    return axial_force / area
-
 
 
