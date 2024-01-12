@@ -126,11 +126,13 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     return x_cg_bar, x_cg_bar_c, Sh_S,surface_ratio
 
-a, b, c, d = horizontal_tail_sizing()
-# print('test 1', a)
-# print('test 2', b)
-# print('test 3', c)
-# print('test 4', d)
+test_print = False
+if test_print ==True:
+    a, b, c, d = horizontal_tail_sizing()
+    print('test 1', a)
+    print('test 2', b)
+    print('test 3', c)
+    print('test 4', d)
 
 
 
@@ -146,7 +148,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     PRINT = False  # for values set to true
-    l_boom_o = 5
+    l_boom_o = 4  # the distance from cg to trailing edge of the tail
     # base imports.
     AR_w = b ** 2 / S
     M = 0.12  # at cruise speed
@@ -166,12 +168,14 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     Span = []
     Moment_arm = []
     root_cord = []
+    X_LEMAC_Vert = []
 
     for p in range(len(AR_v)):
         Surface_k = []
         span_k = []
         moment_arm_k = []
         Cv_r_k = []
+        X_LEMAC_k =[]
         for j in range(len(sweep_v)):
 
             lv = 2
@@ -202,10 +206,12 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
                 Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
 
                 # List of all values
+            X_LEMAC_k.append(X_LEMAC_v)
             Cv_r_k.append(Cv_r)
             Surface_k.append(Sv)
             span_k.append(bv)
             moment_arm_k.append(lv)
+        X_LEMAC_Vert.append(X_LEMAC_k)
         root_cord.append(Cv_r_k)
         Surface.append(Surface_k)
         Span.append(span_k)
@@ -227,6 +233,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
         if sweep_v[i] >= optimal_sweep_v:
             if sweep_v[i - 1] <= optimal_sweep_v:
                 BBB = i - 1
+    optimal_X_LEMAC_v = X_LEMAC_Vert[BB][BBB]
     optimal_surface_v = Surface[BB][BBB]
     optimal_span_v = Span[BB][BBB]
     optimal_moment_arm = Moment_arm[BB][BBB]
@@ -270,8 +277,9 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     AR_v = optimal_AR_v
     root_cord_v = optimal_root_cord
     Sweep_v = optimal_sweep_v
+    X_LEMAC_VERT = optimal_X_LEMAC_v
 
-    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v
+    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v,X_LEMAC_VERT
 
 
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
@@ -349,7 +357,7 @@ def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max,
     # L_v = q * S_v * C_l_v
     # Rudder_load = l_v * L_v
 
-    return Rat_cr_cv_final # , Rudder_load
+    return Rat_cr_cv_final, Rat_br_bv  # , Rudder_load
 
 def aileron_surface_sizing():
     # Let's do this! давай!
@@ -360,26 +368,105 @@ def aileron_surface_sizing():
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
     # delta_a_max (aileron max deflection) 30 deg or 25 deg
 
-    b_2 = 2
-    b_1 =1
-    b_a = b_2 - b_1
-    S = 1
-    b = 1
-    Ca_t =  1
-    Ca_r =  1
-    CL_alpha =  1
-    C_r =  1
-    taper_w =  1
-    Cl_alpha = 1
-    Cd_0 = 1
-    Vtrans =  32
-    deflection_aileron =  12
-    deg2rad=const.deg2rad
+    # b_2 = 2
+    # b_1 =1
+    # b_a = b_2 - b_1
+    # S = 1
+    # b = 1
+    # Ca_t =  1
+    # Ca_r =  1
+    # CL_alpha =  1
+    # C_r =  1
+    # taper_w =  1
+    # Cl_alpha_w = 1
+    # Cd_0 = 1
+    # Vtrans =  32
+    # deflection_aileron =  12
+    # deg2rad=const.deg2rad
+    #
+    # S_a_S =  b_a/ S * (Ca_t + Ca_r)
+    # tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
+    # C_lroll_aileron = -1* ( (CL_alpha_w * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3)) # Factor 2(be) or not (2 be)
+    # C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
+    # p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
 
-    S_a_S =  b_a/ S * (Ca_t + Ca_r)
+    roll_rate =
+    b =
+    V =
+    Cl_alpha_w =
+    Cd_0 =
+    taper_w =
+    C_root =
+    span_wise_inner_frac =
+    span_wise_outer_frac  =
+    aileron_chord_frac =
+    span_wise_inner, span_wise_outer = span_wise_inner_frac * (b / 2), span_wise_outer_frac * (b / 2)
+    b_a = span_wise_outer - span_wise_inner
+    aileron_deflection_up =
+    aileron_deflection_down =
+    deflection_aileron = 0.5 * (aileron_deflection_up + aileron_deflection_down)
+
+    C_lp = -1 * ((Cl_alpha_w + Cd_0) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
+    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V * deflection_aileron))
+    Ca_inner = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_inner)
+    Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
+    S_a_S = b_a / S * (Ca_inner + Ca_outer)
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-    C_lroll_aileron = -1* ( (CL_alpha * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3))
-    C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
-    p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
+    Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
 
+    while Cl_delta_A < Cl_delta_A_req:
+        span_wise_outer_frac += 0.01
+        span_wise_outer = span_wise_outer_frac * (b / 2)
+        Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
+        S_a_S = b_a / S * (Ca_inner + Ca_outer)
+        tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
+        Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
+
+    span_wise_outer_final = span_wise_outer
+    S_a_final = S_a_S * S
+
+    return(span_wise_inner, span_wise_outer_final, S_a_final)
     #return
+
+def stab_con_int_structure():
+    """Keep in mind that these values are all subject to change due to interations"""
+    print('!!! Carefull when using this Data, it will be subject to change due to shifts in Xcg and rotor placement. !!!')
+
+    # vertical tail dimensions
+    S_vert = vertical_tail_size()[0]
+    b_vert = vertical_tail_size()[1]
+    cord_root_vert = vertical_tail_size()[4]
+    cord_tip_vert = vertical_tail_size()[6]*cord_root_vert
+    Dist_X_leading_vert = vertical_tail_size()[2] - 0.25 vertical_tail_size()[4] - vertical_tail_size()[7]
+    Sweep_angle_vert = vertical_tail_size()[5]
+
+    # rudder dimensions
+    cord_root_rudder = rudder_surface_sizing()[0]*cord_root_vert
+    bv_rudder = rudder_surface_sizing()[1]*b_vert
+    Location_rudder_z = 0       # location with respect to vertical tail, in the horizontal direction.
+
+    # horizontal tail dimensions
+    S_hori = horizontal_tail_sizing()[2]
+    cord_root_hori = cord_tip_vert
+    cord_tip_hori = cord_root_hori
+    b_hori = S_hori / cord_root_hori
+    Dist_X_leading_hori = Dist_X_leading_vert + b_vert * np.tan(Sweep_angle_vert*const.deg2rad)
+    Sweep_angle_hori = 0 # no sweep is assumed at the moment.
+
+    # elevator dimensions
+    tau_elevator = elevator_surface_sizing()[0]
+    print('using the graph in overleaf the cord-to-cord ratio can be found, and also the surface-to-surface ratio')
+    print('this is based on the assumption that the span-to-span ratio is 1')
+
+    # aileron dimensions
+    cord_root_aileron = 0
+    bv_aileron = 0
+    Dist_X_leading_aileron = 0 # b_a - bv_aileron/2
+
+    # forces
+    print('The tail forces')
+    print('The vertical force is for a single tail surface')
+    Fz_tail = S_vert*rho*15**2 # extreem assumption
+    Fx_tail = S_hori*rho*V**2
+
+    return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
