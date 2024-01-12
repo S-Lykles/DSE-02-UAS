@@ -111,16 +111,18 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     a = (delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max)
     b =((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar)
 
-    plt.plot(x_cg_bar, Sh_S, label ='stab')
-    # plt.plot(x_np_bar, Sh_S, label ='neutral')
-    plt.plot(x_cg_bar_c, Sh_S, label ='cont')
-    plt.xlim(0,1)
-    plt.ylim(0,0.1)
-    plt.ylabel('Sh/S')
-    plt.xlabel('% Xcg of MAC')
-    plt.title('Horizontal tail')
-    plt.legend()
-    plt.show()
+    PloT = False
+    if PloT == True:
+        plt.plot(x_cg_bar, Sh_S, label ='stab')
+        # plt.plot(x_np_bar, Sh_S, label ='neutral')
+        plt.plot(x_cg_bar_c, Sh_S, label ='cont')
+        plt.xlim(0,1)
+        plt.ylim(0,0.1)
+        plt.ylabel('Sh/S')
+        plt.xlabel('% Xcg of MAC')
+        plt.title('Horizontal tail')
+        plt.legend()
+        plt.show()
 
     return x_cg_bar, x_cg_bar_c, Sh_S,surface_ratio
 
@@ -356,25 +358,28 @@ def aileron_surface_sizing():
     # S_a_S (aileron area to wing area) 0.05 - 0.1
     # b_a_b (aileron span to wing span) 0.2 - 0.3
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
-    # delta_a_max (aileron max deflection) 30 deg
+    # delta_a_max (aileron max deflection) 30 deg or 25 deg
 
-    b_2 =
-    b_1 =
+    b_2 = 2
+    b_1 =1
     b_a = b_2 - b_1
-    S =
-    b =
-    Ca_t =
-    Ca_r =
-    CL_alpha =
-    C_r =
-    taper_w =
-    CL_alpha =
-    Cd_0 =
+    S = 1
+    b = 1
+    Ca_t =  1
+    Ca_r =  1
+    CL_alpha =  1
+    C_r =  1
+    taper_w =  1
+    Cl_alpha = 1
+    Cd_0 = 1
+    Vtrans =  32
+    deflection_aileron =  12
+    deg2rad=const.deg2rad
 
     S_a_S =  b_a/ S * (Ca_t + Ca_r)
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
     C_lroll_aileron = -1* ( (CL_alpha * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3))
-    C_lroll = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 - 3* taper_w)
-
+    C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
+    p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
 
     #return
