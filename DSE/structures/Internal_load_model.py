@@ -13,7 +13,8 @@ def aero_data_to_numpy(file_name):
     y = data[0]
     chord = data[1]
     cl = data[3]
-    return y, chord, cl
+    cm_geom = data[6]
+    return y, chord, cl, cm_geom
 
 
 def find_nearest_point(point, array):
@@ -24,22 +25,30 @@ def find_nearest_point(point, array):
 
 
 def distribution_from_aero_data(start, stop, step, data_name, point_range):
-    y, chord, cl = aero_data_to_numpy(data_name)
+    y, chord, cl, cm_geom = aero_data_to_numpy(data_name)
     cl_distribution = np.interp(point_range, y, cl)
+    cm_distribution = np.interp(point_range, y, cm_geom)
     chord_distribution = np.interp(point_range, y, chord)
-    max_th = 0.12*chord_distribution
+    max_th = 0.12 * chord_distribution
     print(const.v_cruise)
     lift_distribution = cl_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
+    moment_distribution = cm_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
     # Lift only for the start and stop caps
     i_start = find_nearest_point(start, point_range)[1]
     i_stop = find_nearest_point(stop, point_range)[1]
 
     lift_distribution = lift_distribution[i_start:i_stop + 1]
+    moment_distribution = moment_distribution[i_start:i_stop + 1]
+
     empty_array = np.zeros(len(point_range))
     empty_array[i_start:i_stop + 1] = lift_distribution
     lift_distribution = empty_array
 
-    return lift_distribution*step, max_th
+    empty_array2 = np.zeros(len(point_range))
+    empty_array2[i_start:i_stop + 1] = moment_distribution
+    moment_distribution = empty_array2
+
+    return lift_distribution*step, moment_distribution, max_th
 
 
 def load_distribution(start, stop, step, m1, m2, type, point_range):
