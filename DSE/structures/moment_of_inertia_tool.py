@@ -296,7 +296,6 @@ def number_of_stringers_computation(K_c, L, t, E, M, h):
     L = L * 39.3700787 / N
     print(N, 'N')
 
-    # Compute the maximum compressive force acting on the wing box section
     Fmax = M / h
     sigma_cr = Fmax / (t * L)
     L_check = t / np.sqrt(sigma_cr/(K_c * E))
