@@ -21,17 +21,20 @@ def moment_of_inertia_rectangle_y_axis(width, height):
 
     return I_yy
 
+
 # Function computing the moment of inertia of a solid circular section
 def moment_of_inertia_solid_circular_section(diameter):
     I = np.pi * diameter**4 / 64
 
     return I
 
+
 # Function computing the moment of inertia of a thin-walled circular section
 def moment_of_inertia_thin_walled_circular_section(diameter, thickness):
     I = np.pi * thickness * diameter**3 / 8
 
     return I
+
 
 # Parallel axis theorem
 def parallel_axis_theorem(inertia, area, distance):
@@ -53,6 +56,7 @@ def parallel_axis_theorem(inertia, area, distance):
 # t_bottom = Thickness of the bottom sheet
 # l_bottom = Length of the bottom sheet
 # d = Distance between the neutral line (y-axis) and the center of the spars
+
 
 def I_xx_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
                   w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
@@ -200,6 +204,7 @@ def I_yy_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_re
 
     return I_yy
 
+
 # Tool to compute the moment of inertia around the x-axis along the rectangular section of the fuselage
 def I_xx_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bottom):
     # Moment of inertia for the various rectangles:
@@ -232,6 +237,7 @@ def I_yy_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bo
 
     return I_yy
 
+
 # Torsion calculator for a beam with a certain geometrical cross-section
 def compute_torsion(T, rho, J, G, t, A_m, s):
     #Torsion and twist cirucular section
@@ -247,6 +253,7 @@ def compute_torsion(T, rho, J, G, t, A_m, s):
     dtheta_dz_thin_plate = 3* T /G /s /t**3
 
     return tau_circ, dtheta_dz_circ, tau_thin_circ, dtheta_dz_thin_circ, tau_max_thin_plate, dtheta_dz_thin_plate
+
 
 # Buckling calculator for a beam with a certain geometrical cross-section
 def compute_buckling(E, Ixx, buckling, L, v, t, b):
@@ -282,11 +289,13 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 def number_of_stringers_computation(K_c, L, t, E, M, h):
     E = E * 0.000145037738
     t = t * 39.3700787
+    h = h * 39.3700787
+    M = M * 8.85074579
+
     N = np.arange(1, 10, 1)
     L = L * 39.3700787 / N
     print(N, 'N')
-    h = h * 39.3700787
-    M = M * 8.85074579
+
     # Compute the maximum compressive force acting on the wing box section
     Fmax = M / h
     sigma_cr = Fmax / (t * L)
@@ -296,8 +305,12 @@ def number_of_stringers_computation(K_c, L, t, E, M, h):
     print(N_req, "Nreq")
     # return N_stringers
 
-print("Compute number of stringers at the root", number_of_stringers_computation(3.62, 0.52, 0.001, 71*10**9
-                                                                                 ,8700, 0.048))
+def number_of_ribs_computation(K_c, L, t, E, T, h):
+    pass
+
+
+print("Compute number of stringers at the root, inputs in SI units", number_of_stringers_computation(3.62, 0.174, 0.001, 71*10**9
+                                                                                 ,4000, 0.058))
 
 #
 # print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
