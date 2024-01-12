@@ -377,8 +377,8 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0
     aileron_deflection_down = const.deg2rad(deflection_down)
     deflection_aileron = 0.5 * (aileron_deflection_up + aileron_deflection_down)
 
-    C_lp = -1 * ((Cl_alpha_w + CD_0_wing) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
-    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V * deflection_aileron))
+    C_lp = -1 * ((CL_alpha_w + CD_0_wing) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
+    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V_man * deflection_aileron))
     Ca_inner = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_inner)
     Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
     S_a_S = b_a / S * (Ca_inner + Ca_outer)
