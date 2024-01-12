@@ -45,32 +45,49 @@ def place_booms(N_bottom, N_curve, R):
     bottom_boom_co_arr = np.column_stack((bottom_boom_xco, bottom_boom_yco))
 
     boom_co_arr = np.vstack((curve_boom_co_arr, bottom_boom_co_arr))
-    return boom_co_arr
+    return boom_co_arr[:,0], boom_co_arr[:,1]
 
-def boom_coor(N_bottom, N_curve, R):
-    boom_co = np.empty((N_curve // 2 + 1, 2))
-    dt = np.pi / N_curve
-    t = 0
-    for i in range(N_curve // 2 + 1):
-        x = R * np.cos(t)
-        y = R * np.sin(t)
-        boom_co[i] = [x, y]
-        t = t + dt
-    return boom_co
+
+
+# def boom_coor(N_bottom, N_curve, R):
+#     boom_co = np.empty((N_curve // 2 + 1, 2))
+#     dt = np.pi / N_curve
+#     t = 0
+#     for i in range(N_curve // 2 + 1):
+#         x = R * np.cos(t)
+#         y = R * np.sin(t)
+#         boom_co[i] = [x, y]
+#         t = t + dt
+#     return boom_co
 
 def calculate_shear_stress(Sy, Ixx, coordinates, booms):
     c = -Sy / Ixx
     delta_q = np.array([])
     for i, y in enumerate(coordinates[:, 1]):
-        dq = booms[i] * y
-        delta_q = np.append(delta_q, [dq*c])
-    q_tot = sum(delta_q)
-    return delta_q, q_tot
+        dq = booms[i] * y * c
+        delta_q = np.append(delta_q, [dq])
+    s_tot = sum(delta_q)
+    return delta_q, s_tot
 
-booms = np.array([100, 100, 200])
+# x, y = place_booms(5, 7, 0.4)
+#
+# plt.figure()
+# plt.plot(x, y, marker='x')
+# plt.show()
 
-delta, tot = calculate_shear_stress(100, 10000, boom_coor(0, 5, 1), booms)
-print(tot)
+#delta, tot = calculate_shear_stress(100, 10000, boom_coor(0, 5, 1), booms)
+def test(sy, t, r, ixx, theta, ybar):
+    return -(sy * t * r / ixx) * (-r * np.cos(theta) + r - ybar * theta)
+
+def test2(sy, t, ixx, s, ybar):
+    return -(sy * t * ybar * s) / ixx
+
+trange = np.linspace(0, np.pi/2, 100)
+srange = np.linspace(0, 0.4, 100)
+plt.figure()
+plt.plot(np.linspace(0,0.4,100), test(10000, 0.02, 0.4, 0.0001, trange, 0.17))
+plt.plot(np.linspace(0,0.4,100), test2(10000, 0.02, 0.0001, srange, 0.17))
+plt.show()
 
 def calculate_normal_stress(axial_force, area):
     """
