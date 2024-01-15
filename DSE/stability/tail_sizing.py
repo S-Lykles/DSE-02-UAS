@@ -4,6 +4,7 @@ from DSE.Locations import locations
 from DSE.stability.Loaddiag import load_diagram_plot
 from DSE.structures.center_of_gravity import class_two_cg_estimation
 from DSE.aero import aero_constants
+from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
 
 # default values
@@ -38,6 +39,26 @@ c_tip = aero_constants.c_tip
 # def tail_sizing(S, b, c_bar, b_f, h_f, l_fn, sweep_ang_25_c_rad, CL_max, CL_alpha_w, S_net, eta, A_h, l_h,dz_h, sweep_ang_50_c_rad, c_root, c_tip, tail_config, V, R, gamma, T, rho):
 # def horizontal_tail_sizing(eta, V, R, gamma, T, rho, S, b, c_bar, Cl_alpha_h = 2*np.pi,  CL_max=1.5, l_f=2, CL_0=0.3, sweep_ang_rad = 0, Cm_0_airfoil = 0.012, b_f=0.8, hf_max=0.6, l_fn=1.1, sweep_ang_25_c_rad=0, CL_alpha_w=5.787, sweep_ang_50_c_rad=0, c_root=0.6, c_tip=0.5):
 
+def find_intersection(x1, y1, x2, y2):
+    # Calculate slopes
+    m1 = (y1[1] - y1[0]) / (x1[1] - x1[0])
+    m2 = (y2[1] - y2[0]) / (x2[1] - x2[0])
+
+    # Calculate y-intercepts
+    b1 = y1[0] - m1 * x1[0]
+    b2 = y2[0] - m2 * x2[0]
+
+    # Check if lines are parallel
+    if m1 == m2:
+        print("Lines are parallel and don't intersect.")
+        return None
+
+    # Calculate intersection point
+    x_intersect = (b2 - b1) / (m1 - m2)
+    y_intersect = m1 * x_intersect + b1
+
+    return x_intersect, y_intersect
+
 def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
@@ -45,8 +66,8 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     SM = 0.05 #PLACEHOLDER
     A = b**2/S
     S_net = S - b_f*c_root
-    A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
-
+    # A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
+    A_hh = np.arange(0.1,10.5,0.1)
     Vh_V_2 = 1 # tail configuration is assumed to be t-tail
 
     m_tv = 2*dz_h/b
@@ -56,77 +77,188 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     de_da = K_ev/K_ev0 * (r/(r**2+m_tv**2)*0.4876/np.sqrt(r**2+0.6319+m_tv**2)+(1+(r**2/(r**2+0.7915+5.0734*m_tv**2))**0.3113)*(1-np.sqrt(m_tv**2/(1+m_tv**2))))*CL_alpha_w/(np.pi*A)
 
-    # de_da = de_da*1000
 
     V_h = np.sqrt(Vh_V_2)*V
     a = np.sqrt(R*gamma*T)
     M = V_h/a
     beta = np.sqrt(1-M**2)
-    # Cl_alpha_h is taken as 2pi, but it should be an input from aero
-    # CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
-    CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
-    # CL_alpha_h =CL_alpha_h/10
+    sr = []
+    d_xcg = []
+    dcg=0
+    check_y =[]
+    for i in range(len(A_hh)):
+        print(i,len(A_hh))
+        if A_hh[i] == 6.8:
+            PloT=True
+        else:
+            PloT=False
+        A_h = A_hh[i]
+        # # A_h = 2/3*36/3.5
+        # # Cl_alpha_h is taken as 2pi, but it should be an input from aero
+        # # CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
+        CL_alpha_h = Cl_alpha_h*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
+        # CL_alpha_h =CL_alpha_h/10
 
-    CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
+        CL_alpha_A_h = CL_alpha_w * (1+2.15*b_f/b)*S_net/S+np.pi/2*b_f**2/S
 
-    x_ac_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
-    c_g = S/b # mean geometric chord
-    lambd = c_root/c_tip
-    x_ac_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
-    # x_ac_w = 0.3  #PLACEHOLDER,. the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
-    x_ac_w = 0.3+l_fn/c_bar  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
-    x_ac_bar = x_ac_w + x_ac_fc1 + x_ac_fc2
+        x_ac_bar_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
+        c_g = S/b # mean geometric chord
+        lambd = c_root/c_tip
+        x_ac_bar_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
+        x_ac_bar_w = 0.25  #PLACEHOLDER,. the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
+        # x_ac_bar_w = 0.3+l_fn/c_bar  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
+        x_ac_bar = x_ac_bar_w + x_ac_bar_fc1 + x_ac_bar_fc2
 
-    Sh_S = np.arange(0, 0.8, 0.1)
-    x_np_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
-    x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2 - SM
+        Sh_S = np.arange(0, 0.8, 0.1)
+        x_np_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
+        x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2 - SM
 
 
-    # return x_cg_bar, x_np_bar, x_ac_bar
-# def horizontal_tail_contrallability(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
+        # return x_cg_bar, x_np_bar, x_ac_bar
+    # def horizontal_tail_contrallability(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
 
-    CL_h = -0.35 * A_h ** (1 / 3) # It is assumed that tail_ability is 'fixed tail'
+        CL_h = -0.35 * A_h ** (1 / 3) # It is assumed that tail_ability is 'fixed tail'
 
-    CL_A_h = 0.3 #INCORRECT VALUE, it is an input, currently just an assumption (aircraft less tail lift coefficient)
+        CL_A_h = 0.3 #INCORRECT VALUE, it is an input, currently just an assumption (aircraft less tail lift coefficient)
 
-    delta_f_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may not be any flaps
-    delta_nac_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there is no engine mounted in the wing
+        delta_f_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there may not be any flaps
+        delta_nac_Cm_ac = 0  # INCORRECT VALUE, it is assumed 0 as there is no engine mounted in the wing
 
-    delta_fus_Cm_ac = -1.8 * (1 - 2.5 * b_f / l_f) * np.pi * b_f * hf_max * l_f / (
-                4 * S * c_bar) * CL_0 / CL_alpha_A_h
-    Cm_ac_w = Cm_0_airfoil * (A * np.cos(sweep_ang_rad) ** 2 / (A + 2 * np.cos(sweep_ang_rad)))
+        delta_fus_Cm_ac = -1.8 * (1 - 2.5 * b_f / l_f) * np.pi * b_f * hf_max * l_f / (
+                    4 * S * c_bar) * CL_0 / CL_alpha_A_h
+        Cm_ac_w = Cm_0_airfoil * (A * np.cos(sweep_ang_rad) ** 2 / (A + 2 * np.cos(sweep_ang_rad)))
 
-    Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
+        Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
 
-    x_cg_bar_c = x_ac_bar - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
+        x_cg_bar_c = x_ac_bar - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
 
-    # sr =[]
-    # for element in range(len(x_cg_bar)):
-    element=5
-    x_cg_bar_sel =  x_cg_bar[element] #double check this codeline
-    x_np_bar_sel = x_np_bar[x_cg_bar==x_cg_bar_sel] #double check this codeline
+        x_cg_bar_min, x_cg_bar_max, xlemac_lf, slope_lemac = loading_diagram_extremes()
 
-    delta_x_cg_bar =np.abs(x_cg_bar[element] - x_cg_bar_c[element])
-    surface_ratio = ((delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
-    a = (delta_x_cg_bar + x_np_bar_sel-x_cg_bar_sel- Cm_ac/CL_max)
-    b =((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar)
+        y_offset = np.arange(0,10,0.001)
+        y_datum_shift=0
+        y_diff=5
 
-    PloT = False
-    if PloT == True:
-        plt.plot(x_cg_bar, Sh_S, label ='stab')
-        # plt.plot(x_np_bar, Sh_S, label ='neutral')
-        plt.plot(x_cg_bar_c, Sh_S, label ='cont')
-        plt.xlim(0,1)
-        plt.ylim(0,0.1)
-        plt.ylabel('Sh/S')
-        plt.xlabel('% Xcg of MAC')
-        plt.title('Horizontal tail')
-        plt.legend()
+        x_i, y_i = find_intersection([x_cg_bar[0], x_cg_bar[5]], [Sh_S[0], Sh_S[5]], [x_cg_bar_c[0], x_cg_bar_c[5]], [Sh_S[0], Sh_S[5]])
+        for i in range(len(y_offset)):
+            y_shift = y_offset[i]
+
+            x_1, y_1 = find_intersection([x_cg_bar[0], x_cg_bar[5]], [Sh_S[0], Sh_S[5]], [x_cg_bar_max[0], x_cg_bar_max[5]], [xlemac_lf[0]-y_shift, xlemac_lf[5]-y_shift])
+            x_2, y_2 = find_intersection([x_cg_bar_c[0], x_cg_bar_c[5]], [Sh_S[0], Sh_S[5]], [x_cg_bar_min[0], x_cg_bar_min[5]], [xlemac_lf[0]-y_shift, xlemac_lf[5]-y_shift])
+
+            if (y_i> y_1 )or (y_i> y_2):
+                continue
+            else:
+                y_dist=np.abs(y_1-y_2)
+                if y_dist<y_diff:
+                    y_datum_shift=y_shift
+                    y_diff = y_dist
+                    x1, x2, y1, y2 = x_1, x_2, y_1, y_2
+
+        if x1>0 and x2>0:
+            check_y.append(np.abs(y1-y2))
+        else:
+            check_y.append(1000)
+
+        delta_x_cg_bar = x1-x2
+        print('dcg',x1,x2)
+        d_xcg.append(delta_x_cg_bar)
+
+
+        # PloT = False
+        # if x1>0 and x2>0:
+        #     PloT = True
+        # else:
+        #     PloT = False
+
+
+        # surface_ratio = ((delta_x_cg_bar + SM- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
+        # print('plot sr_h:',surface_ratio)
+        surface_ratio =np.maximum(y1, y2)
+        sr.append(surface_ratio)
+        print('sur.r.:', surface_ratio+y_datum_shift)
+
+
+        if delta_x_cg_bar> dcg:
+            dcg = delta_x_cg_bar
+            sf= S*surface_ratio
+            arh=A_h
+
+        # print()
+        xlemac_lf = [x-y_datum_shift for x in xlemac_lf]
+        # xlemac_lf=xlemac_lf-1.57
+        # PloT = True
+        if PloT == True:
+            print(surface_ratio*S/2.3,surface_ratio)
+            plt.plot(x_cg_bar, Sh_S, label ='stab')
+            # plt.plot(x_np_bar, Sh_S, label ='neutral')
+            plt.plot(x_cg_bar_c, Sh_S, label ='cont')
+            plt.plot(x_cg_bar_max, xlemac_lf, label ='xcg max')
+            plt.plot(x_cg_bar_min, xlemac_lf, label ='xcg min')
+            plt.plot(x_cg_bar_min, surface_ratio*np.ones(np.shape(x_cg_bar_min)), label ='xcg  optimum')
+            plt.plot(x_cg_bar_min, np.minimum(y1,y2)*np.ones(np.shape(x_cg_bar_min)), label ='xcg  minoptimum')
+            # plt.xlim(0,1)
+            # plt.ylim(0,0.1)
+            plt.ylabel('Sh/S')
+            plt.xlabel('% Xcg of MAC')
+            plt.title('Horizontal tail [AR=6.8]')
+            plt.legend()
+            plt.show()
+
+    Sh_area = [x*S for x in sr]
+
+    Sh_area0, A_hh0 = np.meshgrid(Sh_area, A_hh)
+    span_h = np.sqrt(Sh_area0*A_hh0)
+    # chord=Sh_area0/span_h
+    N = 400
+
+    # fig, ax = plt.subplots()
+    # cp = ax.contourf(Sh_area0, A_hh0, span_h, N)
+    # cbar = fig.colorbar(cp)
+    # contour_line = ax.contour(Sh_area0, A_hh0, span_h, levels=[2.3], colors='r')
+    # ax.legend([contour_line.collections[0]], ['Span = 2.3 m'], loc='upper right')
+    # # Find the intersection points
+    # contour_data = contour_line.collections[0].get_paths()[0].vertices
+    # # intersection_point = contour_data[np.argmin(np.abs(contour_data[:, 1] - 6.8))]
+    # #
+    # # # Plot a point at the intersection,
+    # # ax.plot(intersection_point[0], intersection_point[1], 'o', color='pink', label='Intersection')
+    #
+    # ax.set_title('Span of the horizontal tail [m]')
+    # ax.set_xlabel('Surface area of horizontal tail [m^2]')
+    # ax.set_ylabel('Aspect ratio horizontal tail')
+    # plt.show()
+    # print(np.shape(Sh_area),np.shape(d_xcg))
+    #
+    # plt.scatter(Sh_area, d_xcg)
+    # plt.xlabel('Minimum optimal surface area of the horizontal tail')
+    # plt.ylabel('Optimum CG range')
+    # plt.show()
+
+    plot2=True
+    if plot2 == True:
+        fig, (ax, ay, az) = plt.subplots(1, 3)
+        cp = ax.contourf(Sh_area0,A_hh0,  span_h, N)
+        fig.colorbar(cp)  # Add a colorbar to a plot
+        contour_line = ax.contour(Sh_area0,A_hh0,  span_h, levels=[2.3], colors='r', label='Span = 2.3 m')
+        ax.set_title('Span of the horizontal tail')
+        ax.set_xlabel('Aspect ratio horizontal tail')
+        ax.set_ylabel('Surface area of horizontal tail')
         plt.show()
+        #
+        cy = ay.contourf(A_hh, Sh_area,  d_xcg, N)
+        ay.clabel(cy, inline=True, fontsize=10)
+        fig.colorbar(cy)
+        ay.set_title('Stability margin [m]')
+        ax.set_xlabel('Aspect ratio horizontal tail')
+        ax.set_ylabel('Surface area of horizontal tail')
 
-    return x_cg_bar, x_cg_bar_c, Sh_S,surface_ratio
+    # Sh = S*surface_ratio
+    Sh = S*np.min(sr)
 
-test_print = False
+    print('AR', 2.3**2/Sh, Sh/2.3)
+    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio
+
+test_print = True
 if test_print ==True:
     a, b, c, d = horizontal_tail_sizing()
     print('test 1', a)

@@ -29,6 +29,3 @@ print(CL_max,CL_0,CL_cruise)
 
 
     # return c_bar, cm_0, Cm_alpha, alpha_0, sweep_ang_25_c_rad, sweep_ang_50_c_rad, Cl_alpha_wing, CL_max, CL_0, c_root, c_tip, CL_cruise, b, S
-
-# print(aero_values())
-print(Cl_alpha_v,CL_alpha_wing)
