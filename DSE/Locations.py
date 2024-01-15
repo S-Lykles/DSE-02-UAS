@@ -1,6 +1,7 @@
 from DSE import const
 from DSE.structures.center_of_gravity import class_two_cg_estimation
 # from DSE.
+
 def locations():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
     "at the botum of the main fuselage of the UAV"

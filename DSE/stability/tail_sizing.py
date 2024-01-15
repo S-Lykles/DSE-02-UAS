@@ -280,17 +280,17 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     PRINT = False  # for values set to true
-    l_o = 4.15 # distance value
+    l_o = 4.15  # distance value
     # initial starting values
     number_vertical_tail = 2
     tail_volume = 0.055 / number_vertical_tail
     C_eta_beta = 0.058
     taper_v = 0.7
     AR_w = b ** 2 / S
-    M = 0.12  # at cruise speed
+    M = 0.12
 
-    # intergration space
-    AR_v = np.arange(1, 2, 0.05)
+   # intergration space
+    AR_v = np.arange(0.5, 2, 0.05)
     sweep_v = np.arange(0, 45, 1)
 
     # Empty list set
@@ -299,6 +299,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     Moment_arm = []
     root_cord = []
     X_LEMAC_Vert = []
+    num = 0
 
     for p in range(len(AR_v)):
         Surface_k = []
@@ -325,15 +326,16 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
                 sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
                 Beta = np.sqrt(1 - M ** 2)
                 CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
-                    4 + (AR_v[p] * Beta / eta) ** 2 * ((np.tan(sweep_05_cord_v * deg2rad) / Beta) ** 2) + 1))
+                    4 + (((AR_v[p] * Beta) / eta) ** 2) * (((np.tan(sweep_05_cord_v * deg2rad)) ** 2 / Beta ** 2) + 1)))
 
-                C_eta_beta_w = CL ** 2 / (
-                            4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
-                new = 4/3 *np.pi * l_fus/2 * (b_max/2)**2
+                C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                new = 4 / 3 * np.pi * l_fus / 2 * (b_max / 2) ** 2
                 C_eta_beta_fuse = -2 / (S * b) * new
 
                 # Update tail surface
-                Sv = 1/number_vertical_tail* (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
+                Sv = 1 / number_vertical_tail * (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / (CL_v_alpha) * (
+                            S * b) / lv
+                num = num + 1
 
                 # List of all values
             X_LEMAC_k.append(X_LEMAC_v)
@@ -409,7 +411,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     Sweep_v = optimal_sweep_v
     X_LEMAC_VERT = optimal_X_LEMAC_v
 
-    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v,X_LEMAC_VERT
+    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v, X_LEMAC_VERT
 
 
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
@@ -573,3 +575,187 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0
     Fx_tail = S_hori*rho*V**2
 
    # return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
+
+
+
+def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=1.5,deg2rad=const.deg2rad):
+    Mission = 1  # Mission phase 0=transition, 1=Cruise
+
+
+    # Constraints
+    min_span = 0.6
+    max_AR_v = 1.4
+
+    # Resolution
+    accuracy = 2
+    steps = 100
+
+    # Play values
+    taper_v = 0.8
+
+    # base imports.
+    # new imports
+    X_rot_aft = 2.120  # Still needs to be imported (from datum location)
+    Dv = 0.5    # import diameter of the rotor
+    # CL_h = [CL_h(max),CL_h(cruise)]
+    CL_h = [1.4741, 0.337]
+    # CL = [CL(max),CL_h(cruise)]
+    CL = [1.489103, 0.065652]
+
+    # Horizontail tail dimensions
+    AR_h = 6.8   # import from horizontal surface
+    bh = 2.3       # import from horizontal surface
+    Sh = np.sqrt(AR_h * bh)
+
+    number_vertical_tail = 2
+    AR_w = b ** 2 / S
+    M = 0.12
+    Beta = np.sqrt(1 - M ** 2)
+
+    # initial starting values
+    tail_volume = 0.055 / number_vertical_tail
+    C_eta_beta = 0.058
+
+    # intergration space
+    AR_v = np.arange(0.5, 2, 0.05)
+    sweep_v = np.arange(0, 45, 1)
+
+    # Empty list set
+    Surface = []
+    Span = []
+    Moment_arm = []
+    root_cord = []
+    boom_length = []
+    num = 0
+    count = 0
+
+    # C_eta_beta
+    C_eta_beta_w = CL[Mission] ** 2 / (4 * np.pi * AR_w) + CL_h[Mission] ** 2 / (4 * np.pi * AR_h) * (Sh * bh) / (S * b)
+    fuse_volume = 4 / 3 * np.pi * l_fus / 2 * (b_max / 2) ** 2
+    C_eta_beta_fuse = -2 / (S * b) * fuse_volume
+
+    for p in range(len(AR_v)):
+        Surface_k = []
+        span_k = []
+        moment_arm_k = []
+        Cv_r_k = []
+        boom_length_k = []
+
+        for j in range(len(sweep_v)):
+            Cv_r_r = []
+            Surface_r = []
+            span_r = []
+            moment_arm_r = []
+            boom_length_r = []
+
+            lv = 2
+            Sv = tail_volume * S * b / lv
+            bv = np.sqrt(AR_v[p] * Sv)
+            Cv_r = 2 / (1 + taper_v) * (Sv / bv)
+
+            sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
+            X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
+            CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
+                4 + (((AR_v[p] * Beta) / eta) ** 2) * (((np.tan(sweep_05_cord_v * deg2rad)) ** 2 / Beta ** 2) + 1)))
+
+            laa = X_rot_aft + Dv / 2 + Cv_r  # - Xcg
+            lAA = 0 + Xcg
+            la = round((laa * 1.01), accuracy)
+            lA = round((5.5 - lAA), accuracy)
+            differ = (lA - la) / steps
+            lb = np.arange(la, lA, differ)
+
+            print(count)
+            for r in range(steps):
+                count = count + 1
+                for k in range(100):
+                    if Sv < 0:
+                        print(Sv)
+
+                    bv = np.sqrt(AR_v[p] * Sv)
+
+                    Cv_r = 2 / (1 + taper_v) * (Sv / bv)
+                    Cv_bar = 2 / 3 * Cv_r * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
+
+                    # Updated values
+                    lv = lb[r] - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
+
+                    # Update tail surface
+                    # dsigma_dbeta =
+                    Sv = 1 / number_vertical_tail * (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / (CL_v_alpha) * (
+                                S * b) / lv  # * 1/(Vv_V**2)
+                    num = num + 1
+
+                # List of all values
+                boom_length_r.append(lb[r])
+                Cv_r_r.append(Cv_r)
+                Surface_r.append(Sv)
+                span_r.append(bv)
+                moment_arm_r.append(lv)
+            boom_length_k.append(boom_length_r)
+            Cv_r_k.append(Cv_r_r)
+            Surface_k.append(Surface_r)
+            span_k.append(span_r)
+            moment_arm_k.append(moment_arm_r)
+        boom_length.append(boom_length_k)
+        root_cord.append(Cv_r_k)
+        Surface.append(Surface_k)
+        Span.append(span_k)
+        Moment_arm.append(moment_arm_k)
+
+    PRINT = True
+    plot = False
+
+    # weight for optimization
+    weight_surf = 1
+    weight_AR = 1
+    weight_sweep = 1
+    weight_boom = 1
+    weight_span = 1
+
+    H = 10 ** 9
+    for p in range(len(AR_v)):
+        for j in range(len(sweep_v)):
+            for r in range(steps):
+
+                if Span[p][j][r] < min_span:
+                    weight_span = 99
+                else:
+                    weight_span = 0
+                if AR_v[p] > max_AR_v:
+                    weight_AR = 99
+                H_opt = weight_surf * Surface[p][j][r] + weight_AR * AR_v[p] + weight_sweep * sweep_v[j] + weight_boom * \
+                        boom_length[p][j][r] + weight_span * Span[p][j][r]
+                if H_opt <= H:
+                    if Span[p][j][r] > min_span:
+                        # if AR_v[p] > max_AR_v:
+                        H = H_opt
+                        p_opt = p
+                        j_opt = j
+                        r_opt = r
+
+    optimal_surface_v = Surface[p_opt][j_opt][r_opt]
+    optimal_span_v = Span[p_opt][j_opt][r_opt]
+    optimal_moment_arm = Moment_arm[p_opt][j_opt][r_opt]
+    optimal_root_cord = root_cord[p_opt][j_opt][r_opt]
+    optimal_sweep_v = sweep_v[j_opt]
+    optimal_AR_v = AR_v[p_opt]
+    optimal_boom = boom_length[p_opt][j_opt][r_opt]
+
+    if PRINT == True:
+        print('----------------------------------------------------------------')
+        print('')
+        print('The optimal values for a single vertical tail are:')
+        print('Surface area :', optimal_surface_v, 'm^2')
+        print('Span :', optimal_span_v, 'm')
+        print('Moment arm :', optimal_moment_arm, 'm')
+        print('Root cord :', optimal_root_cord, 'm')
+        print('Sweep angle:', optimal_sweep_v, 'deg')
+        print('Aspect ratio:', optimal_AR_v)
+        print('boom length =', optimal_boom, 'm')
+        print('-----------------------------------------------------------------')
+
+    print("")
+    print('-------------------------------------------------')
+    print('rotor position =', X_rot_aft)
+    print('update weights')
