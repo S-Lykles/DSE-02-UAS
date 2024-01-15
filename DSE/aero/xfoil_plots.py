@@ -12,16 +12,16 @@ from DSE import const
 file_dir = Path(__file__).parent
 
 # Construct the path to the text file
-data_23012_airfoil = np.loadtxt(file_dir/r"NACA23012_RE1.6.txt", skiprows=8)
+data_23012_airfoil = np.loadtxt(file_dir/r"NACA23012_RE_1.6E6.txt", skiprows=11)
 data_23012_wing = np.loadtxt(file_dir/r"T1-42_0 m_s-LLT.txt", skiprows=8)
-data_0012_airfoil = np.loadtxt(file_dir/r"NACA0012_RE_2E6.txt.txt", skiprows=12)
-data_0012_wing = np.loadtxt(file_dir/r"naca0012.txt", skiprows=12)
+data_0012_airfoil = np.loadtxt(file_dir/r"NACA0012_RE_2E6.txt", skiprows=11)
+data_0012_wing = np.loadtxt(file_dir/r"naca0012.txt", skiprows=11)
 
 # Extract columns
 alpha_23012_airfoil = data_23012_airfoil[:, 0]    # Angle of attack
-cl_23012_airfoil = data_23012_airfoil[:, 2]       # Lift coefficient
-cd_23012_airfoil = data_23012_airfoil[:, 5]       # Drag coefficient
-cm_23012_airfoil = data_23012_airfoil[:, 8]       # Moment coefficient
+cl_23012_airfoil = data_23012_airfoil[:, 1]       # Lift coefficient
+cd_23012_airfoil = data_23012_airfoil[:, 2]       # Drag coefficient
+cm_23012_airfoil = data_23012_airfoil[:, 4]       # Moment coefficient
 
 alpha_23012_wing = data_23012_wing[:, 0]    # Angle of attack
 cl_23012_wing = data_23012_wing[:, 2]       # Lift coefficient
