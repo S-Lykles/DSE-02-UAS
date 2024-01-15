@@ -24,6 +24,7 @@ S_h = 1.26
 Cl_alpha_v = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
 Cl_alpha_h = Cl_alpha_v
 sweep_ang_rad = atan(0.125/3)
+
 # Cm_0_airfoil =
 # sweep_ang_14_c_rad =
 # CL_alpha_w =
