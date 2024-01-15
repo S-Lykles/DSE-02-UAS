@@ -35,8 +35,4 @@ def locations():
     # Xac_v is the position of the aerodynamic center of the vertical tail.
 
 
-<<<<<<< HEAD
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h, Xcg
-=======
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac
->>>>>>> 98d6199bae102080740bcfe342e19b48fa04a6b9
+    return l_fr, l_aft, l_acw, l_h, h_p, h_acw, h_h, z_h, X_lemac, Xcg, Zac, Zh

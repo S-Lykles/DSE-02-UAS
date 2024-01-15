@@ -4,46 +4,62 @@ from math import *
 import numpy as np
 
 CL = CL_cruise
-alpha0 = alpha_0012[14]*pi/180 # initial equilibrium condition at alpha = 2 deg
-CD_0 = cd_23012[14] 
-CL0 = cl_23012[14]
+# initial equilibrium condition at 2 deg before cruise angle
+alpha_initial_eq = alpha_0012_airfoil[index_cruise_wing-4]*pi/180 
+CD_initial_eq = cd_23012_wing[index_cruise_wing-4] 
+CL_initial_eq = cl_23012_wing[index_cruise_wing-4]
+
 gamma0 = 2*pi/180
-alpha = alpha_23012[16]*pi/180 # cruise at alpha = 3 deg 
-CD = cd_23012[16]
+
+#Values taken during cruise
+alpha = alpha_23012_wing[index_cruise_wing]*pi/180 # cruise at alpha where cl.\/cd is max
+CD = cd_23012_wing[index_cruise_wing]
 CT = 0.01
-V = 43
+V = 42
+V_h = V
 T = 288.15 - 0.0065 * 500
 M0 = V/(sqrt(1.4*287.15*T))
+
 CDM = 0 # No effect on cd due to increasing Mach number
 CLM = 0 # No effect on cl due to increasing Mach number
 CLM_w = 0 # No effect on cl due to increasing Mach number
 CLM_h = 0 # No effect on cl due to increasing Mach number
 
-l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h, Xcg = locations()
+CL_alpha = CL_alpha_wing
+CD_alpha = CD_alpha_wing
+CTalpha = 0 #  assumption form marilenas paper
+CT0 = CD_initial_eq + CL_initial_eq * atan(gamma0) # citation 14 from marilenas control derivatives paper
+CTu_w = -3 * CT0
+CTu_h = CTu_w * S_h / S # assumption using ratio of volumes
+
+l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
 
 Xac_w = l_acw
+Xac_h = l_h
+Zcg_w = Zac
+Zcg_h = Zh
+lw = l_h - l_acw
 S_w = S
 St =  S_w + S_h
 c = c_bar
+
+deps_dalpha = 0 # Assumption
+
 
 # Longitudinal aerodynamic forces
 CX = CL * alpha - CD + CT
 CZ = -CL - CD * alpha
 
 # Velocity stability derivatives
-CXu = M0**2 / (1 - M0**2) *CL0 * alpha0 - 3 * CD_0 - 3 * CL0 * atan(gamma0) - M0 * CDM
-CZu = -M0**2 / (1 - M0**2)  *CL0 - M0 * CDM * alpha0
-print("cx",CX)
-print("cz",CZ)
-print("cxu",CXu)
-print("czu",CZu)
+CXu = M0**2 / (1 - M0**2) * CL_initial_eq * alpha_initial_eq - 3 * CD_initial_eq - 3 * CL_initial_eq * atan(gamma0) - M0 * CDM
+CZu = -M0**2 / (1 - M0**2)  * CL_initial_eq - M0 * CDM * alpha_initial_eq
 Cmu = M0 * (CLM_w * (Xcg - Xac_w) * S_w / St/ c - CLM_h * (Xac_h - Xcg) * S_h / St/ c * V_h**2 * V**(-2)) + CTu_w * Zcg_w * S_w / St/ c - CTu_h * Zcg_h * S_h / St/ c * V_h**2 * V**(-2)
 
 
 
 # Angle of Attack stability derivatives
-CXalpha = CL_alpha * alpha0 + CL0 - CDalpha + CTalpha
-CZalpha = -CLalpha - CDalpha * alpha0 - CD0
+CXalpha = CL_alpha * alpha_initial_eq + CL_initial_eq - CD_alpha + CTalpha
+CZalpha = -CL_alpha - CD_alpha * alpha_initial_eq - CD_initial_eq
 # Cmalpha = 
 
 # Pitch rate stbility derivatives
@@ -60,3 +76,14 @@ Cmalphadott = - Cl_alpha_h * S_h * V_h**2 * deps_dalpha * lw * (Xac_h - Xcg)/ St
 CXde = 0
 # CZde = 
 # Cmde = 
+
+# A = [CXu, CZu, Cmu,
+#      CXalpha, CZalpha, 0,
+#      CXq, CZq, Cmq,
+#      CXalphadott, CZalphadott, 0,]
+# print("""
+# CXu, CZu, Cmu,
+# CXalpha, CZalpha, 0,
+# CXq, CZq, Cmq,
+# CXalphadott, CZalphadott, 0
+# """, A)
