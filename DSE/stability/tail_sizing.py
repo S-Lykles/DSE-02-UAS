@@ -148,16 +148,14 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
 
     PRINT = False  # for values set to true
-    l_boom_o = 4  # the distance from cg to trailing edge of the tail
-    # base imports.
-    AR_w = b ** 2 / S
-    M = 0.12  # at cruise speed
-
+    l_o = 4.15 # distance value
     # initial starting values
     number_vertical_tail = 2
     tail_volume = 0.055 / number_vertical_tail
-    C_eta_beta = 0.058 / number_vertical_tail
-    taper_v = 0.70
+    C_eta_beta = 0.058
+    taper_v = 0.7
+    AR_w = b ** 2 / S
+    M = 0.12  # at cruise speed
 
     # intergration space
     AR_v = np.arange(1, 2, 0.05)
@@ -189,7 +187,7 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
 
                 # Updated values
                 X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
-                lv = l_boom_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
+                lv = l_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
 
                 # Update C_eta_beta
                 sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
@@ -198,12 +196,12 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
                     4 + (AR_v[p] * Beta / eta) ** 2 * ((np.tan(sweep_05_cord_v * deg2rad) / Beta) ** 2) + 1))
 
                 C_eta_beta_w = CL ** 2 / (
-                            4 * np.pi * AR_w) * 1 / number_vertical_tail  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
-                new = (np.pi * l_fus * b_max ** 2) / 3
-                C_eta_beta_fuse = -2 / (S * b) * new * 1 / number_vertical_tail
+                            4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
+                new = 4/3 *np.pi * l_fus/2 * (b_max/2)**2
+                C_eta_beta_fuse = -2 / (S * b) * new
 
                 # Update tail surface
-                Sv = (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
+                Sv = 1/number_vertical_tail* (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / CL_v_alpha * (S * b) / lv
 
                 # List of all values
             X_LEMAC_k.append(X_LEMAC_v)
@@ -220,8 +218,8 @@ def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_cons
     plot = False
 
     N = 50  # Resolution
-    optimal_sweep_v = 30
-    optimal_AR_v = 1.375
+    optimal_sweep_v = 10
+    optimal_AR_v = 1.025
 
     BB = 0
     BBB = 0
@@ -359,7 +357,8 @@ def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max,
 
     return Rat_cr_cv_final, Rat_br_bv  # , Rudder_load
 
-def aileron_surface_sizing():
+def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0.5, aileron_chord_frac = 0.27, deflection_up = 20.0, deflection_down = 20.0, b = aero_constants.b, CL_alpha_w = aero_constants.CL_alpha_wing, CD_0_wing = aero_constants.CD0_wing, taper_w = aero_constants.c_tip / aero_constants.c_root, C_root = aero_constants.c_root, S = aero_constants.S):
+    """Aileron sizing for roll rate requirement, assumes a roll rate now, assumes that the aileron starts immediately beyond the propeller projection on the wing, deflects no more than 20 degrees, does not cause adverse yaw and takes up 27% of wing chord. Can all be changed if required"""
     # Let's do this! давай!
 
     # Typical values:
@@ -368,67 +367,39 @@ def aileron_surface_sizing():
     # C_a_C (aileron chord to wing chord) 0.15 - 0.25
     # delta_a_max (aileron max deflection) 30 deg or 25 deg
 
-    # b_2 = 2
-    # b_1 =1
-    # b_a = b_2 - b_1
-    # S = 1
-    # b = 1
-    # Ca_t =  1
-    # Ca_r =  1
-    # CL_alpha =  1
-    # C_r =  1
-    # taper_w =  1
-    # Cl_alpha_w = 1
-    # Cd_0 = 1
-    # Vtrans =  32
-    # deflection_aileron =  12
-    # deg2rad=const.deg2rad
-    #
-    # S_a_S =  b_a/ S * (Ca_t + Ca_r)
-    # tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-    # C_lroll_aileron = -1* ( (CL_alpha_w * tau_a * C_r) / (S * b) ) * ( (b_2**2 - b_1**2) + ( 4/3*(taper_w -1)*b) * (b_2**3 - b_1**3)) # Factor 2(be) or not (2 be)
-    # C_lroll_rate = -1 * ( (Cl_alpha + Cd_0) * C_r * b / (24 * S) ) * ( 1 + 3* taper_w)
-    # p = -2*Vtrans / b * ( C_lroll_aileron / C_lroll_rate) * max(deflection_aileron)*deg2rad
-
-    roll_rate =
-    b =
-    V =
-    Cl_alpha_w =
-    Cd_0 =
-    taper_w =
-    C_root =
-    span_wise_inner_frac =
-    span_wise_outer_frac  =
-    aileron_chord_frac =
+    V_man = 1.3 * V_trans # Requirement, I think
+    span_wise_outer_frac  = span_wise_inner_frac + 0.01
     span_wise_inner, span_wise_outer = span_wise_inner_frac * (b / 2), span_wise_outer_frac * (b / 2)
     b_a = span_wise_outer - span_wise_inner
-    aileron_deflection_up =
-    aileron_deflection_down =
+    aileron_deflection_up = const.deg2rad(deflection_up) # Assuming Frise aileron (no adverse yaw hooray)
+    aileron_deflection_down = const.deg2rad(deflection_down)
     deflection_aileron = 0.5 * (aileron_deflection_up + aileron_deflection_down)
 
-    C_lp = -1 * ((Cl_alpha_w + Cd_0) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
-    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V * deflection_aileron))
+    C_lp = -1 * ((CL_alpha_w + CD_0_wing) * C_root * b / (24 * S)) * (1 + 3 * taper_w)
+    Cl_delta_A_req = -1 * ((roll_rate * b * C_lp) / (2 * V_man * deflection_aileron))
     Ca_inner = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_inner)
     Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
     S_a_S = b_a / S * (Ca_inner + Ca_outer)
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-    Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
+    Cl_delta_A = ((CL_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
 
     while Cl_delta_A < Cl_delta_A_req:
-        span_wise_outer_frac += 0.01
+        span_wise_outer_frac += 0.001
         span_wise_outer = span_wise_outer_frac * (b / 2)
         Ca_outer = aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * span_wise_outer)
         S_a_S = b_a / S * (Ca_inner + Ca_outer)
         tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942
-        Cl_delta_A = ((Cl_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
+        Cl_delta_A = ((CL_alpha_w * tau_a * C_root) / (S * b)) * ((span_wise_outer ** 2 - span_wise_inner ** 2) + (4 / 3) * ((taper_w - 1) / b) * (span_wise_outer ** 3 - span_wise_inner ** 3))
+
+    if span_wise_outer_frac > 1.0:
+        print('Aileron is too big, consider decreasing inboard span-wise location!!!')
 
     span_wise_outer_final = span_wise_outer
     S_a_final = S_a_S * S
 
     return(span_wise_inner, span_wise_outer_final, S_a_final)
-    #return
 
-def stab_con_int_structure():
+#def stab_con_int_structure():
     """Keep in mind that these values are all subject to change due to interations"""
     print('!!! Carefull when using this Data, it will be subject to change due to shifts in Xcg and rotor placement. !!!')
 
@@ -437,7 +408,7 @@ def stab_con_int_structure():
     b_vert = vertical_tail_size()[1]
     cord_root_vert = vertical_tail_size()[4]
     cord_tip_vert = vertical_tail_size()[6]*cord_root_vert
-    Dist_X_leading_vert = vertical_tail_size()[2] - 0.25 vertical_tail_size()[4] - vertical_tail_size()[7]
+    Dist_X_leading_vert = vertical_tail_size()[2] - 0.25* vertical_tail_size()[4] - vertical_tail_size()[7]
     Sweep_angle_vert = vertical_tail_size()[5]
 
     # rudder dimensions
@@ -469,4 +440,4 @@ def stab_con_int_structure():
     Fz_tail = S_vert*rho*15**2 # extreem assumption
     Fx_tail = S_hori*rho*V**2
 
-    return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
+   # return S_vert, b_vert, cord_root_vert, cord_tip_vert, Dist_X_leading_vert, Sweep_angle_vert, cord_root_rudder, bv_rudder, S_hori,cord_root_vert, cord_tip_vert, cord_tip_hori, b_hori, Dist_X_leading_hori, Sweep_angle_hori, tau_elevator, cord_root_aileron, bv_aileron, Dist_X_leading_aileron, Fz_tail, Fx_tail, Fx_tail
