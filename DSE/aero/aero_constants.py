@@ -28,10 +28,8 @@ sweep_ang_rad = atan(0.125/3)
 # sweep_ang_14_c_rad =
 # CL_alpha_w =
 # sweep_ang_12_Ch_rad =
-
+print(Cl_max_h)
+print(Cl_cruise_h)
 
 
     # return c_bar, cm_0, Cm_alpha, alpha_0, sweep_ang_25_c_rad, sweep_ang_50_c_rad, Cl_alpha_wing, CL_max, CL_0, c_root, c_tip, CL_cruise, b, S
-
-# print(aero_values())
-print(Cl_alpha_v,CL_alpha_wing)

@@ -3,29 +3,33 @@ import matplotlib.pyplot as plt
 
 def calculate_centroid(R, r, t):
     """
-    Calculates the centroid of a half circle
-    :param R:
-    :param r:
-    :param t:
-    :return:
+    Calculates the centroid of a closed half circle shell which represents the upper fuselage (for clarification, ask Onni)
+    :param R: Outer radius
+    :param r: Inner radius
+    :param t: Thickness of the flat bottom plate
+    :return Cy: Y coordinate of the structure crossection centroid as measured from the top of the bottom plate
+    :return Cy_halftube: Y coordinate of the open tube crossection, measured from the top of the bottom plate
+    :return Cy_bottom: Y coordinate of the bottom plate centroid, measured from the top of the bottom plate
+    :return A_halftube: area of the open half tube (without bottom plate)
+    :return A_bottom: area of the bottom plate
     """
     Cy_halftube = 4/3/np.pi * (R**3-r**3) / (R**2-r**2)
     Cy_bottom = -t/2
     A_halftube = np.pi*(R**2-r**2) / 2
     A_bottom = 2*R*t
     Cy = (Cy_halftube*A_halftube + Cy_bottom*A_bottom) / (A_halftube+A_bottom)
-    print(Cy_halftube, Cy_bottom)
     return Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom
 
 
 def calculate_inertia(R, r, t):
     """
-    Calculates moments of inertia of a half-circle shell around axis which are located at the flat surface in the middle
+       Calculates moments of inertia of a half-circle shell around axis which are located at the flat surface in the middle
 
-    :param R: Outer radius in m
-    :param r: Inner radius in m
-    :return Ixx: Moment of inertia around x axis
-    :return Iyy: Moment of inertia around y axis
+       :param R: Outer radius in m
+       :param r: Inner radius in m
+       :param t: thickness of the bottom plate
+       :return Ixx: Moment of inertia around x axis through the centroid
+       :return Iyy: Moment of inertia around y axis through the centroid
     """
     Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom = calculate_centroid(R, r, t)
 
@@ -42,25 +46,34 @@ def calculate_inertia(R, r, t):
 
 def calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy):
     """
-    Calculate bending stress.
+    Calculates the bending stress in each station along the crossection
 
-    Parameters:
-    - pos_x = x coordinates of the postion where the stress is computed
-    - pos_y = y coordinates ofthe position where the stress is computed
-    - Fz = Force along the z axis
-    - Mx = Moment around x axis
-    - My = Moment around y axis
-    - Ixx = moment of inertia about x axis
-    - Iyy = moment of inertia about y axis
-
-    Returns:
-    - stress_z = axial stress along z-axis
+    :param boom_co_arr: coordinates of the points along the crossection outline (in m)
+    :param Mx: moment around the x-axis (in kN)
+    :param My: moment around the y-axis (in kN)
+    :param Ixx: second moment of area about the x-axis (in m^4)
+    :param Iyy: second moment of area about the y-axis (in m^4)
+    :return: stress_z: array wth stress at each point along the crossection outline
     """
 
     stress_z = Mx*Iyy*boom_co_arr[:,1]/Ixx + My*Ixx*boom_co_arr[:,0]/Iyy
     return stress_z
 
+def calculate_torsion_stress(boom_co_arr, T, r):
+    """"""
+
+    stress_xy = T / (2*np.pi**2*r) * np.ones(len(boom_co_arr))
+    return stress_xy
+
 def place_booms(N_bottom, N_curve, R):
+    """
+    Distributes points equidistantly along the fuselage crossection
+    :param N_bottom: number of points on the bottom plate
+    :param N_curve: number of points along the curved section
+    :param R: outer radius
+    :return boom_co_arr: array with the coordinate pairs of each
+    """
+
     angles = np.linspace(np.pi/(N_curve-1), np.pi*(N_curve-2)/(N_curve-1), N_curve-2)
     curve_boom_co_arr = np.column_stack((R * np.cos(angles), R * np.sin(angles)))
 
@@ -78,53 +91,35 @@ r = 0.99
 t = 0.01
 Mx = 50
 My = 50
+T = 50
+
+N_points_bottom = 100
+N_points_curve = 100
 
 
 Ixx, Iyy = calculate_inertia(R, r, t)
-boom_co_arr = place_booms(50, 150, R)
-stress_z = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
-
+boom_co_arr = place_booms(N_points_bottom, N_points_curve, R)
+stress_bending = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
+stress_torsion = calculate_torsion_stress(boom_co_arr, T, r)
 # Plot the 3D curve
-plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_z, cmap='viridis', label='Axial Stress')
-
+plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_bending, cmap='viridis', label='Axial Stress')
+#plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_torsion, cmap='viridis', label='Torsion Stress')
 # Add a color bar to show the stress values
 cbar = plt.colorbar()
-cbar.set_label('Axial Stress')
+cbar.set_label('Axial Stress [units TBD]')
 
 # Customize the plot
 plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
-plt.title('3D Curve with Axial Stress')
+plt.title('Fuselage Stress')
+
+ax = plt.gca()
+ax.set_aspect('equal', adjustable='box')
+
 
 # Show the plot
 plt.show()
 
-
-def calculate_shear_stress(shear_force, shear_area):
-    """
-    Calculate shear stress.
-
-    Parameters:
-    - shear_force: Shear force (N)
-    - shear_area: Shear area of the cross-section (m^2)
-
-    Returns:
-    - Shear stress (Pa)
-    """
-    return shear_force / shear_area
-
-def calculate_normal_stress(axial_force, area):
-    """
-    Calculate normal stress.
-
-    Parameters:
-    - axial_force: Axial force (N)
-    - area: Cross-sectional area (m^2)
-
-    Returns:
-    - Normal stress (Pa)
-    """
-    return axial_force / area
 
 
 
