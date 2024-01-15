@@ -37,6 +37,8 @@ Cm_alpha = (cm_23012_airfoil[20]-cm_23012_airfoil[0])/((alpha_23012_airfoil[20]-
 
 c_root = 0.833
 c_tip = 0.333
+tc = 0.12
+taper = 0.4
 
 sweep_ang_rad = atan(0.125/3)
 sweep_ang_25_c_rad = 0*pi/180
