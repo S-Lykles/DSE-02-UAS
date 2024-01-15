@@ -12,7 +12,7 @@ from DSE import const
 file_dir = Path(__file__).parent
 
 # Construct the path to the text file
-data_23012_airfoil = np.loadtxt(file_dir/r"NACA23012_RE_1.6E6.txt", skiprows=11)
+data_23012_airfoil = np.loadtxt(file_dir/r"NACA23012_RE_2E6.txt", skiprows=11)
 data_23012_wing = np.loadtxt(file_dir/r"T1-42_0 m_s-LLT.txt", skiprows=8)
 data_0012_airfoil = np.loadtxt(file_dir/r"NACA0012_RE_2E6.txt", skiprows=11)
 data_0012_wing = np.loadtxt(file_dir/r"naca0012.txt", skiprows=11)
