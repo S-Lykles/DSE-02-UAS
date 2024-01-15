@@ -14,9 +14,8 @@ def calculate_centroid(R, r, t):
     A_halftube = np.pi*(R**2-r**2) / 2
     A_bottom = 2*R*t
     Cy = (Cy_halftube*A_halftube + Cy_bottom*A_bottom) / (A_halftube+A_bottom)
-    print(Cy_halftube, Cy_bottom)
+    #print(Cy_halftube, Cy_bottom)
     return Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom
-
 
 def calculate_inertia(R, r, t):
     """
@@ -39,7 +38,6 @@ def calculate_inertia(R, r, t):
 
     return Ixx, Iyy
 
-
 def calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy):
     """
     Calculate bending stress.
@@ -60,6 +58,32 @@ def calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy):
     stress_z = Mx*Iyy*boom_co_arr[:,1]/Ixx + My*Ixx*boom_co_arr[:,0]/Iyy
     return stress_z
 
+# def calculate_shear_stress(Sy, Ixx, coordinates, booms):
+#     c = -Sy / Ixx
+#     delta_q = booms * coordinates[:, 1] * c
+#     s_tot = np.sum(delta_q)
+#     return delta_q, s_tot
+
+def fuse_shear(fy, ixx, t, r, coord, ybar):
+    xco = coord[:, 0]
+    yco = coord[:, 1]
+    theta = np.arctan2(yco, xco)
+
+    # Calculate circle_shear only for xco between -r and 0
+    circle_shear = np.where((yco > 0) & (xco >= -r) & (xco <= 0),
+                            -(fy * t * r / ixx) * (-r * np.cos(theta) + r - ybar * theta), 0)
+
+    # Calculate mirror values for circle_shear and concatenate
+    circle_shear_mirror = np.where((yco > 0) & (xco <= r) & (xco >= 0),
+                                   -(fy * t * r / ixx) * (r * np.cos(theta) + r - ybar * theta), 0)
+    circle_shear = np.concatenate((circle_shear, circle_shear_mirror))
+
+    # Calculate straight_shear only for xco between 0 and r
+    straight_shear = np.where((yco == 0) & (xco >= 0) & (xco <= r),
+                              -(fy * t * ybar * xco) / ixx, 0)
+
+    return xco, yco, circle_shear, straight_shear
+
 def place_booms(N_bottom, N_curve, R):
     angles = np.linspace(np.pi/(N_curve-1), np.pi*(N_curve-2)/(N_curve-1), N_curve-2)
     curve_boom_co_arr = np.column_stack((R * np.cos(angles), R * np.sin(angles)))
@@ -71,34 +95,46 @@ def place_booms(N_bottom, N_curve, R):
     boom_co_arr = np.vstack((curve_boom_co_arr, bottom_boom_co_arr))
     return boom_co_arr
 
-
-
-R = 1
-r = 0.99
+# inputs
+R = 0.4
+r = 0.4 - 0.01
 t = 0.01
 Mx = 50
 My = 50
+Sy = -100
+s_range = np.linspace(0,0.4,100)
+angle_range = np.linspace(0, np.pi/2, 100)
 
-
+Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom = calculate_centroid(R, r, t)
 Ixx, Iyy = calculate_inertia(R, r, t)
 boom_co_arr = place_booms(50, 150, R)
-stress_z = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
 
-# Plot the 3D curve
-plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_z, cmap='viridis', label='Axial Stress')
+# ##shear
+xco, yco, circle_shear, straight_shear = fuse_shear(Sy, Ixx, t, R, boom_co_arr, Cy)
 
-# Add a color bar to show the stress values
-cbar = plt.colorbar()
-cbar.set_label('Axial Stress')
-
-# Customize the plot
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.title('3D Curve with Axial Stress')
-
-# Show the plot
-plt.show()
+# plt.scatter(xco, yco, c=curve_shear, cmap='viridis')
+# plt.colorbar(label='Circle Shear')
+# plt.xlabel('X Coordinates')
+# plt.ylabel('Y Coordinates')
+# plt.title('2D Scatter Plot with Circle Shear Colors')
+# plt.show()
 
 
-
-
+# ##Bending stress
+# stress_z = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
+#
+# #plot bending
+# # Plot the 3D curve
+# plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_z, cmap='viridis', label='Axial Stress')
+#
+# # Add a color bar to show the stress values
+# cbar = plt.colorbar()
+# cbar.set_label('Axial Stress')
+#
+# # Customize the plot
+# plt.xlabel('X-axis')
+# plt.ylabel('Y-axis')
+# plt.title('3D Curve with Axial Stress')
+#
+# # Show the plot
+# plt.show()

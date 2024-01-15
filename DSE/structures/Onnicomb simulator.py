@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
 
 def calculate_centroid(R, r, t):
     """
@@ -18,6 +20,8 @@ def calculate_centroid(R, r, t):
     print(Cy_halftube, Cy_bottom)
     return Cy, Cy_halftube, Cy_bottom, A_halftube, A_bottom
 
+Cy = calculate_centroid(1, 0.99, 0.01)
+print(Cy)
 
 def calculate_inertia(R, r, t):
     """
@@ -100,35 +104,12 @@ plt.title('3D Curve with Axial Stress')
 # Show the plot
 plt.show()
 
-
-
-# def boom_coor(N_bottom, N_curve, R):
-#     boom_co = np.empty((N_curve // 2 + 1, 2))
-#     dt = np.pi / N_curve
-#     t = 0
-#     for i in range(N_curve // 2 + 1):
-#         x = R * np.cos(t)
-#         y = R * np.sin(t)
-#         boom_co[i] = [x, y]
-#         t = t + dt
-#     return boom_co
-
 def calculate_shear_stress(Sy, Ixx, coordinates, booms):
     c = -Sy / Ixx
-    delta_q = np.array([])
-    for i, y in enumerate(coordinates[:, 1]):
-        dq = booms[i] * y * c
-        delta_q = np.append(delta_q, [dq])
-    s_tot = sum(delta_q)
+    delta_q = booms * coordinates[:, 1] * c
+    s_tot = np.sum(delta_q)
     return delta_q, s_tot
 
-# x, y = place_booms(5, 7, 0.4)
-#
-# plt.figure()
-# plt.plot(x, y, marker='x')
-# plt.show()
-
-#delta, tot = calculate_shear_stress(100, 10000, boom_coor(0, 5, 1), booms)
 def test(sy, t, r, ixx, theta, ybar):
     return -(sy * t * r / ixx) * (-r * np.cos(theta) + r - ybar * theta)
 
@@ -141,19 +122,4 @@ plt.figure()
 plt.plot(np.linspace(0,0.4,100), test(10000, 0.02, 0.4, 0.0001, trange, 0.17))
 plt.plot(np.linspace(0,0.4,100), test2(10000, 0.02, 0.0001, srange, 0.17))
 plt.show()
-
-def calculate_normal_stress(axial_force, area):
-    """
-    Calculate normal stress.
-
-    Parameters:
-    - axial_force: Axial force (N)
-    - area: Cross-sectional area (m^2)
-
-    Returns:
-    - Normal stress (Pa)
-    """
-    return axial_force / area
-
-
 
