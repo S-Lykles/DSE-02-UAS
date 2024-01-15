@@ -82,6 +82,13 @@ def fuse_shear(fy, ixx, t, r, coord, ybar):
     straight_shear = np.where((yco == 0) & (xco >= 0) & (xco <= r),
                               -(fy * t * ybar * xco) / ixx, 0)
 
+    # Ensure all arrays have the same length by padding with zeros
+    max_length = max(len(xco), len(yco), len(circle_shear), len(straight_shear))
+    xco = np.pad(xco, (0, max_length - len(xco)))
+    yco = np.pad(yco, (0, max_length - len(yco)))
+    circle_shear = np.pad(circle_shear, (0, max_length - len(circle_shear)))
+    straight_shear = np.pad(straight_shear, (0, max_length - len(straight_shear)))
+
     return xco, yco, circle_shear, straight_shear
 
 def place_booms(N_bottom, N_curve, R):
@@ -112,12 +119,18 @@ boom_co_arr = place_booms(50, 150, R)
 # ##shear
 xco, yco, circle_shear, straight_shear = fuse_shear(Sy, Ixx, t, R, boom_co_arr, Cy)
 
-# plt.scatter(xco, yco, c=curve_shear, cmap='viridis')
-# plt.colorbar(label='Circle Shear')
-# plt.xlabel('X Coordinates')
-# plt.ylabel('Y Coordinates')
-# plt.title('2D Scatter Plot with Circle Shear Colors')
+# plt.figure()
+# plt.plot(xco, circle_shear)
+# plt.plot(xco, straight_shear)
 # plt.show()
+
+plt.scatter(xco, yco, c=straight_shear, cmap='viridis')
+#plt.scatter(xco, yco, c=circle_shear, cmap='viridis')
+plt.colorbar(label='Circle Shear')
+plt.xlabel('X Coordinates')
+plt.ylabel('Y Coordinates')
+plt.title('2D Scatter Plot with Circle Shear Colors')
+plt.show()
 
 
 # ##Bending stress
