@@ -24,7 +24,6 @@ fus_component_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                       'fuel_relay':     [38.7, 0.3 * l_fus, 0, 0],
                       'power_plant':    [28.5, 0.5 * l_fus, 0, 0]}
 
-
 def fuselage_group_cg(class_one, component_dict):
     """
     The output of the calculation is in the following form:
@@ -123,6 +122,7 @@ def class_two_cg_estimation(empty, fuel, payload_supply, payload_relay):
     -----------------------------------------------------------------------------
     The datum for this calculation is the start of the 6x6 area boundary
     """
+
     fuselage_group_array = fuselage_group_cg(False, fus_component_dict)
     wing_group_array = wing_group_cg(True, x_lemac=3, c_bar=2)
     tail_group_array = tail_group_cg(True)
@@ -157,3 +157,114 @@ def class_two_cg_estimation(empty, fuel, payload_supply, payload_relay):
 print(class_two_cg_estimation(True, False, False, False))
 
 """After this a weight-cg diagram can be drawn by varying weight conditions"""
+
+
+#Updated version of the above code
+components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
+                   'WingL': [10, 1.5, 1.2, 0.85],
+                   'WingR': [10, 1.5, -1.2, 0.85],
+                   'BoomL': [5, 2.75, 1, 0.75],
+                   'BoomR': [5, 2.75, -1, 0.75],
+                   'Engine': [30, 2.5, 0, 0.725],
+                   'LiftMotorLF': [5, 0.5, 1, 0.85],
+                   'LiftMotorRF': [5, 0.5, -1, 0.85],
+                   'LiftMotorLR': [5, 3.5, 1, 0.85],
+                   'LiftMotorRR': [5, 3.5, -1, 0.85],
+                   'Generator': [4, 2.5, -0.2, 0.725],
+                   'Tailsurface': [5, 6, 0, 1.15],
+                   'Fuselage': [5, 1.5, 0, 0.725],
+                   'FCU': [0.1, 0.5, 0, 0.725],
+                   'Comms': [1, 0.5, 0, 0.725],
+                   'Battery': [2, 1, 0, 0.725],
+                    'Payload_pd': [50,1.5,0,0.3],
+                    'Payload_le': [20,1.5,0,0.3],
+                   'Fuel_pd': [14,1.5, 0, 0.3],
+                   'Fuel_le': [34,1.5, 0, 0.3]}
+
+
+
+
+def OEW(oew = True):
+
+    if oew:
+        oew_data = ['WingL', 'WingR', 'BoomL', 'BoomR', 'Generator', 'Tailsurface', 'Fuselage', 'FCU', 'Comms']
+
+    return oew_data
+
+
+def payload(payload_supply, payload_relay, components):
+
+    if payload_supply:
+        payload_data = ['Payload_pd']
+    elif payload_relay:
+        payload_data = ['Payload_le']
+    else:
+        prop_data = []
+
+    for element in prop_data:
+        components.append(element)
+
+    return components
+
+
+def propulsion(fuel_supply, fuel_relay, components):
+
+    if fuel_supply:
+        prop_data = ['Engine', 'Generator', 'Fuel_pd']
+        # return prop_data
+    elif fuel_relay:
+        prop_data = ['Engine', 'Generator', 'Fuel_le', 'Battery']
+    else:
+        prop_data = []
+
+    for element in prop_data:
+        components.append(element)
+
+    return components
+
+def cg_estimation(component_list, component_dict):
+    # component_list = ['empty_fus', 'payload_supply', 'avionics', 'power_plant']
+    first_element = component_list[0]
+    component_matrix = np.array([component_dict[first_element]])
+    component_list = component_list[1:]
+
+    for component in component_list:
+        component_matrix = np.concatenate((component_matrix, np.array([component_dict[component]])))
+
+    weight_of_groups = component_matrix[:, 0]
+    x_cg_groups = component_matrix[:, 1]
+    y_cg_groups = component_matrix[:, 2]
+    z_cg_groups = component_matrix[:, 3]
+
+    w_total = np.sum(weight_of_groups)
+    x_cg = np.sum(weight_of_groups * x_cg_groups) / w_total
+    y_cg = np.sum(weight_of_groups * y_cg_groups) / w_total
+    z_cg = np.sum(weight_of_groups * z_cg_groups) / w_total
+
+    # Possible implementation to assign names to the values
+    # Multiple array to find the offset of the total cg
+    sensitivity = weight_of_groups / w_total
+
+    # These are initial estimates of the Inertia parameters, based om the composite moment of inertia rule
+    # Mass moment of inertia of the different groups have to estimated go give an accurate value
+    # Ixx = np.sum(0) + np.sum(wing_group_array * ((y_cg_groups - y_cg)**2 + (z_cg_groups - z_cg)**2))
+    # Iyy = np.sum(0) + np.sum(wing_group_array * ((z_cg_groups - z_cg)**2 + (x_cg_groups - x_cg) **2))
+    # Izz = np.sum(0) + np.sum(wing_group_array * ((x_cg_groups - x_cg)**2 + (y_cg_groups - y_cg) **2))
+    # Don't forget about Ixy, Ixz, Iyz
+
+    return w_total, [x_cg, y_cg, z_cg], sensitivity  # [Ixx, Iyy, Izz]
+
+def cg_per_mission(oew, fuel_supply, fuel_relay, payload_supply, payload_relay, components_dict=components_dict ):
+
+    # centre_of_gravity(OEM, fuel_pd, 0, 0, 0)
+
+    component_list = OEW(oew)
+    component_list = propulsion(fuel_supply, fuel_relay, component_list)
+    component_list = propulsion(payload_supply, payload_relay, component_list)
+
+    cal_cg = cg_estimation(component_list, components_dict)
+
+    return cal_cg
+
+test = cg_per_mission(True, True, False, False, False)
+print('fuel supply',test[1])

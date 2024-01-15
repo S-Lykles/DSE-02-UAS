@@ -21,7 +21,7 @@ def locations():
     Zh = 1.6 #PLACEHOLDER,  guessed value
     print("Caution: The values about about distances are just guessed values, must be revisited. python file: DSE/structures/locations")
 
-
+    X_lemac = 3 #PLACEHOLDER,  guessed value
 
     l_fr  = Xcg - Xfr   # Xfr is the distance of the front rotor
     l_aft = Xaft - Xcg  # Xaft is the distance of the aft rotor
@@ -35,4 +35,8 @@ def locations():
     # Xac_v is the position of the aerodynamic center of the vertical tail.
 
 
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h
+<<<<<<< HEAD
+    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h, Xcg
+=======
+    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac
+>>>>>>> 98d6199bae102080740bcfe342e19b48fa04a6b9
