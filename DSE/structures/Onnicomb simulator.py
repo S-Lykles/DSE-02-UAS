@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def calculate_centroid(R, r, t):
     """
     Calculates the centroid of a closed half circle shell which represents the upper fuselage (for clarification, ask Onni)
@@ -41,7 +42,7 @@ def calculate_inertia(R, r, t):
     Iyy_bottom = (2*R)**3*t/12
     Iyy = Iyy_halftube + Iyy_bottom
 
-    return Ixx, Iyy
+    return Ixx, Iyy, Cy
 
 
 def calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy):
@@ -85,41 +86,44 @@ def place_booms(N_bottom, N_curve, R):
     return boom_co_arr
 
 
+if __name__ == '__main__':
+    #INPUTS
+    R = 1
+    r = 0.99
+    t = 0.01
+    Mx = 50
+    My = 50
+    T = 1000
 
-R = 1
-r = 0.99
-t = 0.01
-Mx = 50
-My = 50
-T = 50
-
-N_points_bottom = 100
-N_points_curve = 100
-
-
-Ixx, Iyy = calculate_inertia(R, r, t)
-boom_co_arr = place_booms(N_points_bottom, N_points_curve, R)
-stress_bending = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
-stress_torsion = calculate_torsion_stress(boom_co_arr, T, r)
-# Plot the 3D curve
-plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_bending, cmap='viridis', label='Axial Stress')
-#plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_torsion, cmap='viridis', label='Torsion Stress')
-# Add a color bar to show the stress values
-cbar = plt.colorbar()
-cbar.set_label('Axial Stress [units TBD]')
-
-# Customize the plot
-plt.xlabel('X-axis')
-plt.ylabel('Y-axis')
-plt.title('Fuselage Stress')
-
-ax = plt.gca()
-ax.set_aspect('equal', adjustable='box')
+    N_points_bottom = 100
+    N_points_curve = 100
 
 
-# Show the plot
-plt.show()
+    Ixx, Iyy, Cy = calculate_inertia(R, r, t)
+    boom_co_arr = place_booms(N_points_bottom, N_points_curve, R)
+    stress_bending = calculate_bending_stress(boom_co_arr, Mx, My, Ixx, Iyy)
+    stress_torsion = calculate_torsion_stress(boom_co_arr, T, r)
+    # Plot the 3D curve
+    #plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_bending, cmap='viridis', label='Axial Stress')
+    plt.scatter(boom_co_arr[:,0], boom_co_arr[:,1], c=stress_bending, cmap='viridis', label='Torsion Stress')
+    plt.scatter(0, Cy, marker = '+', label = 'point test')
+    # Add a color bar to show the stress values
+    cbar = plt.colorbar()
+    cbar.set_label('Stress [units TBD]')
 
+    # Customize the plot
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Bending Stress')
+    plt.grid()
+
+    ax = plt.gca()
+    ax.set_aspect('equal', adjustable='box')
+
+
+    # Show the plot
+    plt.show()
+    print(Cy)
 
 
 
