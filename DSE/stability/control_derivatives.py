@@ -9,6 +9,7 @@ d_dt = 99999 # placeholder time step
 
 rho = const.rho0
 S = aero_constants.S
+Sh = 9999 # placeholder horizontal tail surface
 b = aero_constants.b
 c_bar = aero_constants.c_bar
 m = const.total_mass
@@ -21,7 +22,6 @@ sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
 Theta_0 = 9999 # placeholder
-V = 42
 T = 288.15 - 0.0065 * 500
 M0 = V/(sqrt(1.4*287.15*T))
 CDM = Cd * M0 / (1-M0**2)
@@ -29,6 +29,7 @@ CL_alpha_w = aero_constants.CL_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
 taper_w = aero_constants.taper
+Cl_h = aero_constants.Cl_cruise_h
 Cl_alpha_h = aero_constants.Cl_alpha_h
 Cd0_h = 9999 # placeholder, input from aerodynamics
 AR_h = 6.8 # import from horizonal
@@ -44,6 +45,8 @@ eta = 0.95
 bv = 0.848956720089143
 Sv = 0.379330269781324
 lv = 1.2354894391032434
+C_t = 9999 # Thrust coefficient (performance import)
+Z_m = 0.0 # Vertical moment arm engine, preferrably zero (might not be)
 
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
@@ -110,8 +113,8 @@ else:
     Clr = -9999
     Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
     CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    CZu = -9999
-    CMu = -9999
+    CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
+    CMu = (2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
     CXq = 0
 
 A = np.array([[CXu, CZu, Cmu],
