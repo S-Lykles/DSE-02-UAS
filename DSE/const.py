@@ -38,9 +38,9 @@ WH_KG2J_KG = 1 / J_KG2WH_KG
 
 # Disk loading
 
-
 # Requirements
-MTOW = 160 * g0  # [N]
+total_mass = 160
+MTOW = total_mass * g0  # [N]
 Payload = 50 * g0  # [N]
 R_cruise = 185e3  # [m]
 T_cruise = 3600 * 1.25  # [s]
