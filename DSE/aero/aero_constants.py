@@ -23,6 +23,7 @@ c_bar = 0.598
 CD0_wing = 0.0077
 CD_alpha_wing = (cd_23012_wing[20]-cd_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
 CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)]
+CL_0_h = cl_23012_wing[np.where(alpha_0012_airfoil == 0)]
 CL_alpha_wing = (cl_23012_wing[20]-cl_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
 Cl_alpha_v = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
 Cl_alpha_h = Cl_alpha_v
