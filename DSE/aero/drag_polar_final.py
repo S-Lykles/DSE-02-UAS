@@ -54,7 +54,9 @@ d_fus = 0.8
 S_wet_fus = pi * d_fus * 2 * l_fus
 
 #other drag components
-CD_misc = 0
+CD_misc_prop = 0.02
+CD_misc_lg = 0.01
+CD_misc = CD_misc_prop + CD_misc_lg
 frac_CD_LP = 0.075
 
 frac_lam_list = [0.5, 0, 0.5, 0.5, 0.5]
@@ -73,10 +75,10 @@ def Reynolds_per_component():
 
 
 def C_f_laminar(R):
-    return 1.328/R**0.5
+    return 1.328/(R**0.5)
 
 def C_f_turbulent(R, M):
-    return 0.455 / ((np.log(R))**2.58*(1+0.144*M**2)**0.65)
+    return 0.455 / (((np.log10(R))**2.58)*(1+0.144*M**2)**0.65)
 
 def C_f_per_component():
     Reynold_list = Reynolds_per_component()
@@ -98,8 +100,11 @@ def FF_nacelle(f):
 
 def CD0(Cf_list, FF_list, Q_list, Swet_list, Sref, CD_misc, frac_CD_LP):
     sm = 0
+    CD_list = []
     for Cf, FF, Q, Swet in itertools.zip_longest(Cf_list, FF_list, Q_list, Swet_list):
+        CD_list.append(Cf*FF*Q*Swet/Sref)
         sm += Cf*FF*Q*Swet
+    print('CD', CD_list)
     CD0 = sm / Sref + CD_misc + ((frac_CD_LP)/(1-frac_CD_LP))* (sm / Sref + CD_misc)
     return CD0
 
@@ -120,12 +125,17 @@ Q_wing = 1.0
 Q_fus = 1.0
 Q_h = 1.08
 Q_v = 1.08
-Q_winglet = 1.0 #PLACEHOLDER
+Q_winglet = 1.08 #PLACEHOLDER
 
-FF_list = (FF_w, FF_h, FF_v, FF_fuselage, FF_winglet)
+FF_list = [FF_w, FF_fuselage, FF_h, FF_v,  FF_winglet]
 Q_list = [Q_wing, Q_fus, Q_h, Q_v, Q_winglet]
 S_wet_list = [S_wet_wing, S_wet_fus, S_wet_h, S_wet_v, S_wet_winglet]
 C_f_list = C_f_per_component()
+print(S_ref, CD_misc, frac_CD_LP)
+print('C_f', C_f_list)
+print('FF', FF_list)
+print('Q', Q_list)
+print('S_wet', S_wet_list)
 
 CD0 = CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)
 print(CD0)
