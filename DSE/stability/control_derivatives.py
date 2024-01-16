@@ -3,13 +3,17 @@ from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
 
-
+V = -9999 # placeholder
+d_dt = 99999 # placeholder time step
 
 rho = const.rho0
 S = aero_constants.S
 b = aero_constants.b
 c_bar = aero_constants.c_bar
 m = const.total_mass
+Cd = 9999 # placeholder, input from aerodyamics
+CL = aero_constants.CL_cruise
+CL_h = aero_constants.Cl_cruise_h
 
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
@@ -20,11 +24,13 @@ Ky_2 = Iyy/(m*c_bar**2)
 mu_c = m/(rho*S*c_bar)
 mu_b = m/(rho*S*b)
 Kx_2 = Ixx/(m*b**2)
+Dc = c_bar/V * d_dt
 
 T1 = -9999 # placeholder, input from propulsion
 T2 = -9999 # placeholder, input from propulsion
 T3 = -9999 # placeholder, input from propulsion
 T4 = -9999 # placeholder, input from propulsion
+Tp = -9999 # placeholder, input from propulsion
 Lw = -9999 # placeholder, input from propulsion
 Lh = -9999 # placeholder, input from propulsion
 q_rad= -9999 # placeholder, input for control
@@ -33,6 +39,8 @@ l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
 
 vtol=True
 if vtol:
+    CX0 = 0
+    CZ0 = -1*(T1+T2+T3+T4)/(0.5*rho*S*V**2)
     CXalpha = 0
     CZalpha = 0
     Cmalpha = 0
@@ -46,6 +54,8 @@ if vtol:
     Clr = -9999
 
 else:
+    CX0 = Tp / (0.5*rho*S*V**2) - Cd
+    CZ0 = -CL - CL_h*(Sh/S) * (Vh/V**2)
     CXalpha = - CD_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c - aero_constants.Cl_alpha_h * l_h / aero_constants.c - CD_alpha_w * Zac / aero_constants.c   
