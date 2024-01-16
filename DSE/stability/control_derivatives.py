@@ -33,7 +33,7 @@ if vtol:
     CZq = (T1+T2+T3+T4)*np.sin(q_rad)
     Cnr = -9999
     Cmq = -9999
-    CYr = -9999
+    CYr = 0
     Clr = -9999
 
 else:
