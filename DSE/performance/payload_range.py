@@ -55,7 +55,7 @@ def Wf_range(W1, R, SFC: float, eta, CL, CD, S, P_extra, h=500, v_cruise=const.v
     def dw_dr(R, W):
         v = np.sqrt(W * 2 / (rho * S * CL))
         P = W * CD/CL * v/eta + P_extra
-        dwdr = (-P * SFC * const.g0) / v  # TODO: change eta
+        dwdr = (-P * SFC * const.g0) / v
         return np.max(np.where(v > v_cruise, dwdr, -np.inf), axis=0)
 
     sol = solve_ivp(dw_dr, (0, np.max(R)), W1, rtol=1e-8, atol=1e-8, dense_output=True)
@@ -125,7 +125,7 @@ def T_endurance_mission(Wf_max, CL, CD, S, eta, SFC, P_max, P_aux, t_takeoff=4*6
     W = W.flatten()
     W -= Wf_climb(max(h_cruise2-const.h_loiter,0), W, SFC)
     W = Wf_range(W, R, SFC, eta, CL, CD, S, P_extra, h=h_cruise2, v_cruise=0)
-    i = np.arange(30)
+    i = np.arange(N)
     W = W.reshape((N,N,N))[i, :, i]
     return R, t, (W0 - W).T
     
@@ -138,7 +138,8 @@ def payload_range_diagram(OEW:float, Wf_max, Payload_max, CL, CD, S, eta, SFC, P
     
     Rp = np.linspace(0, 2*const.R_cruise, 40)
     Rp, Wf = Wf_payload_mission(CL, CD, S, eta, SFC, P_max, P_aux, t_takeoff, h_cruise1, h_cruise2, W0=W0, R=Rp)
-
+    Wf_req = Wf[np.argmin(np.abs(Rp-const.R_cruise))]
+    print(f"Required fuel weight for payload req: {Wf_req/const.g0} kg")
     # interpolate Wf to increase resolution
     R = np.linspace(0, 2*const.R_cruise, 1000)
     Wf = interpolate.interp1d(Rp, Wf, axis=0)(R)

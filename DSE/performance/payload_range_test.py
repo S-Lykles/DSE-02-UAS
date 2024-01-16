@@ -124,8 +124,12 @@ def run_Wf_endurance():
     OEW = 100 * const.g0
     Payload = 20 * const.g0
     Wf_max = const.MTOW - OEW - Payload
-    
+
     R, t, W = T_endurance_mission(Wf_max, CL, CD, S, eta, SFC, P_max, P_aux)
+    ix_req = np.argmin(np.abs(R-const.R_cruise))
+    iy_req = np.argmin(np.abs(t-const.T_loiter_end))
+    Wf_req = W[iy_req, ix_req]
+    print(f'Fuel used for endurance req: {Wf_req/const.g0:.3f}')
 
      # W is 2d array with R on columns and t on rows
     plt.figure(figsize=plot_setting.set_size(plot_setting.slidewidth/2, plot_setting.slideheight/2))
