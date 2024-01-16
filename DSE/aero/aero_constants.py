@@ -16,7 +16,8 @@ index_cruise_airfoil_h = np.where(alpha_0012_airfoil == alpha_cruise_airfoil)
 
 alpha_0 = 0
 b = 6
-c_bar = 0.598
+#c_bar = 0.598
+
 
 # Cl relates to airfoil only, CL to the entire wing. Same for Cd and CD about drag
 
@@ -39,9 +40,11 @@ c_root = 0.833
 c_tip = 0.333
 tc = 0.12
 taper = 0.4
+c_bar = c_root * (2/3) * ((1+taper+taper**2)/(1+taper))
 
 sweep_ang_rad = atan(0.125/3)
 sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = -2.386*pi/180
 S = 3.5
 S_h = 1.26
+
