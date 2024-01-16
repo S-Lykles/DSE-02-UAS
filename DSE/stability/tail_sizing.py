@@ -67,7 +67,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     A = b**2/S
     S_net = S - b_f*c_root
     # A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
-    A_hh = np.arange(0.1,10.5,0.1)
+    A_hh = np.arange(0.1, 10.6, 0.1)
     Vh_V_2 = 1 # tail configuration is assumed to be t-tail
 
     m_tv = 2*dz_h/b
@@ -103,7 +103,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
         x_ac_bar_fc1 = -1.8/CL_alpha_A_h*b_f*hf_max*l_fn/(S*c_bar)
         c_g = S/b # mean geometric chord
-        lambd = c_root/c_tip
+        lambd = c_tip/c_root
         x_ac_bar_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
         x_ac_bar_w = 0.25  #PLACEHOLDER,. the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
         # x_ac_bar_w = 0.3+l_fn/c_bar  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
@@ -112,10 +112,6 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         Sh_S = np.arange(0, 0.8, 0.1)
         x_np_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2
         x_cg_bar = x_ac_bar + CL_alpha_h/CL_alpha_A_h * (1-de_da) * Sh_S*l_h/c_bar*Vh_V_2 - SM
-
-
-        # return x_cg_bar, x_np_bar, x_ac_bar
-    # def horizontal_tail_contrallability(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, rho = const.rho0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
 
         CL_h = -0.35 * A_h ** (1 / 3) # It is assumed that tail_ability is 'fixed tail'
 
@@ -234,7 +230,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     # plt.ylabel('Optimum CG range')
     # plt.show()
 
-    plot2=True
+    plot2=False
     if plot2 == True:
         fig, (ax, ay, az) = plt.subplots(1, 3)
         cp = ax.contourf(Sh_area0,A_hh0,  span_h, N)
