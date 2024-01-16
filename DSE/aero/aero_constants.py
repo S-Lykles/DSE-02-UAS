@@ -41,8 +41,12 @@ tc = 0.12
 taper = 0.4
 c_bar = c_root * (2/3) * ((1+taper+taper**2)/(1+taper))
 
+
 sweep_ang_rad = atan(0.125/3)
 sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = -2.386*pi/180
 S = 3.5
 S_h = 1.26
+
+AR = b**2 / S
+e = 1.78*(1 - 0.045 * AR **0.68) - 0.64
