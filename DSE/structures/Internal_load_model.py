@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import csv
 from pathlib import Path
 
-
 def aero_data_to_numpy(file_name):
     file_dir = Path(__file__).parent
     data = np.loadtxt(file_dir/f"{file_name}")
