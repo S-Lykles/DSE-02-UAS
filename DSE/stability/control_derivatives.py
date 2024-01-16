@@ -15,6 +15,8 @@ Cd = 9999 # placeholder, input from aerodyamics
 CL = aero_constants.CL_cruise
 CL_h = aero_constants.Cl_cruise_h
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
+CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
+CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
 
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
@@ -69,7 +71,7 @@ else:
     Cmq = -9999
     CYp = -1.87  # Ref(lit) : K.W. Booth. Effect of horizontal-tail chord on the calculated subsonic span loads and stability derivatives of isolated unswept tail assemblies in sideslip and steady roll. Technical report, NASA Memo 4-1-59 L, 1959.
     CYr = -9999
-    Clp = -1/8 *  (CL**2/(np.pi*A*(np.cos(sweep_ang_25_c*const))**2)) * (1 + (2*(np.sin(sweep_ang_25_c))**2)* ((A + 2*np.cos(sweep_ang_25_c)) / (A + 4*np.cos(sweep_ang_25_c)))) - 1/8*(Cd - CL**2/(np.pi*A))   # Ref(lit): https://ntrs.nasa.gov/api/citations/19930090563/downloads/19930090563.pdf
+    Clp = CL_alpha_cruise / CL_alpha_CL_0 -1/8 *  (CL**2/(np.pi*A*(np.cos(sweep_ang_25_c*const))**2)) * (1 + (2*(np.sin(sweep_ang_25_c))**2)* ((A + 2*np.cos(sweep_ang_25_c)) / (A + 4*np.cos(sweep_ang_25_c)))) - 1/8*(Cd - CL**2/(np.pi*A))   # Ref(lit): https://ntrs.nasa.gov/api/citations/19930090563/downloads/19930090563.pdf
     Clr = -9999
 
 
