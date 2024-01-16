@@ -3,6 +3,9 @@ from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
 from DSE.stability.tail_sizing import horizontal_tail_sizing
+
+de_da = horizontal_tail_sizing()[4]
+
 V = 42 # placeholder
 V_h = V
 d_dt = 99999 # placeholder time step
@@ -41,6 +44,7 @@ e = aero_constants.e
     # Horizontal
 Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
 AR_h = 6.8 # import from horizonal
+Sh = 0.538 # import from horizontal
 bh = 2.3 # import from horizontal
 CL_h = aero_constants.Cl_cruise_h
 Cl_alpha_h = aero_constants.Cl_alpha_h
@@ -95,6 +99,10 @@ if vtol:
     CZalphadott = 0
     Cmalphadott = 0
     CZq = (T1+T2+T3+T4)*np.sin(q_rad)
+    CZq = -9999
+    Cmq = -9999
+
+    CYr = -9999
     Cnr = -9999
     Cmq = -9999
     CYr = 0
@@ -109,8 +117,8 @@ else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
     CZ0 = -CL_w - CL_h*(Sh/S) * (V_h/V**2)
     CXalpha = - Cd_alpha
-    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
-    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar  
+    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h
+    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar
     CXalphadott = 0
     CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
     Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
