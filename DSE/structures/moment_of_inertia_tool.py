@@ -284,7 +284,7 @@ def number_of_stringers_computation(K_c, s, t, E, t_c):
     E = E * 0.000145037738
     t = t * 39.3700787
     h = (0.833 - s / 6) * t_c * 39.3700787
-    M = moment_distribution[s*100] * 8.85074579
+    M = moment_distribution[round(s*100)] * 8.85074579
 
     N = np.arange(1, 10, 1)
     L = 0.52 * (0.833 - s / 6) * 39.3700787 / N
@@ -321,7 +321,7 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
     # return N_stringers
 
 
-print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 1, 0.001, 71*10**9, 0.12))
+print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 0, 0.001, 71*10**9, 0.12))
 
 
 # print("Compute number of stringers required:", number_of_stringers_computation(3.62, 0.833*0.52, 0.001, 71*10**9,
