@@ -3,7 +3,7 @@ from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
 
-V = -9999 # placeholder
+V = 42 # placeholder
 V_h = V
 d_dt = 99999 # placeholder time step
 
@@ -12,13 +12,14 @@ S = aero_constants.S
 b = aero_constants.b
 c_bar = aero_constants.c_bar
 m = const.total_mass
-Cd = 9999 # placeholder, input from aerodyamics
-CL = aero_constants.CL_cruise
+Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
+CL = aero_constants.CL_cruise[0]
 CL_h = aero_constants.Cl_cruise_h
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
 CL_alpha_w = aero_constants.CL_alpha_wing
+Cd_alpha = aero_constants.CD_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
 taper_w = aero_constants.taper
@@ -28,7 +29,9 @@ AR_h = 6.8 # import from horizonal
 M =0.12 # base
 beta = np.sqrt(1-M**2)
 eta = 0.95
-
+e =1 
+deps_dalpha = 1
+S_h = aero_constants.S_h
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
@@ -52,7 +55,7 @@ q_rad= -9999 # placeholder, input for control
 
 l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
 
-vtol=True
+vtol=False
 if vtol:
     CX0 = 0
     CZ0 = -1*(T1+T2+T3+T4)/(0.5*rho*S*V**2)
@@ -78,13 +81,13 @@ if vtol:
 
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
-    CZ0 = -CL - CL_h*(Sh/S) * (Vh/V**2)
-    CXalpha = - CD_alpha
+    CZ0 = -CL - CL_h*(S_h/S) * (V_h/V**2)
+    CXalpha = - Cd_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
-    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c - aero_constants.Cl_alpha_h * l_h / aero_constants.c - CD_alpha_w * Zac / aero_constants.c   
+    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar  
     CXalphadott = 0
-    CZalphadott = - CN_h_alpha * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c
-    Cmalphadott = - CN_h_alpha * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c / aero_constants.c
+    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
+    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
     CZq = (Lw+Lh)*np.sin(q_rad)
     Cnr = -9999
     Cmq = -9999
@@ -92,15 +95,16 @@ else:
     CYr = -9999
     Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)
     Clr = -9999
-    CXu = 0
-    CZu = 0
+    CXu = 2* Cd / V
+    CZu = 2* CL / V
     Cmu = 0
     CXq = 0
 
-A = np.array([[CXu, CZu, Cmu],
-     [CXalpha, CZalpha, 0],
+A = np.array(
+    [[CXu, CZu, Cmu],
+     [CXalpha, CZalpha, Cmalpha],
      [CXq, CZq, Cmq],
-     [CXalphadott, CZalphadott, 0]])
+     [CXalphadott, CZalphadott, Cmalphadott]])
 print("""
           CXu, CZu, Cmu,
           CXalpha, CZalpha, 0,

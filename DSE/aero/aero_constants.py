@@ -3,9 +3,9 @@ from math import pi, atan
 import numpy as np
 
 # Obtain list for Cl/Cd and find max for cruise condition
-a = np.array([cl_23012_airfoil])
-b = np.array([cd_23012_airfoil])
-c = a/b
+cl_list = np.array([cl_23012_airfoil])
+cd_list = np.array([cd_23012_airfoil])
+c = cl_list/cd_list
 
 # Get index from cruise condition
 index_cruise_airfoil = np.argmax(c)
@@ -28,6 +28,8 @@ CL_alpha_wing = (cl_23012_wing[20]-cl_23012_wing[0])/((alpha_23012_wing[20]-alph
 Cl_alpha_v = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
 Cl_alpha_h = Cl_alpha_v
 CL_cruise = cl_23012_wing[index_cruise_wing]
+CD_cruise = cd_23012_wing[index_cruise_wing]
+print(CD_cruise)
 Cl_cruise = cl_23012_airfoil[index_cruise_airfoil]
 Cl_cruise_h = cl_0012_airfoil[index_cruise_airfoil_h]
 CL_max = max(cl_23012_wing)
@@ -48,3 +50,5 @@ sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = -2.386*pi/180
 S = 3.5
 S_h = 1.26
+
+print(Cl_alpha_h)
