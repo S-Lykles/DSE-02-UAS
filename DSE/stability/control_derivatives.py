@@ -13,11 +13,18 @@ b = aero_constants.b
 c_bar = aero_constants.c_bar
 m = const.total_mass
 Cd = 9999 # placeholder, input from aerodyamics
+CD0 = 9999 # placeholder, input from aerodynamics, just normal Cd0 if initial equilibrium calculated for at 0 angle of attack
 CL = aero_constants.CL_cruise
 CL_h = aero_constants.Cl_cruise_h
+CL0 = aero_constants.CL_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
+Theta_0 = 9999 # placeholder
+V = 42
+T = 288.15 - 0.0065 * 500
+M0 = V/(sqrt(1.4*287.15*T))
+CDM = Cd * M0 / (1-M0**2)
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
@@ -79,6 +86,9 @@ if vtol:
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
     CZ0 = -CL - CL_h*(Sh/S) * (Vh/V**2)
+    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    CZu = -9999
+    CMu = -9999
     CXalpha = - CD_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c - aero_constants.Cl_alpha_h * l_h / aero_constants.c - CD_alpha_w * Zac / aero_constants.c   
