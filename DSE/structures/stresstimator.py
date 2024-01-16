@@ -33,7 +33,7 @@ def geo_to_cart(geom):
     #print(len(x), len(y), len(z))
     return x, y, z
 
-step = 0.1
+step = 0.05
 semispan = 3
 
 
@@ -48,15 +48,33 @@ volume = sum(area)*step
 
 
 torqueyy = np.resize(torqueyy, len(Aenc))
-Aenc = np.array(Aenc)
-mass = 2700*volume
-shear_flow = 0.5*(torqueyy/Aenc)
+Aenc = 0.5*np.array(Aenc)
+shear_flow = []
+tspar= 0.001
+Emod = 70 * 10 ** 9
 
+for (tyy, aen) in itertools.zip_longest(torqueyy, Aenc):
+    shearflow = 0.5*tyy/aen
+    shear_flow.append(shearflow)
+nrib = 0
+seclength = 0
 
-plt.plot(point_range, shear_flow)
+for shear in shear_flow:
+    seclength += step
+    taucrit = Emod*0.9*4*(tspar*tspar/(seclength*seclength))
+    print(shear, taucrit, shear/tspar)
+    if taucrit <= abs(shear/tspar):
+        print('rib', seclength)
+        nrib += 1
+        seclength = 0
+        shear_flow -= shear
+
+plt.plot(np.resize(point_range, len(shear_flow)), shear_flow)
+plt.xlabel('semi-spanwise location (m)')
+plt.ylabel('spanwise shear flow distirbution (N/m)')
 plt.show
 
-print(volume, mass)
+#print(volume, mass)
 
 x, y, z = geo_to_cart(geom)
 plt.rcParams["figure.figsize"] = [7.00, 3.50]
