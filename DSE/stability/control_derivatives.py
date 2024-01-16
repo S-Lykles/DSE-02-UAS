@@ -32,9 +32,18 @@ taper_w = aero_constants.taper
 Cl_alpha_h = aero_constants.Cl_alpha_h
 Cd0_h = 9999 # placeholder, input from aerodynamics
 AR_h = 6.8 # import from horizonal
+Sh = 0.538 # import from horizontal
+bh = 2.3 # import from horizontal
+Cl_alpha_v = aero_constants.Cl_alpha_v
+AR_v = 1.9
+sweep_v = 22
+eta_v = 0.95    # assumption
 M =0.12 # base
 beta = np.sqrt(1-M**2)
 eta = 0.95
+bv = 0.848956720089143
+Sv = 0.379330269781324
+lv = 1.2354894391032434
 
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
@@ -86,9 +95,6 @@ if vtol:
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
     CZ0 = -CL - CL_h*(Sh/S) * (Vh/V**2)
-    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    CZu = -9999
-    CMu = -9999
     CXalpha = - CD_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c - aero_constants.Cl_alpha_h * l_h / aero_constants.c - CD_alpha_w * Zac / aero_constants.c   
@@ -98,13 +104,14 @@ else:
     CZq = (Lw+Lh)*np.sin(q_rad)
     Cnr = -9999
     Cmq = -9999
-    CYp = -1.87  # Ref(lit) : K.W. Booth. Effect of horizontal-tail chord on the calculated subsonic span loads and stability derivatives of isolated unswept tail assemblies in sideslip and steady roll. Technical report, NASA Memo 4-1-59 L, 1959.
+    CYp = -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
     CYr = -9999
-    Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)
+    Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
     Clr = -9999
-    CXu = 0
-    CZu = 0
-    Cmu = 0
+    Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
+    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    CZu = -9999
+    CMu = -9999
     CXq = 0
 
 A = np.array([[CXu, CZu, Cmu],
