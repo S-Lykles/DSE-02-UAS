@@ -52,7 +52,7 @@ CX = CL * alpha - CD + CT
 CZ = -CL - CD * alpha
 
 # Velocity stability derivatives
-CXu = M0**2 / (1 - M0**2) * CL_initial_eq * alpha_initial_eq - 3 * CD_initial_eq - 3 * CL_initial_eq * atan(gamma0) - M0 * CDM
+CXu = M0**2 / (1 - M0**2) * CL_initial_eq * alpha_initial_eq - 3 * CD_initial_eq - 3 * CL_initial_eq * tan(gamma0) - M0 * CDM
 CZu = -M0**2 / (1 - M0**2)  * CL_initial_eq - M0 * CDM * alpha_initial_eq
 Cmu = M0 * (CLM_w * (Xcg - Xac_w) * S_w / St/ c - CLM_h * (Xac_h - Xcg) * S_h / St/ c * V_h**2 * V**(-2)) + CTu_w * Zcg_w * S_w / St/ c - CTu_h * Zcg_h * S_h / St/ c * V_h**2 * V**(-2)
 
