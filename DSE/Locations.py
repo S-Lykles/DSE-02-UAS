@@ -1,6 +1,7 @@
 from DSE import const
 from DSE.structures.center_of_gravity import class_two_cg_estimation
 # from DSE.
+
 def locations():
     "The current datum point is set at the nose of the craft in the x-direction. whilst in the Z-direction it is located"
     "at the botum of the main fuselage of the UAV"
@@ -21,7 +22,7 @@ def locations():
     Zh = 1.6 #PLACEHOLDER,  guessed value
     print("Caution: The values about about distances are just guessed values, must be revisited. python file: DSE/structures/locations")
 
-
+    X_lemac = 3 #PLACEHOLDER,  guessed value
 
     l_fr  = Xcg - Xfr   # Xfr is the distance of the front rotor
     l_aft = Xaft - Xcg  # Xaft is the distance of the aft rotor
@@ -35,4 +36,4 @@ def locations():
     # Xac_v is the position of the aerodynamic center of the vertical tail.
 
 
-    return l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h
+    return l_fr, l_aft, l_acw, l_h, h_p, h_acw, h_h, z_h, X_lemac, Xcg, Zac, Zh
