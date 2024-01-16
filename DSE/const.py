@@ -9,6 +9,7 @@ P0 = 101325  # [Pa]
 alpha = -0.0065  # [K/m]
 a = np.sqrt(gamma * R * T0)  # [m/s]
 
+V_min = 42 # [m/s]
 def m2rho(m):
     """Return density of air at given altitude in kg/m^3"""
     return rho0 * (1 - alpha * m / T0)**(g0 / alpha / R - 1)
@@ -39,9 +40,9 @@ WH_KG2J_KG = 1 / J_KG2WH_KG
 
 # Disk loading
 
-
 # Requirements
-MTOW = 160 * g0  # [N]
+total_mass = 160
+MTOW = total_mass * g0  # [N]
 Payload = 50 * g0  # [N]
 R_cruise = 185e3  # [m]
 T_cruise = 3600 * 1.25  # [s]

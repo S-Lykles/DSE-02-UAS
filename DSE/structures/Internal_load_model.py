@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import csv
 from pathlib import Path
 
-
 def aero_data_to_numpy(file_name):
     file_dir = Path(__file__).parent
     data = np.loadtxt(file_dir/f"{file_name}")
@@ -13,9 +12,9 @@ def aero_data_to_numpy(file_name):
     y = data[0]
     chord = data[1]
     cl = data[3]
-    return y, chord, cl
-
-
+    cd = data[4] + data[5]
+    cm_geom = data[6]
+    return y, chord, cl, cd, cm_geom
 
 
 def find_nearest_point(point, array):
@@ -26,21 +25,32 @@ def find_nearest_point(point, array):
 
 
 def distribution_from_aero_data(start, stop, step, data_name, point_range):
-    y, chord, cl = aero_data_to_numpy(data_name)
+    y, chord, cl, cd, cm_geom = aero_data_to_numpy(data_name)
     cl_distribution = np.interp(point_range, y, cl)
+    cd_distribution = np.interp(point_range, y, cd)
+    cm_distribution = np.interp(point_range, y, cm_geom)
     chord_distribution = np.interp(point_range, y, chord)
-    max_th = 0.12*chord_distribution
+    max_th = 0.12 * chord_distribution
+    print(const.v_cruise)
     lift_distribution = cl_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
+    drag_distribution = cd_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
+    torque_distribution = cm_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
     # Lift only for the start and stop caps
     i_start = find_nearest_point(start, point_range)[1]
     i_stop = find_nearest_point(stop, point_range)[1]
 
     lift_distribution = lift_distribution[i_start:i_stop + 1]
+    torque_distribution = torque_distribution[i_start:i_stop + 1]
+
     empty_array = np.zeros(len(point_range))
     empty_array[i_start:i_stop + 1] = lift_distribution
     lift_distribution = empty_array
 
-    return lift_distribution*step, max_th
+    empty_array2 = np.zeros(len(point_range))
+    empty_array2[i_start:i_stop + 1] = torque_distribution
+    torque_distribution = empty_array2
+
+    return lift_distribution*step, drag_distribution*step, torque_distribution, max_th
 
 
 def load_distribution(start, stop, step, m1, m2, type, point_range):
@@ -69,44 +79,67 @@ def point_load(point, magnitude, point_range):
     return load_lst
 
 
-def combined_loading(beam_start, beam_stop, step):
+def combined_loading(beam_start, beam_stop, step, VTOL):
+    """
+    For the WING !
+    """
     point_range = np.arange(beam_start, beam_stop + step, step)
+    zeros = np.zeros(len(point_range))
+    lift_distribution, drag_distribution, torque_distribution, max_th = distribution_from_aero_data(0.2, beam_stop, step, 'external files/wing_data.txt', point_range)
+    Boom_from_centerline = 1
+    load_factor_vtol = 1.1
+    Upwards_load = (load_factor_vtol * const.MTOW) / 2
+    Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
 
-    load1 = load_distribution(0, 4, step, 4, -3, 'linear', point_range)
-    load2 = load_distribution(1, 2, step, 400, 400, 'linear', point_range)
-    load3, max_th =  distribution_from_aero_data(0.2, beam_stop, step, 'wing_data.txt', point_range)
-    load4 = point_load(1, 1000, point_range)
-
-    loading_distribution = 4.5*(load3 + load4)
-    plt.plot(point_range, loading_distribution)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('internal force (N)')
+    if VTOL:
+        loading_distribution = Upwards_pointload
+        loading_distributionx = 0
+    else:
+        load_factor_manouvre = 3.8
+        loading_distributionz = load_factor_manouvre * lift_distribution
+        loading_distributionx = load_factor_manouvre * drag_distribution
+    ax = plt.axes(projection='3d')
+    ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
+    ax.plot3D(point_range, zeros, loading_distributionz/step, 'red')
+    ax.set_xlabel('semi-spanwise location (m)')
+    ax.set_ylabel('internal force (drag) (N)')
+    ax.set_zlabel('internal force (lift) (N)')
     plt.show()
-    return loading_distribution, point_range, max_th
+    plt.plot(point_range, torque_distribution)
+    plt.xlabel('semi-spanwise location (m)')
+    plt.ylabel('Internal Torque (Nm)')
+    plt.show()
+    return loading_distributionx, loading_distributionz, torque_distribution, point_range, max_th
 
 
+loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 3, 0.01, False)
 
-loads, point_range, max_th = combined_loading(0, 3, 0.01)
 
-
-def moment_distr_from_load_distr(load_distribution, point_range, step):
-    moment_distribution = np.array([])
-
+def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step):
+    momentx_distribution = np.array([])
+    momentz_distribution = np.array([])
+    zeros = np.zeros(len(point_range))
     # cumulative load distribution
     for i in np.arange(0, len(point_range), 1):
         distances = point_range - point_range[i]
         distances = distances[i:]
-        loads = load_distribution[i:]
-        #print(loads)
-        moment = np.trapz(loads * distances, distances, step)
-        print(moment)
-        moment_distribution = np.append(moment_distribution, moment/step)
-    print(moment_distribution[0])
-    plt.plot(point_range, moment_distribution)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('Internal moment (Nm)')
+        loadsx = load_distributionx[i:]
+        loadsz = load_distributionz[i:]
+        momentx = np.trapz(loadsx * distances, distances, step)
+        momentz = np.trapz(loadsz * distances, distances, step)
+        #print(momentx, momentz)
+        momentx_distribution = np.append(momentx_distribution, momentx/step)
+        momentz_distribution = np.append(momentz_distribution, momentz/ step)
+    #print(momentx_distribution[0], momentz_distribution[0])
+    ax = plt.axes(projection='3d')
+    ax.plot3D(point_range, momentx_distribution, zeros, 'blue')
+    ax.plot3D(point_range, zeros, momentz_distribution, 'red')
+    ax.set_xlabel('semi-spanwise location (m)')
+    ax.set_ylabel('internal moment (x) (Nm)')
+    ax.set_zlabel('internal moment (z) (Nm)')
     plt.show()
-    return moment_distribution, point_range
+    return momentx_distribution, momentz_distribution, point_range
+
 
 def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step):
     Ixxreq = abs(moment_distribution)*max_th/sigmacrit
@@ -137,9 +170,7 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step)
     print(mbox)
 
 
+moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 0.01)
 
-
-moment_distribution, point_range = moment_distr_from_load_distr(loads, point_range, 0.01)
-
-Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
+#Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
 
