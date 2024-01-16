@@ -44,6 +44,9 @@ vtol=True
 if vtol:
     CX0 = 0
     CZ0 = -1*(T1+T2+T3+T4)/(0.5*rho*S*V**2)
+    CXu = 0
+    CZu = -9999
+    CMu = -9999
     CXalpha = 0
     CZalpha = 0
     Cmalpha = 0
@@ -60,6 +63,9 @@ if vtol:
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
     CZ0 = -CL - CL_h*(Sh/S) * (Vh/V**2)
+    CXu = -9999
+    CZu = -9999
+    CMu = -9999
     CXalpha = - CD_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c - aero_constants.Cl_alpha_h * l_h / aero_constants.c - CD_alpha_w * Zac / aero_constants.c   
