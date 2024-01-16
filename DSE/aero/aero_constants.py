@@ -23,7 +23,6 @@ b = 6
 CD0_wing = 0.0077
 CD_alpha_wing = (cd_23012_wing[20]-cd_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
 CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)]
-CL_0_h = cl_23012_wing[np.where(alpha_0012_airfoil == 0)]
 CL_alpha_wing = (cl_23012_wing[20]-cl_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
 Cl_alpha_v = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
 Cl_alpha_h = Cl_alpha_v
@@ -51,4 +50,13 @@ sweep_ang_50_c_rad = -2.386*pi/180
 S = 3.5
 S_h = 1.26
 
-print(Cl_alpha_h)
+AR = b**2 / S
+e = 1.78*(1 - 0.045 * AR **0.68) - 0.64
+
+# winglet data
+tc_winglet = tc
+taper_winglet = taper
+sweep_ang_25_c_rad_winglet = 45 * const.deg2rad
+S_winglet = 0.21
+b_winglet = 0.45
+c_root_winglet = 0.333
