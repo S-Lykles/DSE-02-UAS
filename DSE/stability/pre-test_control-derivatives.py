@@ -12,7 +12,7 @@ CL_initial_eq = 2
 
 gamma0 = 2*pi/180
 
-#Values taken during cruise
+# Values taken during cruise
 alpha = alpha_23012_wing[index_cruise_wing]*pi/180 # cruise at alpha where cl.\/cd is max
 CD = cd_23012_wing[index_cruise_wing]
 CT = 0.01
@@ -20,7 +20,6 @@ V = 42
 V_h = V # assume no interference of freestream air for horizontal tail
 T = 288.15 - 0.0065 * 500
 M0 = V/(sqrt(1.4*287.15*T))
-print(M0)
 CDM = CD_initial_eq * M0 / (1-M0**2) # No effect on cd due to increasing Mach number
 CLM = CL_initial_eq * M0 / (1-M0**2) # No effect on cl due to increasing Mach number
 CLM_w = CLM # No effect on cl due to increasing Mach number

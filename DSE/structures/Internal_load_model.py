@@ -34,7 +34,7 @@ def distribution_from_aero_data(start, stop, step, data_name, point_range):
     print(const.v_cruise)
     lift_distribution = cl_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
     drag_distribution = cd_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
-    torque_distribution = cm_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution)
+    torque_distribution = cm_distribution * 0.5 * const.rho0 * const.v_cruise**2 * (chord_distribution ** 2)
     # Lift only for the start and stop caps
     i_start = find_nearest_point(start, point_range)[1]
     i_stop = find_nearest_point(stop, point_range)[1]
@@ -86,17 +86,19 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     point_range = np.arange(beam_start, beam_stop + step, step)
     zeros = np.zeros(len(point_range))
     lift_distribution, drag_distribution, torque_distribution, max_th = distribution_from_aero_data(0.2, beam_stop, step, 'external files/wing_data.txt', point_range)
-    Boom_from_centerline = 1
+    Boom_from_centerline = 1.3
     load_factor_vtol = 1.1
     Upwards_load = (load_factor_vtol * const.MTOW) / 2
     Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
-
+    reac_torque = load_distribution(0, Boom_from_centerline, step, 1700/step, 1700/step, 'linear', point_range)
+    reac_force = load_distribution(0, Boom_from_centerline, step, 800, 800, 'linear', point_range)
     if VTOL:
         loading_distribution = Upwards_pointload
         loading_distributionx = 0
     else:
         load_factor_manouvre = 3.8
-        loading_distributionz = load_factor_manouvre * lift_distribution
+        loading_distributionz = load_factor_manouvre * lift_distribution + reac_force
+        torque_distribution = 3.8*torque_distribution + reac_torque
         loading_distributionx = load_factor_manouvre * drag_distribution
     ax = plt.axes(projection='3d')
     ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
