@@ -3,6 +3,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from pathlib import Path
+from Internal_load_model import moment_distribution
 
 # This tool can be used to compute the moment of inertia of various cross-sectional shapes
 # The formula's were obtained from course AE2135-I or
@@ -21,20 +22,17 @@ def moment_of_inertia_rectangle_y_axis(width, height):
 
     return I_yy
 
-
 # Function computing the moment of inertia of a solid circular section
 def moment_of_inertia_solid_circular_section(diameter):
     I = np.pi * diameter**4 / 64
 
     return I
 
-
 # Function computing the moment of inertia of a thin-walled circular section
 def moment_of_inertia_thin_walled_circular_section(diameter, thickness):
     I = np.pi * thickness * diameter**3 / 8
 
     return I
-
 
 # Parallel axis theorem
 def parallel_axis_theorem(inertia, area, distance):
@@ -56,7 +54,6 @@ def parallel_axis_theorem(inertia, area, distance):
 # t_bottom = Thickness of the bottom sheet
 # l_bottom = Length of the bottom sheet
 # d = Distance between the neutral line (y-axis) and the center of the spars
-
 
 def I_xx_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_rear_center,
                   w_rear_center, h_rear_tip, w_rear_tip, h_center_center, w_center_center, h_center_tip,
@@ -204,7 +201,6 @@ def I_yy_wing_box(h_front_center, w_front_center, h_front_tip, w_front_tip, h_re
 
     return I_yy
 
-
 # Tool to compute the moment of inertia around the x-axis along the rectangular section of the fuselage
 def I_xx_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bottom):
     # Moment of inertia for the various rectangles:
@@ -237,7 +233,6 @@ def I_yy_rectangle_section_fuselage(h_top, w_top, h_side, w_side, h_bottom, w_bo
 
     return I_yy
 
-
 # Torsion calculator for a beam with a certain geometrical cross-section
 def compute_torsion(T, rho, J, G, t, A_m, s):
     #Torsion and twist cirucular section
@@ -253,7 +248,6 @@ def compute_torsion(T, rho, J, G, t, A_m, s):
     dtheta_dz_thin_plate = 3* T /G /s /t**3
 
     return tau_circ, dtheta_dz_circ, tau_thin_circ, dtheta_dz_thin_circ, tau_max_thin_plate, dtheta_dz_thin_plate
-
 
 # Buckling calculator for a beam with a certain geometrical cross-section
 def compute_buckling(E, Ixx, buckling, L, v, t, b):
@@ -286,16 +280,17 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 # Max sheet height from point in which moment acts
 
 
-def number_of_stringers_computation(K_c, L, t, E, M, h):
+def number_of_stringers_computation(K_c, s, t, E, t_c):
     E = E * 0.000145037738
     t = t * 39.3700787
-    h = h * 39.3700787
-    M = M * 8.85074579
+    h = (0.833 - s / 6) * t_c * 39.3700787
+    M = moment_distribution[s*100] * 8.85074579
 
     N = np.arange(1, 10, 1)
-    L = L * 39.3700787 / N
+    L = 0.52 * (0.833 - s / 6) * 39.3700787 / N
     print(N, 'N')
 
+    # Compute the maximum compressive force acting on the wing box section
     Fmax = M / h
     sigma_cr = Fmax / (t * L)
     L_check = t / np.sqrt(sigma_cr/(K_c * E))
@@ -304,28 +299,36 @@ def number_of_stringers_computation(K_c, L, t, E, M, h):
     print(N_req, "Nreq")
     # return N_stringers
 
-def number_of_ribs_computation(K_c, L, t, E, T, h):
-    pass
 
 
-print("Compute number of stringers at the root, inputs in SI units", number_of_stringers_computation(3.62, 0.174, 0.001, 71*10**9
-                                                                                 ,4000, 0.058))
+def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
+    E = E * 0.000145037738
+    t = t * 39.3700787
+    h = (0.833 - s / 6) * t_c * 39.3700787
+    T = T * 8.85074579
 
+    N = np.arange(1, 10, 1)
+    L = 0.52 * (0.833 - s / 6) * 39.3700787 / N
+    print(N, 'N')
+
+    # Compute the maximum compressive force acting on the wing box section
+    Fmax = T / h
+    sigma_cr = Fmax / (t * L)
+    L_check = t / np.sqrt(sigma_cr / (K_c * E))
+    # Compute the maximum spacing between stringers
+    N_req = L / L_check
+    print(N_req, "Nreq")
+    # return N_stringers
+
+
+print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 1, 0.001, 71*10**9, 0.12))
+
+
+# print("Compute number of stringers required:", number_of_stringers_computation(3.62, 0.833*0.52, 0.001, 71*10**9,
+#                                                                                4000, 0.833*0.12))
+# print("Compute number of ribs required "
+#       "span wise to handle the torsion:", I_xx_wing_box(0.06, 0.006,0.004, 0.05,0.05,
+#                                                         0.004 ,0.004,0.05 , 0.04, 0.005,
+#                                                         0.004, 0.05, 0.001, 2,0.001,2,
+#                                                         3))
 #
-# print("Moment of inertia around x-axis for the root of a single beam", I_xx_wing_box(0.085, 0.004, 0.0025,
-#                                                                           0.06, 0.085,0.004,0.0025,
-#                                                                           0.06,0,0,0,
-#                                                                           0,0.0001,0.06,0.0001, 0.04, 2))
-#
-# print("Moment of inertia around x-axis for the tip of a single beam", I_xx_wing_box(0.036, 0.002, 0.001,
-#                                                                           0.04, 0.036,0.002,0.001,
-#                                                                           0.04,0,0,0,
-#                                                                           0,0.0001,0.1,0.0001, 0.1,2))
-#
-# print("The moment of inertia of the fuselage around the x-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
-#                                                                                                       0.7, 0.05,
-#                                                                                                       0.05, 0.8))
-#
-# print("The moment of inertia of the fuselage around the y-axis is:",  I_xx_rectangle_section_fuselage(0.05, 0.8,
-#                                                                                                       0.7, 0.05,
-#                                                                                                       0.05, 0.8))
