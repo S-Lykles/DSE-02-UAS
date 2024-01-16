@@ -437,7 +437,7 @@ def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max,
     # Typical Cn_Beta values 0.04-0.11/rad for subsonic single engine aircraft (SEAD lecture 9)
     Rat_br_bv = 0.9  # Ratio of vertical tail fitted with rudder !!!!!Check if this is not in conflict with max deflected elevator!!!!!!
     S_v_total = 2 * S_v # Correction for having 2 vertical stabilisers
-    No_values = 10
+    No_values = 500
     # Tolerance = 5e-3
     # K_f_1 between 0.65 and 0.75 for typical aircraft
     # K_f_2 between 1.3 and 1.4 for typical aircraft
