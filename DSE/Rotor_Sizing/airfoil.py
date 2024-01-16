@@ -41,9 +41,23 @@ Cl_func_clarky = lambda M, a: cl_interp(M, a, grid=False)
 Cd_func_clarky = lambda M, a: cd_interp(M, a, grid=False)
 Cp_func_clarky = lambda M, a: cp_min_interp(M, a, grid=False)
 
+alpha = np.linspace(-2, 15, 100)
+M_grid = np.linspace(0.1, 0.7, 50)
+M_grid, alpha = np.meshgrid(M_grid, alpha)
+Cpfrac = (1 + (const.gamma-1)/2*M_grid**2) / (1 + (const.gamma-1)/2)
+Cp_crit = 2 / const.gamma/M_grid**2 * (Cpfrac**(const.gamma/(const.gamma-1))-1)
+cp = Cp_func_clarky(M_grid, alpha)
+
+# Get the M-alpha line where Cp = Cp_crit
+CS = plt.contour(M_grid, alpha, cp-Cp_crit, levels=[0])
+for path_collection in CS.collections:
+    for path in path_collection.get_paths():
+        M_alpha = path.vertices
+plt.close()
+
 if __name__ == "__main__":
     import matplotlib.colors as mcolors
-    color_below_zero = 'red'  # Color for values below 0
+    color_below_zero = 'pink'  # Color for values below 0
     color_above_zero = 'white'   # Color for values above 0
     epsilon = 1e-5
     cmap = mcolors.LinearSegmentedColormap.from_list('custom_colormap', 
@@ -67,8 +81,8 @@ if __name__ == "__main__":
     cl_cd = cl / cd
     # ax.contourf(M_grid, alpha, cl, levels=100)
     plt.scatter(*list(zip(*alpha_max)))
-    CS = ax.contourf(M_grid, alpha, cp-Cp_crit, cmap=cmap, levels=1)
-    CS = ax.contour(M_grid, alpha, cl, colors='k', linestyles='-')
+    CS = ax.contourf(M_grid, alpha, cp-Cp_crit, cmap=cmap, levels=1, vmin=-.5, vmax=.5)
+    CS = ax.contour(M_grid, alpha, cl/cd, colors='k', linestyles='-')
     ax.clabel(CS, inline=1, fontsize=10)
     ax.set_xlabel("M")
     ax.set_ylabel(r"$\alpha$")
