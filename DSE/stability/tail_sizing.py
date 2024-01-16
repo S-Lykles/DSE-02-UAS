@@ -715,12 +715,12 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     PRINT = True
 
     # weight for optimization
-    weight_surf = 0.5
-    weight_AR = 1
-    weight_span = 10
+    weight_surf = 0.3
+    weight_AR = 0.3
+    weight_span = -0.3
     weight_boom = 1.2
-    weight_root_cord = 1.2
-    weight_taper = 1
+    weight_root_cord = 1.9
+    weight_taper = -0.1
 
     tel = 0
     H = 10 ** 9
@@ -779,3 +779,5 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     print('-------------------------------------------------')
     print('rotor position =', X_rot_aft)
     print('update weights')
+
+    return
