@@ -4,8 +4,8 @@ import numpy as np
 
 # Obtain list for Cl/Cd and find max for cruise condition
 a = np.array([cl_23012_airfoil])
-b = np.array([cd_23012_airfoil])
-c = a/b
+bb = np.array([cd_23012_airfoil])
+c = a/bb
 
 # Get index from cruise condition
 index_cruise_airfoil = np.argmax(c)
@@ -17,6 +17,8 @@ index_cruise_airfoil_h = np.where(alpha_0012_airfoil == alpha_cruise_airfoil)
 alpha_0 = 0
 b = 6
 c_bar = 0.598
+S = 3.5
+S_h = 1.26
 
 # Cl relates to airfoil only, CL to the entire wing. Same for Cd and CD about drag
 
@@ -39,9 +41,7 @@ c_root = 0.833
 c_tip = 0.333
 tc = 0.12
 taper = 0.4
-
-sweep_ang_rad = atan(0.125/3)
+AR = b * b / S
+sweep_ang_rad = atan(0.125/(b/2))
 sweep_ang_25_c_rad = 0*pi/180
 sweep_ang_50_c_rad = -2.386*pi/180
-S = 3.5
-S_h = 1.26
