@@ -6,44 +6,59 @@ from DSE.stability.tail_sizing import horizontal_tail_sizing
 V = 42 # placeholder
 V_h = V
 d_dt = 99999 # placeholder time step
+T = 288.15 - 0.0065 * 500
 
-rho = const.rho0
-S = aero_constants.S
-Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
-b = aero_constants.b
-c_bar = aero_constants.c_bar
-m = const.total_mass
-Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
-CL = aero_constants.CL_cruise[0]
-CL_h = aero_constants.Cl_cruise_h
-CL0 = aero_constants.CL_0
-sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
+
+##   !!! Imported Values !!!
+##  !! still undifend and not placed !!
+Theta_0 = 9999 # placeholder
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
-Theta_0 = 9999 # placeholder
-T = 288.15 - 0.0065 * 500
-M0 = V/(np.sqrt(1.4*287.15*T))
-CDM = Cd * M0 / (1-M0**2)
+Cd0_h = 9999 # placeholder, input from aerodynamics
+
+# Base
+rho = const.rho0
+m = const.total_mass
+M =0.12
+
+# Wing properties
+S = aero_constants.S
+b = aero_constants.b
+c_bar = aero_constants.c_bar
+Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
+CL_w = aero_constants.CL_cruise[0]
+CL_w = aero_constants.CL_cruise[0]
+CL0 = aero_constants.CL_0
+sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
 taper_w = aero_constants.taper
-Cl_h = aero_constants.Cl_cruise_h
-Cl_alpha_h = aero_constants.Cl_alpha_h
-Cd0_h = 9999 # placeholder, input from aerodynamics
+e = aero_constants.e
+
+# Tail properties
+    # Horizontal
+Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
 AR_h = 6.8 # import from horizonal
 bh = 2.3 # import from horizontal
-Cl_alpha_v = aero_constants.Cl_alpha_v
+CL_h = aero_constants.Cl_cruise_h
+Cl_alpha_h = aero_constants.Cl_alpha_h
+eta = 0.95
+
+    # Vertical
 AR_v = 1.9
 sweep_v = 22
 eta_v = 0.95    # assumption
-M =0.12 # base
-beta = np.sqrt(1-M**2)
-eta = 0.95
-e = aero_constants.e
+Cl_alpha_v = aero_constants.Cl_alpha_v
 
-CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
+# Initial Calucaltions
+M0 = V/(np.sqrt(1.4*287.15*T))
+CDM = Cd * M0 / (1-M0**2)
+beta = np.sqrt(1-M**2)
+
+
+CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL_w / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
 Ixz = -9999 # placeholder, input from structures
@@ -92,7 +107,7 @@ if vtol:
 
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
-    CZ0 = -CL_w - CL_h*(S_h/S) * (V_h/V**2)
+    CZ0 = -CL_w - CL_h*(Sh/S) * (V_h/V**2)
     CXalpha = - Cd_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar  
