@@ -41,6 +41,7 @@ eta_v = 0.95    # assumption
 M =0.12 # base
 beta = np.sqrt(1-M**2)
 eta = 0.95
+e = aero_constants.e
 
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
