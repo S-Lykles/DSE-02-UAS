@@ -63,12 +63,12 @@ de_da = horizontal_tail_sizing()[4]
 V_h = Vh
 
     # Vertical
-bv = 0.848956720089143
-Sv = 0.379330269781324
-lv = 1.2354894391032434
+bv =  0.60188057586457
+Sv = 0.1811301138015332
+lv = 2.452651830421447
 AR_v = 1.9
-sweep_v = 22
-eta_v = 0.95    # assumption
+sweep_v = 11
+eta_v = 0.90    # assumption
 Cl_alpha_v = aero_constants.Cl_alpha_v
 
 # Initial Calucaltions
