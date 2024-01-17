@@ -117,7 +117,7 @@ def place_booms(N_bottom, N_curve, R):
 if __name__ == '__main__':
     #INPUTS
     R = 0.4 #m
-    t = 0.0001 #m
+    t = 0.001 #m
     r = R-t #m
     Mx = 1943 #Nm
     My = 0 #Nm
