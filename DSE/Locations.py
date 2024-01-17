@@ -12,6 +12,7 @@ def locations():
     Xcg = class_two_cg_estimation(True, False, False,  False)[1][0] #double check this function
     Zcg = class_two_cg_estimation(True, False, False,  False)[1][2]#double check this function
     print("Caution: The values about CG are approximate, need to be revisited. python file: DSE/structures/locations")
+    Xcg = 1.7
     Xfr = 0.6 #PLACEHOLDER,  guessed value
     Xaft = 3 #PLACEHOLDER,  guessed value
     Xac =1.1 #PLACEHOLDER,  guessed value
@@ -37,4 +38,3 @@ def locations():
 
 
     return l_fr, l_aft, l_acw, l_h, h_p, h_acw, h_h, z_h, X_lemac, Xcg, Zac, Zh
-

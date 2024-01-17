@@ -67,7 +67,8 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     A = b**2/S
     S_net = S - b_f*c_root
     # A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
-    A_hh = np.arange(0.1, 10.6, 0.1)
+    # A_hh = np.arange(0.1, 10.6, 0.1)
+    A_hh = np.arange(6.7, 6.9, 0.1)
     Vh_V_2 = 1 # tail configuration is assumed to be t-tail
 
     m_tv = 2*dz_h/b
@@ -90,7 +91,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
        # print(i,len(A_hh))
         # print(i,len(A_hh))
         if A_hh[i] == 6.8:
-            PloT=False
+            PloT=True
         else:
             PloT=False
         A_h = A_hh[i]
@@ -257,7 +258,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
-    a, b, c, d = horizontal_tail_sizing()
+    a, b, c, d, e = horizontal_tail_sizing()
     print('test 1', a)
     print('test 2', b)
     print('test 3', c)

@@ -2,11 +2,25 @@ import numpy as np
 from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
+from DSE.stability.tail_sizing import horizontal_tail_sizing
+
+print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
+
 
 V = 42 # placeholder
 Vh = V
 d_dt = 99999 # placeholder time step
+T = 288.15 - 0.0065 * 500
 
+
+##   !!! Imported Values !!!
+##  !! still undifend and not placed !!
+Theta_0 = 9999 # placeholder
+CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
+CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
+Cd0_h = 9999 # placeholder, input from aerodynamics
+
+# Base
 rho = const.rho0
 m = const.total_mass
 M =0.12
@@ -21,6 +35,16 @@ T4 = -9999 # placeholder, input from propulsion
 Tp = -9999 # placeholder, input from propulsion
 Lw = -9999 # placeholder, input from propulsion
 CY_alpha_p = -9999
+J = -9999
+sigma = -9999
+ks = 1.14
+ka = 0.4
+# T_C = C_t/J**2
+# a = np.sqrt(1+8*T_C/np.pi-1)/2
+# fa = (1+a)*((1+a)+(1+2*a)**2)/(1+(1+2*a)**2
+mo = 0.95*2*np.pi
+# I = 3/4*mo*integral_blade_c
+# CY_alpha_p = ks*fa*sigma*I1/(1+ka*sigma*I1)
 lp = -9999
 Vp = -9999
 
@@ -73,7 +97,7 @@ M0 = V/(np.sqrt(1.4*287.15*T))
 CDM = Cd * M0 / (1-M0**2)
 beta = np.sqrt(1-M**2)
 eta = 0.95
-CT = 0.01 
+CT = 0.01
 CT_alpha = 0
 
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*aero_constants.e)
@@ -90,7 +114,12 @@ Dc = c_bar/V * d_dt
 Db = b/V * d_dt
 Lh = 0.8*Lw
 
-
+T1 = -9999 # placeholder, input from propulsion
+T2 = -9999 # placeholder, input from propulsion
+T3 = -9999 # placeholder, input from propulsion
+T4 = -9999 # placeholder, input from propulsion
+Tp = -9999 # placeholder, input from propulsion
+Lw = -9999 # placeholder, input from propulsion
 Lh = -9999 # placeholder, input from propulsion
 q_rad= -9999 # placeholder, input for control
 
@@ -138,32 +167,118 @@ else:
     CXalphadott = 0
     CZalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h / S / aero_constants.c_bar
     Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
-    # CZq = (Lw+Lh)*np.sin(q_rad)
-    # Cnr = -9999
-    # Cmq = -9999
-    # CYp = 0 # -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
-    # CYr = -9999
-    # Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
-    # Clr = -9999
-    # Cnp = 0 #-lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
-    # CXu = -3 * aero_constants.CD_0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    # CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
-    # CMu = 0 #(2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
-    # CXq = 0
 
-A = np.array(
-    [[CXu, CZu, Cmu],
-     [CXalpha, CZalpha, Cmalpha],
-     [CXq, CZq, Cmq],
-     [CXalphadott, CZalphadott, Cmalphadott]])
-print("""
-          CXu, CZu, Cmu,
-          CXalpha, CZalpha, 0,
-          CXq, CZq, Cmq,
-          CXalphadott, CZalphadott, 0
-""",A)
+    CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
+    Cmq = -(CL_alpha_w * l_acw**2/c_bar**2 + CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2)
+    # Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
+    if PRInt == True:
+        print('CZq = ', CZq,'Cmq = ',  Cmq)
+        print('CXalpha = ', CXalpha, 'CZalpha = ', CZalpha, 'Cmalpha = ', Cmalpha)
+        print('CXalphadott = ', CXalphadott, 'CZalphadott = ', CZalphadott, 'Cmalphadott = ', Cmalphadott)
+    CYr_v1 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v1
+    CYr_v2 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v2
+    CYr = CYr_v1+CYr_v2 + 2*CY_alpha_p*(Vp/V)**2*Sv*lp/(S*b)*0
+    Clr = CL_w+CL_h*Sh*bh/(S*b)*(Vh/V)**2 - zv/b*(CYr_v1+CYr_v2)
+    Cnr = lv/b*CYr_v1+lv/b*CYr_v2
+    print('CYr:',CYr_v1, CYr_v2)
+    print('Clr:',CL_w,CL_h,Sh,bh,S,b,Vh,V,zv,b,CYr_v1,CYr_v2)
+    print('Cnr:',lv,b,CYr_v1,CYr_v2)
+    print('CYr_v1:',Vv,V,Sv,lv,S,b,CL_alpha_v2)
+
+    CYp = -2*  8/(np.pi*3) *eta_v**2 * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
+    Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
+    Cnp = -lv / b * CYp - 1 / 8 * (CL_w + CL_h * Sh / S * bh / b)
+    CXu = -3 * CD0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    CZu = -M0**2 / (1 - M0**2)  * (CL_w + CL_h * (Sh/S))
+    CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    CXq = 0
+
+    CXdelt_e = 0
+    CZdelt_e = elevator_surface_sizing()[1] * (aero_constants.c_bar/l_h)
+    CMdelt_e = elevator_surface_sizing()[1]
+    CXdelt_t = 0
+    CZdelt_t = 0
+    CMdelt_t = 0
+
+P = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+     [0, (CZ_alphadott - 2 * mu_c) * c_bar / V, 0, 0],
+     [0, 0, -c_bar / V, 0],
+     [0, CM_alphadott * c_bar / V, 0 - 2 * mu_c * Ky_2 * c_bar / V]]
+
+Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
+     [-CZu, -CZalpha, CX0, -(CZq + 2*mu_c, 0)],
+     [0, 0, 0, -1],
+     [-Cmu, -Cmalpha, 0, -Cmq]
+
+
+R = [[-CXdelt_e,CXdelt_t],
+     [-CZdelt_e,CYdelt_t],
+     [0,0],
+     [-Cmdel_e, CMdelt_t]]
+
+A = np.linalg.inv(P) @ Q
+B = np.linalg.inv(P) @ R
+
+C = [[1,0,0,0],
+     [0,1,0,0],
+     [0,0,1,0],
+     [0,0,0,1]]
+
+D = [[0,0,0,0],
+     [0,0,0,0],
+     [0,0,0,0],
+     [0,0,0,0]]
+
+x0 = [0,0,0,0]
+start = 0
+stop = 30
+step =1
+t=np.arange(start,stop,step)
+sys = signal.StateSpace(A,B,C,D)
+# step response
+t,y = signal.step(sys, x0,t)
+plt.plot(t,y)
+plt.title('Step response')
+plt.xlabel('t')
+plt.ylabel('y')
+plt.show()
 
 
 
-# Db = -9999
-# Dc = -9999
+# print("""t
+#           CXu, CZu, CMu,
+#           CXalpha, CZalpha, 0,
+#           CXq, CZq, Cmq,
+#           CXalphadott, CZalphadott, 0
+# """, B_symm)
+
+
+
+## Short period
+# 1. V is constant which makes the udˆ equal to zero.
+# 2. As it this motion applies to the steady horizontal and symmetric flight it can be assumed that γ , Cx0
+# is zero and thus pitch rate is zero
+# 3. All inputs are 0, thus the right hand side of the equations of motion equal 0
+
+## Phugoid motion
+# 1. Constant velocity, thus, α˙ = 0
+# 2. Steady symmetric flight so Cx0 = 0
+# 3. Since the period is very long it can be assumed all vertical accelerations are zero and thus the change
+# in pitch angle q˙ = 0
+# 4. Since 2µc >> CZq in the phugoid motion we can neglect CZq
+
+## Aperiodic roll
+# 1. There is only rolling motion present. β = 0 and r = 0
+
+## Dutch roll
+# 1. 4µb >> CYr thus CYr can be neglected
+# 2. Since the roling motion is not very significant for simplicity it can be neglected. ϕ = 0 and p = 0
+# 3. The change in sideslip angle does not have a big effect on the normal force, therefore, CYβ˙ = Cnβ˙ = 0
+# 4. The aircraft’s centre of gravity moves in a straight line. This follows from the assumption that there is
+# only rotation in yaw
+
+## Aperiodic spiral
+# 1. Again due to the slow nature of the oscilation it can be assumed that all linear and angular accelerations are zero. Thus Db = 0
+# 2. The only relevant variables are yaw, roll and pitch. Therefore, CYr and CYp
+# can be neglected.
+
