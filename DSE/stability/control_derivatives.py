@@ -4,43 +4,73 @@ from DSE.Locations import locations
 from DSE.aero import aero_constants
 
 V = 42 # placeholder
-V_h = V
+Vh = V
 d_dt = 99999 # placeholder time step
-alpha_rad = 2
 
 rho = const.rho0
+m = const.total_mass
+M =0.12
+
+# Propulsion
+C_t = 9999 # placeholder, input from propulsion
+CT_alpha = 0 # placeholder, input from propulsion
+T1 = -9999 # placeholder, input from propulsion
+T2 = -9999 # placeholder, input from propulsion
+T3 = -9999 # placeholder, input from propulsion
+T4 = -9999 # placeholder, input from propulsion
+Tp = -9999 # placeholder, input from propulsion
+Lw = -9999 # placeholder, input from propulsion
+CY_alpha_p = -9999
+lp = -9999
+Vp = -9999
+
+
+# Wing properties
 S = aero_constants.S
 Sh = 1.26
 de_da = 0.42313505699610365
 b = aero_constants.b
 c_bar = aero_constants.c_bar
-m = const.total_mass
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
-CL = aero_constants.CL_cruise[0]
-CL_h = aero_constants.Cl_cruise_h
+CL_w = aero_constants.CL_cruise[0]
+CL_w = aero_constants.CL_cruise[0]
 CL0 = aero_constants.CL_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
-CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
-CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
-Theta_0 = 9999 # placeholder
-T = 288.15 - 0.0065 * 500
-M0 = V/(np.sqrt(1.4*287.15*T))
-CDM = Cd * M0 / (1-M0**2)
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
 taper_w = aero_constants.taper
-Cl_h = aero_constants.Cl_cruise_h
-Cl_alpha_h = aero_constants.Cl_alpha_h
-Cd0_h = 9999 # placeholder, input from aerodynamics
-AR_h = 6.8 # import from horizonal
+e = aero_constants.e
+
+# Tail properties
+    # Horizontal
+# Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
+AR_h = 6.8 # import from horizontal
+Sh = 0.538 # import from horizontal
 bh = 2.3 # import from horizontal
-Cl_alpha_v = aero_constants.Cl_alpha_v
+CL_h = aero_constants.Cl_cruise_h
+Cl_alpha_h = aero_constants.Cl_alpha_h
+eta = 0.95
+de_da = horizontal_tail_sizing()[4]
+V_h = Vh
+
+    # Vertical
+bv =  0.60188057586457
+Sv = 0.1811301138015332
+lv = 2.452651830421447
 AR_v = 1.9
-sweep_v = 22
-eta_v = 0.95    # assumption
-M =0.12 # base
+sweep_v = 11
+eta_v = 0.90    # assumption
+Cl_alpha_v = aero_constants.Cl_alpha_v
+Vv = V
+lv = -9999
+#CL_alpha_v1 = aero_constants.CL_alpha_v
+#CL_alpha_v2 = CL_alpha_v1
+
+# Initial Calucaltions
+M0 = V/(np.sqrt(1.4*287.15*T))
+CDM = Cd * M0 / (1-M0**2)
 beta = np.sqrt(1-M**2)
 eta = 0.95
 CT = 0.01 
@@ -58,16 +88,19 @@ mu_b = m/(rho*S*b)
 Kx_2 = Ixx/(m*b**2)
 Dc = c_bar/V * d_dt
 Db = b/V * d_dt
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
+Lh = 0.8*Lw
+
+
 Lh = -9999 # placeholder, input from propulsion
 q_rad= -9999 # placeholder, input for control
 
 l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
+Z_m = -9999
+
+
+
+zv = -9999
+CD0 = -9999
 
 vtol=False
 if vtol:
@@ -82,7 +115,10 @@ if vtol:
     CXalphadott = 0
     CZalphadott = 0
     Cmalphadott = 0
-    CZq = (T1+T2+T3+T4)*np.sin(q_rad)
+    CZq = -9999
+    Cmq = -9999
+
+    CYr = -9999
     Cnr = -9999
     Cmq = -9999
     CYr = 0
@@ -116,10 +152,14 @@ else:
     # CXq = 0
 
 A = np.array(
-    [[CXalpha, CZalpha, Cmalpha],
+    [[CXu, CZu, Cmu],
+     [CXalpha, CZalpha, Cmalpha],
+     [CXq, CZq, Cmq],
      [CXalphadott, CZalphadott, Cmalphadott]])
 print("""
-          CXalpha, CZalpha, Cmalpha,
+          CXu, CZu, Cmu,
+          CXalpha, CZalpha, 0,
+          CXq, CZq, Cmq,
           CXalphadott, CZalphadott, 0
 """,A)
 

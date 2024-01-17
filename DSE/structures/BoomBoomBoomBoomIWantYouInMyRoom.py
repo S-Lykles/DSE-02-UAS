@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from DSE import plot_setting
+
 
 def create_boom(N, w, h):
     bottom = np.column_stack((np.linspace(-w/2, w/2, int(N/4)), -h/2*np.ones(int(N/4))))
@@ -42,31 +44,38 @@ def shear_flow(Ixx, w, h, t, boom_co, Sy):
     #Left plate shear
     shear_flow[int(3*N/4):int(N)] =  shear_flow[int(N/4):int(N/2)]
 
-
-
     return shear_flow
 
-N = 400
-w = 0.125
-h = 2*0.0875
-t = 0.025
-Mx = 0
-My = -10
-Sx = 00
-Sy = -200000
 
 
-boom = create_boom(N, w, h)
-Ixx, Iyy = sec_prop(w, h, t)
-bending = stress_bend(Ixx, Iyy, boom, Mx, My)
-shear = shear_flow(Ixx, w, h, t, boom, Sy)
-print(shear[0])
-print(max(abs(shear)))
-plot = True
-if plot == True:
-    plt.scatter(boom[:,0], boom[:,1], c = shear)
-    plt.colorbar()
-    ax = plt.gca()
-    ax.set_aspect('equal', adjustable='box')
-    plt.grid()
-    plt.show()
+if __name__ == '__main__':
+
+    #INPUT
+    N = 400         #must be divisible by 4
+    w = 0.125       #m
+    h = 0.125       #m
+    t = 0.025       #m
+    Mx = 10000      #Nm
+    My = 10000      #Nm
+    Sx = 00         #N
+    Sy = -200000    #N
+
+
+    boom = create_boom(N, w, h)
+    Ixx, Iyy = sec_prop(w, h, t)
+    bending = stress_bend(Ixx, Iyy, boom, Mx, My)
+    shear = shear_flow(Ixx, w, h, t, boom, Sy)
+
+
+    plot = True
+    if plot == True:
+        plt.rcParams.update(plot_setting.report_fast)
+        plt.scatter(boom[:,0], boom[:,1], c = shear/t)
+        plt.xlabel('x-coordinate')
+        plt.ylabel('y-coordinate')
+        plt.grid()
+        cbar = plt.colorbar()
+        cbar.set_label('Stress [Pa]')
+        ax = plt.gca()
+        ax.set_aspect('equal', adjustable='box')
+        plt.show()

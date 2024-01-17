@@ -88,6 +88,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     check_y =[]
     for i in range(len(A_hh)):
        # print(i,len(A_hh))
+        # print(i,len(A_hh))
         if A_hh[i] == 6.8:
             PloT=False
         else:
@@ -156,7 +157,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
             check_y.append(1000)
 
         delta_x_cg_bar = x1-x2
-        #print('dcg',x1,x2)
+        # print('dcg',x1,x2)
         d_xcg.append(delta_x_cg_bar)
 
 
@@ -171,7 +172,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         # print('plot sr_h:',surface_ratio)
         surface_ratio =np.maximum(y1, y2)
         sr.append(surface_ratio)
-        #print('sur.r.:', surface_ratio+y_datum_shift)
+        # print('sur.r.:', surface_ratio+y_datum_shift)
 
 
         if delta_x_cg_bar> dcg:
@@ -182,7 +183,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         # print()
         xlemac_lf = [x-y_datum_shift for x in xlemac_lf]
         # xlemac_lf=xlemac_lf-1.57
-        # PloT = True
+        PloT = False
         if PloT == True:
             print(surface_ratio*S/2.3,surface_ratio)
             plt.plot(x_cg_bar, Sh_S, label ='stab')
@@ -262,8 +263,6 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-
-
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
     Sh_S = horizontal_tail_sizing()[0]
@@ -277,7 +276,7 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v = 0.379330269781324, l_v = 1.2354894391032434, S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
+def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v =0.1811301138015332, l_v =  2.452651830421447, S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
@@ -433,6 +432,15 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0
 
 
 def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=1.5,deg2rad=const.deg2rad):
+    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
+     Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+     Assumptions made during these calculations:
+     Currently there is no interaction between the wing,body,horizontal tail and vertical tail (d_sigma / d_beta = 0)
+     The induced velocity interaction between the tail-less aircraft and vertical tail is assumed to be 1=( V_hv / V)**2
+     The location of the CG and fuselage length where assumed on 10/01/24 and can therefore differ from the current design.
+     The tail volume and Yawing moment coefficient used in this calculation where based on a literature study on small single propellor aircraft.
+     A small taper ratio was used during the sizing this was based on a literature study regression.
+     The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
     Mission = 1  # Mission phase 0=transition, 1=Cruise
     number_vertical_tail = 2
     PRINT = True  # Printing the optimal values
@@ -447,7 +455,7 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     steps = 100
     iteration = 100
     # intergration space
-    AR_v = np.arange(0.5, 2, 0.1)
+    AR_v = np.arange(0.5, 2.5, 0.1)
     sweep_v = np.arange(0, 45, 1)
     taper_v = np.arange(0.4, 1.1, 0.1)
 
@@ -463,7 +471,7 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     M = 0.12  # FIXT IMPORTS
 
     # initial starting values
-    tail_volume = 0.055 / number_vertical_tail  # FIXT IMPORTS
+    tail_volume = 0.035 / number_vertical_tail  # FIXT IMPORTS
     C_eta_beta = 0.058  # FIXT IMPORTS
 
     Sh = np.sqrt(AR_h * bh)
@@ -569,10 +577,10 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     PRINT = True
 
     # weight for optimization
-    weight_surf = 0.3
-    weight_AR = 0.3
-    weight_span = -0.3
-    weight_boom = 1.2
+    weight_surf = 1.2
+    weight_AR = 0.7
+    weight_span = -0.2
+    weight_boom = 0.6
     weight_root_cord = 1.9
     weight_taper = -0.1
 
@@ -615,6 +623,15 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     optimal_boom = boom_length[q_opt][p_opt][j_opt][r_opt]
     optimal_taper = taper_v[q_opt]
 
+    S_v = optimal_surface_v
+    b_v = optimal_span_v
+    l_v = optimal_moment_arm
+    root_cord_v = optimal_root_cord
+    sweep_v = optimal_sweep_v
+    Aspect_v = optimal_AR_v
+    Taper_v = optimal_taper
+    cg_trailing_edge_boom = optimal_boom
+
     if PRINT == True:
         print('----------------------------------------------------------------')
         print('')
@@ -634,4 +651,4 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     print('rotor position =', X_rot_aft)
     print('update weights')
 
-    return
+    return S_v,b_v,l_v,root_cord_v,sweep_v,Aspect_v,Taper_v,cg_trailing_edge_boom

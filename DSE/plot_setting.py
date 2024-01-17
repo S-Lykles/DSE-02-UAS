@@ -14,7 +14,7 @@ settings = {
     'axes.grid.which': 'both',
     "axes.labelsize": "medium",
     "axes.titlesize": "medium",
-    "figure.labelsize": "medium",
+    #"figure.labelsize": "medium",
     "figure.titlesize": "medium",
     # Make the legend/label fonts a little smaller
     "legend.fontsize": "small",

@@ -66,3 +66,9 @@ sweep_ang_25_c_rad_winglet = 45 * const.deg2rad
 S_winglet = 0.21
 b_winglet = 0.45
 c_root_winglet = 0.333
+<<<<<<< HEAD
+=======
+
+Cl_alpha_wing = (cl_23012_airfoil[20]-cl_23012_airfoil[0])/((alpha_23012_airfoil[20]-alpha_23012_airfoil[0])*pi/180)
+print(Cl_alpha_h)
+>>>>>>> d9a488dc76dc5fb12efdbdb579fbbd6201adcb03
