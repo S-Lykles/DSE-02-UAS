@@ -276,7 +276,7 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v = Tail_opt_DO_NOT_RUN()[0], l_v = Tail_opt_DO_NOT_RUN()[2], S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
+def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v =0.1811301138015332, l_v =  2.452651830421447, S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
