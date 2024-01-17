@@ -60,3 +60,5 @@ sweep_ang_25_c_rad_winglet = 45 * const.deg2rad
 S_winglet = 0.21
 b_winglet = 0.45
 c_root_winglet = 0.333
+
+print(Cl_alpha_h)
