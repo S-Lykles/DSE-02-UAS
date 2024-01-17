@@ -2,48 +2,91 @@ import numpy as np
 from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
+from DSE.stability.tail_sizing import horizontal_tail_sizing
+
+print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
+
 
 V = 42 # placeholder
-V_h = V
+Vh = V
 d_dt = 99999 # placeholder time step
+T = 288.15 - 0.0065 * 500
 
-rho = const.rho0
-S = aero_constants.S
-Sh = 9999 # placeholder horizontal tail surface
-b = aero_constants.b
-c_bar = aero_constants.c_bar
-m = const.total_mass
-Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
-CL = aero_constants.CL_cruise[0]
-CL_h = aero_constants.Cl_cruise_h
-CL0 = aero_constants.CL_0
-sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
+
+##   !!! Imported Values !!!
+##  !! still undifend and not placed !!
+Theta_0 = 9999 # placeholder
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
-Theta_0 = 9999 # placeholder
-T = 288.15 - 0.0065 * 500
-M0 = V/(sqrt(1.4*287.15*T))
-CDM = Cd * M0 / (1-M0**2)
+Cd0_h = 9999 # placeholder, input from aerodynamics
+
+# Base
+rho = const.rho0
+m = const.total_mass
+M =0.12
+
+# Propulsion
+C_t = 9999 # placeholder, input from propulsion
+CT_alpha = 0 # placeholder, input from propulsion
+T1 = -9999 # placeholder, input from propulsion
+T2 = -9999 # placeholder, input from propulsion
+T3 = -9999 # placeholder, input from propulsion
+T4 = -9999 # placeholder, input from propulsion
+Tp = -9999 # placeholder, input from propulsion
+Lw = -9999 # placeholder, input from propulsion
+CY_alpha_p = -9999
+lp = -9999
+Vp = -9999
+
+
+# Wing properties
+S = aero_constants.S
+b = aero_constants.b
+c_bar = aero_constants.c_bar
+Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
+CL_w = aero_constants.CL_cruise[0]
+CL_w = aero_constants.CL_cruise[0]
+CL0 = aero_constants.CL_0
+sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
 Cd0_w = aero_constants.CD0_wing
 Cr_w = aero_constants.c_root
 taper_w = aero_constants.taper
-Cl_h = aero_constants.Cl_cruise_h
-Cl_alpha_h = aero_constants.Cl_alpha_h
-Cd0_h = 9999 # placeholder, input from aerodynamics
-AR_h = 6.8 # import from horizonal
+e = aero_constants.e
+
+# Tail properties
+    # Horizontal
+# Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
+AR_h = 6.8 # import from horizontal
 Sh = 0.538 # import from horizontal
 bh = 2.3 # import from horizontal
-Cl_alpha_v = aero_constants.Cl_alpha_v
-AR_v = 1.9
-sweep_v = 22
-eta_v = 0.95    # assumption
-M =0.12 # base
-beta = np.sqrt(1-M**2)
+CL_h = aero_constants.Cl_cruise_h
+Cl_alpha_h = aero_constants.Cl_alpha_h
 eta = 0.95
+de_da = horizontal_tail_sizing()[4]
+V_h = Vh
 
-CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
+    # Vertical
+bv =  0.60188057586457
+Sv = 0.1811301138015332
+lv = 2.452651830421447
+AR_v = 1.9
+sweep_v = 11
+eta_v = 0.90    # assumption
+Cl_alpha_v = aero_constants.Cl_alpha_v
+Vv = V
+lv = -9999
+#CL_alpha_v1 = aero_constants.CL_alpha_v
+#CL_alpha_v2 = CL_alpha_v1
+
+# Initial Calucaltions
+M0 = V/(np.sqrt(1.4*287.15*T))
+CDM = Cd * M0 / (1-M0**2)
+beta = np.sqrt(1-M**2)
+
+
+CD_alpha_w = CL_alpha_w * 2 * CL_w / (np.pi * b*b/S*e)
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
 Ixz = -9999 # placeholder, input from structures
@@ -55,16 +98,19 @@ mu_b = m/(rho*S*b)
 Kx_2 = Ixx/(m*b**2)
 Dc = c_bar/V * d_dt
 Db = b/V * d_dt
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
+Lh = 0.8*Lw
+
+
 Lh = -9999 # placeholder, input from propulsion
 q_rad= -9999 # placeholder, input for control
 
 l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
+Z_m = -9999
+
+
+
+zv = -9999
+CD0 = -9999
 
 vtol=False
 if vtol:
@@ -79,7 +125,10 @@ if vtol:
     CXalphadott = 0
     CZalphadott = 0
     Cmalphadott = 0
-    CZq = (T1+T2+T3+T4)*np.sin(q_rad)
+    CZq = -9999
+    Cmq = -9999
+
+    CYr = -9999
     Cnr = -9999
     Cmq = -9999
     CYr = 0
@@ -92,39 +141,76 @@ if vtol:
 
 else:
     CX0 = Tp / (0.5*rho*S*V**2) - Cd
-    CZ0 = -CL - CL_h*(S_h/S) * (V_h/V**2)
-    CXalpha = - Cd_alpha
-    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
-    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar  
+    CZ0 = -CL_w - CL_h*(Sh/S) * (Vh/V**2)
+    CXalpha = CL_alpha_w * aero_constants.alpha_0 + aero_constants.CL_initial_conditions - Cd_alpha + CT_alpha
+    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h * Sh / S
+    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar
     CXalphadott = 0
-    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
-    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
-    CZq = (Lw+Lh)*np.sin(q_rad)
-    Cnr = -9999
-    Cmq = -9999
-    CYp = -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
-    CYr = -9999
+    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h / S / aero_constants.c_bar
+    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
+
+    CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
+    Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2
+    # Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
+
+    print('CZq = ', CZq,'Cmq = ',  Cmq)
+    print('Czq values,', -CL_alpha_w,CL_alpha_h,l_h,Sh,c_bar,S,(Vh/V)**2)
+    CYr_v1 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v1
+    CYr_v2 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v2
+    CYr = CYr_v1+CYr_v2 + 2*CY_alpha_p*(Vp/V)**2*Sv*lp/(S*b)
+
+    Clr = CL_w+CL_h*Sh*bh/(S*b)*(Vh/V)**2 - zv/b*(CYr_v1+CYr_v2)
+    Cnr = lv/b*CYr_v1+lv/b*CYr_v2
+
+    CYp = -2*  8/(np.pi*3) *eta_v**2 * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
     Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
-    Clr = -9999
-    Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
-    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
-    CMu = (2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    Cnp = -lv / b * CYp - 1 / 8 * (CL_w + CL_h * Sh / S * bh / b)
+    CXu = -3 * CD0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    CZu = -M0**2 / (1 - M0**2)  * (CL_w + CL_h * (Sh/S))
+    CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
     CXq = 0
 
-A = np.array(
-    [[CXu, CZu, Cmu],
-     [CXalpha, CZalpha, Cmalpha],
-     [CXq, CZq, Cmq],
-     [CXalphadott, CZalphadott, Cmalphadott]])
-print("""
-          CXu, CZu, Cmu,
-          CXalpha, CZalpha, 0,
-          CXq, CZq, Cmq,
-          CXalphadott, CZalphadott, 0
-""",A)
+# A = np.array([
+#     [CXu, CZu, CMu],
+#     [CXalpha, CZalpha, Cmalpha],
+#     [CXq, CZq, Cmq],
+#     [CXalphadott, CZalphadott, Cmalphadott]
+# ])
+#
+# print("""
+#           CXu, CZu, CMu,
+#           CXalpha, CZalpha, 0,
+#           CXq, CZq, Cmq,
+#           CXalphadott, CZalphadott, 0
+# """, A)
 
 
 
-# Db = -9999
-# Dc = -9999
+## Short period
+# 1. V is constant which makes the udˆ equal to zero.
+# 2. As it this motion applies to the steady horizontal and symmetric flight it can be assumed that γ , Cx0
+# is zero and thus pitch rate is zero
+# 3. All inputs are 0, thus the right hand side of the equations of motion equal 0
+
+## Phugoid motion
+# 1. Constant velocity, thus, α˙ = 0
+# 2. Steady symmetric flight so Cx0 = 0
+# 3. Since the period is very long it can be assumed all vertical accelerations are zero and thus the change
+# in pitch angle q˙ = 0
+# 4. Since 2µc >> CZq in the phugoid motion we can neglect CZq
+
+## Aperiodic roll
+# 1. There is only rolling motion present. β = 0 and r = 0
+
+## Dutch roll
+# 1. 4µb >> CYr thus CYr can be neglected
+# 2. Since the roling motion is not very significant for simplicity it can be neglected. ϕ = 0 and p = 0
+# 3. The change in sideslip angle does not have a big effect on the normal force, therefore, CYβ˙ = Cnβ˙ = 0
+# 4. The aircraft’s centre of gravity moves in a straight line. This follows from the assumption that there is
+# only rotation in yaw
+
+## Aperiodic spiral
+# 1. Again due to the slow nature of the oscilation it can be assumed that all linear and angular accelerations are zero. Thus Db = 0
+# 2. The only relevant variables are yaw, roll and pitch. Therefore, CYr and CYp
+# can be neglected.
+
