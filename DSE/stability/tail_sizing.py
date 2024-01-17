@@ -610,7 +610,7 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     M = 0.12  # FIXT IMPORTS
 
     # initial starting values
-    tail_volume = 0.055 / number_vertical_tail  # FIXT IMPORTS
+    tail_volume = 0.035 / number_vertical_tail  # FIXT IMPORTS
     C_eta_beta = 0.058  # FIXT IMPORTS
 
     Sh = np.sqrt(AR_h * bh)
@@ -716,10 +716,10 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     PRINT = True
 
     # weight for optimization
-    weight_surf = 0.3
+    weight_surf = 1.2
     weight_AR = 0.3
-    weight_span = -0.3
-    weight_boom = 1.2
+    weight_span = -0.2
+    weight_boom = 0.6
     weight_root_cord = 1.9
     weight_taper = -0.1
 
