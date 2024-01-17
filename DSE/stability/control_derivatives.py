@@ -19,10 +19,20 @@ CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cr
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
 Cd0_h = 9999 # placeholder, input from aerodynamics
 
+
 # Base
 rho = const.rho0
 m = const.total_mass
 M =0.12
+
+# Propulsion
+C_t = 9999 # placeholder, input from propulsion
+T1 = -9999 # placeholder, input from propulsion
+T2 = -9999 # placeholder, input from propulsion
+T3 = -9999 # placeholder, input from propulsion
+T4 = -9999 # placeholder, input from propulsion
+Tp = -9999 # placeholder, input from propulsion
+Lw = -9999 # placeholder, input from propulsion
 
 # Wing properties
 S = aero_constants.S
@@ -49,8 +59,13 @@ bh = 2.3 # import from horizontal
 CL_h = aero_constants.Cl_cruise_h
 Cl_alpha_h = aero_constants.Cl_alpha_h
 eta = 0.95
+de_da = horizontal_tail_sizing()[4]
+V_h = Vh
 
     # Vertical
+bv = 0.848956720089143
+Sv = 0.379330269781324
+lv = 1.2354894391032434
 AR_v = 1.9
 sweep_v = 22
 eta_v = 0.95    # assumption
@@ -74,13 +89,7 @@ mu_b = m/(rho*S*b)
 Kx_2 = Ixx/(m*b**2)
 Dc = c_bar/V * d_dt
 Db = b/V * d_dt
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
-Lh = -9999 # placeholder, input from propulsion
+Lh = 0.8*Lw
 q_rad= -9999 # placeholder, input for control
 
 l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
@@ -119,8 +128,8 @@ else:
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar
     CXalphadott = 0
-    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
-    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
+    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h / S / aero_constants.c_bar
+    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
 
     CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
     Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
@@ -134,10 +143,10 @@ else:
 
     CYp = -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
     Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
-    Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
-    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
-    CMu = (2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    Cnp = -lv / b * CYp - 1 / 8 * (CL_w + CL_h * Sh / S * bh / b)
+    CXu = -3 * Cd0_w - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    CZu = -M0**2 / (1 - M0**2)  * (CL_w + CL_h * (Sh/S))
+    CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * h_p) * ((2 * h_p)/(V * c_bar))
     CXq = 0
 
 A = np.array(
@@ -146,7 +155,7 @@ A = np.array(
      [CXq, CZq, Cmq],
      [CXalphadott, CZalphadott, Cmalphadott]])
 print("""
-          CXu, CZu, Cmu,
+          CXu, CZu, CMu,
           CXalpha, CZalpha, 0,
           CXq, CZq, Cmq,
           CXalphadott, CZalphadott, 0
