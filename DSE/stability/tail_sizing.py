@@ -89,7 +89,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     for i in range(len(A_hh)):
        # print(i,len(A_hh))
         if A_hh[i] == 6.8:
-            PloT=True
+            PloT=False
         else:
             PloT=False
         A_h = A_hh[i]
