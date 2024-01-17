@@ -2,7 +2,7 @@ import numpy as np
 from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
-from DSE.stability.tail_sizing import horizontal_tail_sizing
+from DSE.stability.tail_sizing import horizontal_tail_sizing, elevator_surface_sizing
 
 print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
 
@@ -11,7 +11,6 @@ V = 42 # placeholder
 Vh = V
 d_dt = 99999 # placeholder time step
 T = 288.15 - 0.0065 * 500
-
 
 ##   !!! Imported Values !!!
 ##  !! still undifend and not placed !!
@@ -136,8 +135,8 @@ if vtol:
     CX0 = 0
     CZ0 = -1*(T1+T2+T3+T4)/(0.5*rho*S*V**2)
     CXu = 0
-    CZu = -9999
-    CMu = -9999
+    CZu = 0
+    CMu = 0
     CXalpha = 0
     CZalpha = 0
     Cmalpha = 0
@@ -190,13 +189,15 @@ else:
     Cnp = -lv / b * CYp - 1 / 8 * (CL_w + CL_h * Sh / S * bh / b)
     CXu = -3 * CD0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
     CZu = -M0**2 / (1 - M0**2)  * (CL_w + CL_h * (Sh/S))
-    CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    # CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    CMu = M0**2 / (1 - M0**2) * (CL_w * (l_acw/c_bar) - CL_h * ((l_h * S)/(c_bar * Sh)) - Cd0_w * (Zac/c_bar))
     CXq = 0
 
     CXdelt_e = 0
     CZdelt_e = elevator_surface_sizing()[1] * (aero_constants.c_bar/l_h)
     CMdelt_e = elevator_surface_sizing()[1]
     CXdelt_t = 0
+    CYdelt_t = 0
     CZdelt_t = 0
     CMdelt_t = 0
 
@@ -238,7 +239,7 @@ sys = signal.StateSpace(A,B,C,D)
 # step response
 t,y = signal.step(sys, x0,t)
 plt.plot(t,y)
-plt.title('Step response')
+plt.title('Step response ')
 plt.xlabel('t')
 plt.ylabel('y')
 plt.show()
