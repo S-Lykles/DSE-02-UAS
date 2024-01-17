@@ -77,8 +77,8 @@ eta_v = 0.90    # assumption
 Cl_alpha_v = aero_constants.Cl_alpha_v
 Vv = V
 lv = -9999
-CL_alpha_v1 = aero_constants.CL_alpha_v
-CL_alpha_v2 = CL_alpha_v1
+#CL_alpha_v1 = aero_constants.CL_alpha_v
+#CL_alpha_v2 = CL_alpha_v1
 
 # Initial Calucaltions
 M0 = V/(np.sqrt(1.4*287.15*T))
@@ -100,12 +100,7 @@ Dc = c_bar/V * d_dt
 Db = b/V * d_dt
 Lh = 0.8*Lw
 
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
+
 Lh = -9999 # placeholder, input from propulsion
 q_rad= -9999 # placeholder, input for control
 
