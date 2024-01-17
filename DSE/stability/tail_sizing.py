@@ -263,154 +263,6 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-
-
-def vertical_tail_size(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=aero_constants.CL_cruise,Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=class_two_cg_estimation(True, False, False,  False)[1][0],deg2rad=const.deg2rad):
-    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
-     Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
-     Assumptions made during these calculations:
-     Currently there is no interaction between the wing,body,horizontal tail and vertical tail (d_sigma / d_beta = 0)
-     The induced velocity interaction between the tail-less aircraft and vertical tail is assumed to be 1=( V_hv / V)**2
-     The location of the CG and fuselage length where assumed on 10/01/24 and can therefore differ from the current design.
-     The tail volume and Yawing moment coefficient used in this calculation where based on a literature study on small single propellor aircraft.
-     A small taper ratio was used during the sizing this was based on a literature study regression.
-     The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
-
-    PRINT = False  # for values set to true
-    l_o = 4.15  # distance value
-    # initial starting values
-    number_vertical_tail = 2
-    tail_volume = 0.055 / number_vertical_tail
-    C_eta_beta = 0.058
-    taper_v = 0.7
-    AR_w = b ** 2 / S
-    M = 0.12
-
-   # intergration space
-    AR_v = np.arange(0.5, 2, 0.05)
-    sweep_v = np.arange(0, 45, 1)
-
-    # Empty list set
-    Surface = []
-    Span = []
-    Moment_arm = []
-    root_cord = []
-    X_LEMAC_Vert = []
-    num = 0
-
-    for p in range(len(AR_v)):
-        Surface_k = []
-        span_k = []
-        moment_arm_k = []
-        Cv_r_k = []
-        X_LEMAC_k =[]
-        for j in range(len(sweep_v)):
-
-            lv = 2
-            Sv = tail_volume * S * b / lv
-
-            for k in range(100):
-                bv = np.sqrt(AR_v[p] * Sv)
-
-                Cv_r = 2 / (1 + taper_v) * (Sv / bv)
-                Cv_bar = 2 / 3 * Cv_r * ((1 + taper_v + taper_v ** 2) / (1 + taper_v))
-
-                # Updated values
-                X_LEMAC_v = bv / 6 * ((1 + 2 * taper_v) / (1 + taper_v)) * np.tan(sweep_v[j] * deg2rad)
-                lv = l_o - Xcg - Cv_r + X_LEMAC_v + 0.25 * Cv_bar
-
-                # Update C_eta_beta
-                sweep_05_cord_v = sweep_v[j]  # for now a constant sweep is assumed
-                Beta = np.sqrt(1 - M ** 2)
-                CL_v_alpha = (Cl_alpha_v * AR_v[p]) / (2 + np.sqrt(
-                    4 + (((AR_v[p] * Beta) / eta) ** 2) * (((np.tan(sweep_05_cord_v * deg2rad)) ** 2 / Beta ** 2) + 1)))
-
-                C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w)  # + CL_h**2 / (4*np.pi*AR_h)* (Sh*bh) / (S*b)
-                new = 4 / 3 * np.pi * l_fus / 2 * (b_max / 2) ** 2
-                C_eta_beta_fuse = -2 / (S * b) * new
-
-                # Update tail surface
-                Sv = 1 / number_vertical_tail * (C_eta_beta - C_eta_beta_fuse - C_eta_beta_w) / (CL_v_alpha) * (
-                            S * b) / lv
-                num = num + 1
-
-                # List of all values
-            X_LEMAC_k.append(X_LEMAC_v)
-            Cv_r_k.append(Cv_r)
-            Surface_k.append(Sv)
-            span_k.append(bv)
-            moment_arm_k.append(lv)
-        X_LEMAC_Vert.append(X_LEMAC_k)
-        root_cord.append(Cv_r_k)
-        Surface.append(Surface_k)
-        Span.append(span_k)
-        Moment_arm.append(moment_arm_k)
-
-    plot = False
-
-    N = 50  # Resolution
-    optimal_sweep_v = 10
-    optimal_AR_v = 1.025
-
-    BB = 0
-    BBB = 0
-    for i in range(len(AR_v)):
-        if AR_v[i] >= optimal_AR_v:
-            if AR_v[i - 1] <= optimal_AR_v:
-                BB = i - 1
-    for i in range(len(sweep_v)):
-        if sweep_v[i] >= optimal_sweep_v:
-            if sweep_v[i - 1] <= optimal_sweep_v:
-                BBB = i - 1
-    optimal_X_LEMAC_v = X_LEMAC_Vert[BB][BBB]
-    optimal_surface_v = Surface[BB][BBB]
-    optimal_span_v = Span[BB][BBB]
-    optimal_moment_arm = Moment_arm[BB][BBB]
-    optimal_root_cord = root_cord[BB][BBB]
-
-    if PRINT == True:
-        print('The optimal values for a single vertical tail are:')
-        print('Surface area :', optimal_surface_v, 'm^2')
-        print('Span :', optimal_span_v, 'm')
-        print('Moment arm :', optimal_moment_arm, 'm')
-        print('Root cord :', optimal_root_cord, 'm')
-
-    if plot == True:
-        fig, (ax, ay, az) = plt.subplots(1, 3)
-        cp = ax.contourf(sweep_v, AR_v, Surface, N)
-        fig.colorbar(cp)  # Add a colorbar to a plot
-        ax.set_title('Vertical tail surface (Sv)')
-        ax.set_xlabel('Sweep angle vertical tail')
-        ax.set_ylabel('Aspect ratio vertical tail')
-        ax.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
-
-        cy = ay.contourf(sweep_v, AR_v, Span, N)
-        Cy = ay.contour(sweep_v, AR_v, Span, levels=[0.6], colors=('white'))
-        ay.clabel(Cy, inline=True, fontsize=10)
-        fig.colorbar(cy)
-        ay.set_title('Span of a single vertical tail plaine (bv)')
-        ay.set_xlabel('Sweep angle vertical tail')
-        ay.set_ylabel('Aspect ratio vertical tail')
-        ay.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
-
-        cz = az.contourf(sweep_v, AR_v, Moment_arm, N)
-        fig.colorbar(cz)
-        az.set_title('Moment arm of the vertical tail plaine (lv)')
-        az.set_xlabel('Sweep angle vertical tail')
-        az.set_ylabel('Aspect ratio vertical tail')
-        az.scatter(optimal_sweep_v, optimal_AR_v, color=['red'])
-
-    Sv = optimal_surface_v
-    bv = optimal_span_v
-    l_v = optimal_moment_arm
-    AR_v = optimal_AR_v
-    root_cord_v = optimal_root_cord
-    Sweep_v = optimal_sweep_v
-    X_LEMAC_VERT = optimal_X_LEMAC_v
-
-    return Sv, bv, l_v, AR_v, root_cord_v, Sweep_v, taper_v, X_LEMAC_VERT
-
-
 def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
     Sh_S = horizontal_tail_sizing()[0]
@@ -424,7 +276,7 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
-def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v = 0.379330269781324, l_v = 1.2354894391032434, S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
+def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v = Tail_opt_DO_NOT_RUN()[0], l_v = Tail_opt_DO_NOT_RUN()[2], S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
@@ -580,6 +432,15 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_inner_frac = 0
 
 
 def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,Xcg=1.5,deg2rad=const.deg2rad):
+    """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
+     Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
+     Assumptions made during these calculations:
+     Currently there is no interaction between the wing,body,horizontal tail and vertical tail (d_sigma / d_beta = 0)
+     The induced velocity interaction between the tail-less aircraft and vertical tail is assumed to be 1=( V_hv / V)**2
+     The location of the CG and fuselage length where assumed on 10/01/24 and can therefore differ from the current design.
+     The tail volume and Yawing moment coefficient used in this calculation where based on a literature study on small single propellor aircraft.
+     A small taper ratio was used during the sizing this was based on a literature study regression.
+     The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
     Mission = 1  # Mission phase 0=transition, 1=Cruise
     number_vertical_tail = 2
     PRINT = True  # Printing the optimal values
@@ -594,7 +455,7 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     steps = 100
     iteration = 100
     # intergration space
-    AR_v = np.arange(0.5, 2, 0.1)
+    AR_v = np.arange(0.5, 2.5, 0.1)
     sweep_v = np.arange(0, 45, 1)
     taper_v = np.arange(0.4, 1.1, 0.1)
 
@@ -717,7 +578,7 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
 
     # weight for optimization
     weight_surf = 1.2
-    weight_AR = 0.3
+    weight_AR = 0.7
     weight_span = -0.2
     weight_boom = 0.6
     weight_root_cord = 1.9
@@ -762,6 +623,15 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     optimal_boom = boom_length[q_opt][p_opt][j_opt][r_opt]
     optimal_taper = taper_v[q_opt]
 
+    S_v = optimal_surface_v
+    b_v = optimal_span_v
+    l_v = optimal_moment_arm
+    root_cord_v = optimal_root_cord
+    sweep_v = optimal_sweep_v
+    Aspect_v = optimal_AR_v
+    Taper_v = optimal_taper
+    cg_trailing_edge_boom = optimal_boom
+
     if PRINT == True:
         print('----------------------------------------------------------------')
         print('')
@@ -781,4 +651,4 @@ def Tail_opt_DO_NOT_RUN(l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_con
     print('rotor position =', X_rot_aft)
     print('update weights')
 
-    return
+    return S_v,b_v,l_v,root_cord_v,sweep_v,Aspect_v,Taper_v,cg_trailing_edge_boom

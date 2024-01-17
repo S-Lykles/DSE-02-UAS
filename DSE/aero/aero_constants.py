@@ -62,4 +62,4 @@ b_winglet = 0.45
 c_root_winglet = 0.333
 
 Cl_alpha_wing = (cl_23012_airfoil[20]-cl_23012_airfoil[0])/((alpha_23012_airfoil[20]-alpha_23012_airfoil[0])*pi/180)
-print(Cl_alpha_wing)
+print(Cl_alpha_h)
