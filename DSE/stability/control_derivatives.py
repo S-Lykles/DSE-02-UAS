@@ -2,14 +2,16 @@ import numpy as np
 from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
-from DSE.stability.tail_sizing import horizontal_tail_sizing
+
 V = 42 # placeholder
 V_h = V
 d_dt = 99999 # placeholder time step
+alpha_rad = 2
 
 rho = const.rho0
 S = aero_constants.S
-Sh = horizontal_tail_sizing()[0] # placeholder horizontal tail surface
+Sh = 1.26
+de_da = 0.42313505699610365
 b = aero_constants.b
 c_bar = aero_constants.c_bar
 m = const.total_mass
@@ -41,8 +43,10 @@ eta_v = 0.95    # assumption
 M =0.12 # base
 beta = np.sqrt(1-M**2)
 eta = 0.95
+CT = 0.01 
+CT_alpha = 0
 
-CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*e)
+CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*aero_constants.e)
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
 Ixz = -9999 # placeholder, input from structures
@@ -90,36 +94,32 @@ if vtol:
     CXq = 0
 
 else:
-    CX0 = Tp / (0.5*rho*S*V**2) - Cd
-    CZ0 = -CL_w - CL_h*(S_h/S) * (V_h/V**2)
-    CXalpha = - Cd_alpha
-    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h 
-    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar- aero_constants.Cl_alpha_h * l_h / aero_constants.c_bar- CD_alpha_w * Zac / aero_constants.c_bar  
+    # CX0 = Tp / (0.5*rho*S*V**2) - Cd
+    # CZ0 = -CL - CL_h*(Sh/S) * (V_h/V**2)
+    CXalpha = CL_alpha_w * aero_constants.alpha_0 + aero_constants.CL_initial_conditions - Cd_alpha + CT_alpha
+    CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h * Sh / S
+    Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar - aero_constants.CL_alpha_h * l_h * Sh / S / aero_constants.c_bar - CD_alpha_w * Zac / aero_constants.c_bar  + CT_alpha * Zh / aero_constants.c_bar
     CXalphadott = 0
-    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
-    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
-    CZq = (Lw+Lh)*np.sin(q_rad)
-    Cnr = -9999
-    Cmq = -9999
-    CYp = -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
-    CYr = -9999
-    Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
-    Clr = -9999
-    Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
-    CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
-    CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
-    CMu = (2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
-    CXq = 0
+    CZalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h / S / aero_constants.c_bar
+    Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
+    # CZq = (Lw+Lh)*np.sin(q_rad)
+    # Cnr = -9999
+    # Cmq = -9999
+    # CYp = 0 # -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
+    # CYr = -9999
+    # Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
+    # Clr = -9999
+    # Cnp = 0 #-lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
+    # CXu = -3 * aero_constants.CD_0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
+    # CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
+    # CMu = 0 #(2/c_bar) * (CL * l_acw - Cl_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    # CXq = 0
 
 A = np.array(
-    [[CXu, CZu, Cmu],
-     [CXalpha, CZalpha, Cmalpha],
-     [CXq, CZq, Cmq],
+    [[CXalpha, CZalpha, Cmalpha],
      [CXalphadott, CZalphadott, Cmalphadott]])
 print("""
-          CXu, CZu, Cmu,
-          CXalpha, CZalpha, 0,
-          CXq, CZq, Cmq,
+          CXalpha, CZalpha, Cmalpha,
           CXalphadott, CZalphadott, 0
 """,A)
 

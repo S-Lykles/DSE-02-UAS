@@ -253,7 +253,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     #print('AR', 2.3**2/Sh, Sh/2.3)
     return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da
-
+print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
     a, b, c, d = horizontal_tail_sizing()
