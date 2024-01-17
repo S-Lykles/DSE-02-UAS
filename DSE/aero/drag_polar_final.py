@@ -1,6 +1,7 @@
 from aero_constants import *
 from DSE import const
 import itertools
+import matplotlib.pyplot as plt
 
 #atmospheric constants
 rho = const.m2rho(500)
@@ -36,16 +37,10 @@ Lambda_m_h = np.arctan(np.tan(sweep_ang_50_c_rad_h)-(4 / AR) * ((xc_m_h - 0.5)*(
 Lambda_m_v = np.arctan(np.tan(sweep_ang_50_c_rad_v)-(4 / AR) * ((xc_m_v - 0.5)*((1-taper_v)/(1+taper_v))))
 
 #winglet constants
-tc_winglet = tc
 xc_m_winglet = xc_m_wing
-taper_winglet = taper
-sweep_ang_25_c_rad_winglet = 45 * const.deg2rad
-S_winglet = 0.21
 S_wet_winglet = S_winglet * 2
-b_winglet = 0.45
 AR_winglet = b_winglet**2 / (S_winglet / 2)
 Lambda_m_winglet = np.arctan(np.tan(sweep_ang_25_c_rad_winglet)-(4 / AR) * ((xc_m_winglet - 0.25)*((1-taper_winglet)/(1+taper_winglet))))
-c_root_winglet = 0.333
 c_bar_winglet = c_root_winglet * (2/3) * ((1+taper_winglet+taper_winglet**2)/(1+taper_winglet))
 
 #fuselage constants
@@ -108,8 +103,8 @@ def CD0(Cf_list, FF_list, Q_list, Swet_list, Sref, CD_misc, frac_CD_LP):
     CD0 = sm / Sref + CD_misc + ((frac_CD_LP)/(1-frac_CD_LP))* (sm / Sref + CD_misc)
     return CD0
 
-def drag_polar(CL, CL_minD, AR, e, CD0):
-    CDi = (CL-CL_minD)**2 / (pi * AR * e)
+def drag_polar(CL, AR, e, CD0):
+    CDi = CL**2 / (pi * AR * e)
     return CD0 + CDi
 
 
@@ -138,5 +133,6 @@ print('Q', Q_list)
 print('S_wet', S_wet_list)
 
 CD0 = CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)
-print(CD0)
+CD = drag_polar(C_L, AR, e, CD0)
+
 
