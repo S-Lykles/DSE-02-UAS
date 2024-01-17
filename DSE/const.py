@@ -7,6 +7,8 @@ R = 287.058  # [J/kg/K]
 gamma = 1.4  # [-]
 P0 = 101325  # [Pa]
 alpha = -0.0065  # [K/m]
+a = np.sqrt(gamma * R * T0)  # [m/s]
+
 V_min = 42 # [m/s]
 def m2rho(m):
     """Return density of air at given altitude in kg/m^3"""
