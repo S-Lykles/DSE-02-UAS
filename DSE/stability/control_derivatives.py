@@ -7,7 +7,7 @@ from DSE.stability.tail_sizing import horizontal_tail_sizing
 de_da = horizontal_tail_sizing()[4]
 
 V = 42 # placeholder
-V_h = V
+Vh = V
 d_dt = 99999 # placeholder time step
 T = 288.15 - 0.0065 * 500
 
@@ -98,7 +98,6 @@ if vtol:
     CXalphadott = 0
     CZalphadott = 0
     Cmalphadott = 0
-    CZq = (T1+T2+T3+T4)*np.sin(q_rad)
     CZq = -9999
     Cmq = -9999
 
@@ -122,13 +121,19 @@ else:
     CXalphadott = 0
     CZalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h / S / aero_constants.c_bar
     Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * deps_dalpha * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
-    CZq = (Lw+Lh)*np.sin(q_rad)
-    Cnr = -9999
-    Cmq = -9999
+
+    CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
+    Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
+
+    CYr_v1 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v1
+    CYr_v2 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v2
+    CYr = CYr_v1+CYr_v2 + 2*CY_alpha_p*(Vp/V)**2*Sv*l_p/(S*b)
+
+    Clr = CL_w+CL_h*Sh*bh/(S*b)*(Vh/V)**2 - zv/b*(CYr_v1+CYr_v2)
+    Cnr = lv/b*CYr_v1+lv/b*CYr_v2
+
     CYp = -2*  8/(np.pi*3) *eta_v * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
-    CYr = -9999
     Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
-    Clr = -9999
     Cnp = -lv / b * CYp - 1 / 8 * (CL + CL_h * Sh / S * bh / b)
     CXu = -3 * CD0 - 3 * CL0 * tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
     CZu = -M0**2 / (1 - M0**2)  * (CL + CL_h * (Sh/S))
