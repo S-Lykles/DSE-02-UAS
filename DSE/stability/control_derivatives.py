@@ -220,7 +220,6 @@ R_symm = [[-CXdelt_e,CXdelt_t],
 A = np.linalg.inv(P_symm) @ Q_symm
 B = np.linalg.inv(P_symm) @ R_symm
 
-
 #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
 #C_symm = [[- , - , - , -],
@@ -239,19 +238,31 @@ B = np.linalg.inv(P_symm) @ R_symm
 
 
 
-x0 = [0,0,0,0]
-start = 0
-stop = 30
-step =1
-t=np.arange(start,stop,step)
-sys = signal.StateSpace(A,B,C,D)
-# step response
-t,y = signal.step(sys, x0,t)
-plt.plot(t,y)
-plt.title('Step response ')
-plt.xlabel('t')
-plt.ylabel('y')
-plt.show()
+
+
+
+
+
+
+
+
+
+
+runn =False
+if runn = True:
+    x0 = [0,0,0,0]
+    start = 0
+    stop = 30
+    step =1
+    t=np.arange(start,stop,step)
+    sys = signal.StateSpace(A,B,C,D)
+    # step response
+    t,y = signal.step(sys, x0,t)
+    plt.plot(t,y)
+    plt.title('Step response ')
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.show()
 
 
 
