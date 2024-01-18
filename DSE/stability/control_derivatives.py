@@ -61,6 +61,7 @@ c_bar = aero_constants.c_bar
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
 CL_w = aero_constants.CL_cruise
 CL0 = aero_constants.CL_0
+CD0 = aero_constants.CD_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
@@ -133,7 +134,6 @@ Z_m = -9999
 
 
 zv = -9999
-CD0 = -9999
 
 vtol=False
 if vtol:
@@ -296,10 +296,14 @@ if damping:
     plt.ylabel('y')
     plt.legend()
     plt.show()
-    print(y[0],y[1])
-    print(pole(sys_cl))
-    
 
+    print(pole(sys_cl))
+
+    poles = True
+    if poles:
+        xxx = ss2tf(A_cl, B_symm, C_symm, D_symm)
+        # tf_function = tf(numerator, denominator)
+        print(xxx)
 
 # print("""t
 #           CXu, CZu, CMu,

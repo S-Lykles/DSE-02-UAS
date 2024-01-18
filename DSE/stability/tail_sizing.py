@@ -7,6 +7,7 @@ from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
 
+plot = False
 # default values
 T = const.T0
 gamma = const.gamma
