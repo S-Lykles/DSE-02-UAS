@@ -343,8 +343,6 @@ def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constant
         Moment_arm.append(moment_arm_p)
 
 
-    PRINT = True
-
     # weight for optimization
     weight_surf = 1.2
     weight_AR = 0.7
