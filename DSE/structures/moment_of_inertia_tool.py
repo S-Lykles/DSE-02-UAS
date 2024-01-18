@@ -3,7 +3,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from pathlib import Path
-from Internal_load_model import moment_distribution
+#from Internal_load_model import moment_distribution
 
 # This tool can be used to compute the moment of inertia of various cross-sectional shapes
 # The formula's were obtained from course AE2135-I or
@@ -325,7 +325,10 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
 print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
                                                                                         0.12))#, 0.3))
 
-
+# print("The sizing of the moment of inertia for the horizontal tail wing is:"
+#       , I_xx_wing_box(0.01, 0.002,0.004,0.008,0.01,0.002,
+#                       0.004,0.008,0,0,0,0,0.001,
+#                       0.234*0.5, 0.001, 0.234*0.5, 2))
 # print("Compute number of stringers required:", number_of_stringers_computation(3.62, 0.833*0.52, 0.001, 71*10**9,
 #                                                                                4000, 0.833*0.12))
 # print("Compute number of ribs required "
