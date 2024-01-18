@@ -33,13 +33,13 @@ def geo_to_cart(geom):
     #print(len(x), len(y), len(z))
     return x, y, z
 
-step = 0.01
+step = 1/128
 semispan = 3
 
 
-geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.833, 0.4, semispan, 3, step)
+geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.833, 0.4, semispan, 0, step)
 loadsx, loadsz, torqueyy, point_range, max_th = ilm.combined_loading(0, semispan, step, False)
-moment_distributionx, moment_distributionz, point_range = ilm.moment_distr_from_load_distr(loadsx, loadsz, point_range, 0.01)
+moment_distributionx, moment_distributionz, point_range = ilm.moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
 
 Ixx, Iyy, Ixy, area, Aenc, denom = wgg.wingbox_AMOI(geom, 0.001)
 normal_stress = bending(np.resize(moment_distributionx, len(Ixx)),np.resize(moment_distributionz, len(Ixx)),Ixx,Iyy,Ixy,denom, geom)

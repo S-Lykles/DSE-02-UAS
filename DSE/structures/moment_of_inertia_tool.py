@@ -3,7 +3,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from pathlib import Path
-#from Internal_load_model import moment_distribution
+from Internal_load_model import momentdistributionz
 
 # This tool can be used to compute the moment of inertia of various cross-sectional shapes
 # The formula's were obtained from course AE2135-I or
@@ -284,7 +284,7 @@ def number_of_stringers_computation(K_c, s, t, E, t_c): #, mu):
     E = E * 0.000145037738
     t = t * 39.3700787
     h = (0.833 - s / 6) * t_c * 39.3700787
-    M = moment_distribution[round(s*100)] * 8.85074579
+    M = momentdistributionz[round(s*100)] * 8.85074579
 
     N = np.arange(1, 10, 1)
     L = 0.52 * (0.833 - s / 6) * 39.3700787 / N
@@ -322,9 +322,18 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
     # return N_stringers
 
 
-print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
+print("Compute number of stringers required at s = 0:", number_of_stringers_computation(3.62, 0, 0.001, 71*10**9,
                                                                                         0.12))#, 0.3))
-
+print("Compute number of stringers required at s = 0.273:", number_of_stringers_computation(3.62, 0.273, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
+print("Compute number of stringers required at s = 0.836:", number_of_stringers_computation(3.62, 0.836, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
+print("Compute number of stringers required at s = 1.15:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
+print("Compute number of stringers required at s = 2.25:", number_of_stringers_computation(3.62, 2.25, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
+print("Compute number of stringers required at s = 2.9:", number_of_stringers_computation(3.62, 2.9, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
 # print("The sizing of the moment of inertia for the horizontal tail wing is:"
 #       , I_xx_wing_box(0.01, 0.002,0.004,0.008,0.01,0.002,
 #                       0.004,0.008,0,0,0,0,0.001,

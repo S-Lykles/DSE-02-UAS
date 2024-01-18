@@ -248,10 +248,10 @@ else:
               [0 , 0],
               [0 , 0],
               [1 , 0]]
-    
+
 damping = True
 if damping:
-    sys = ss(A_symm,B_symm,C_symm,D_symm)    
+    sys = ss(A_symm,B_symm,C_symm,D_symm)
     state_matrix = np.eye(4)
     input_matrix = np.eye(2)
     K, S, E = lqr(sys, state_matrix, input_matrix)
@@ -267,7 +267,7 @@ if damping:
     # Step input or initial condition?
     step_input = False
     initial_condition = True
-    if step_input:    
+    if step_input:
         # The input vector.
         ttussen = 1  # ttussen is the time that 1 should be present.
         u01 = np.zeros(len(t))
@@ -285,8 +285,8 @@ if damping:
                        [1],
                        [1],
                        [0]])
-        
-        y, time = initial(sys_cl, t, x0)                  
+
+        y, time = initial(sys_cl, t, x0)
     plt.plot(t,y[:,0],label = "u")
     plt.plot(t,y[:,1],label = "alpha")
     plt.plot(t,y[:,2],label = "theta")
