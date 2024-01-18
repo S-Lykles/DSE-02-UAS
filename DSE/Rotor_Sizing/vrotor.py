@@ -2,10 +2,13 @@ import numpy as np
 from DSE import const
 from DSE.Rotor_Sizing.profile import chord_dist, twist_dist
 import pickle
-from DSE.Rotor_Sizing.bem import solve_dT_dr, solve_dT_dr_2d, integrate_dT_dr, integrate_dT_dA, vi_bem, dT_dr_bem, dT_dA_bem
+from DSE.Rotor_Sizing.bem import solve_dT, integrate_dT, vi_bem, dT_be, dT_vi
+from DSE.Rotor_Sizing.bem_2d import dT_be_2d, solve_dT_2d, integrate_dT_2d
 from DSE.Rotor_Sizing.airfoil import Cp_func_clarky
 from pathlib import Path
 from matplotlib import pyplot as plt
+from scipy.optimize import brentq
+import pandas as pd
 
 
 file_dir = Path(__file__).parent
@@ -20,6 +23,8 @@ R = np.max(r_ROTOR)
 THETA = rotor_params["theta"]
 CHORD = rotor_params["chord"]
 
+df = pd.DataFrame({"r [M]": r_ROTOR, "theta [deg]": np.rad2deg(THETA), "chord [M]": CHORD})
+df.to_csv(file_dir/"rotor_params.csv", index=False)
 
 def rotor_perf(throttle, U=0, Vc=0):
     """Calculate rotor performance at a given throttle setting.
@@ -42,15 +47,25 @@ def rotor_perf(throttle, U=0, Vc=0):
         Torque [Nm]
     """
     assert 0 <= throttle <= 1.1, "Throttle must be between 0 and 1.1, not in %"
-    dT, dQ, _ = solve_dT_dr_2d(r_ROTOR, OMEGA*throttle, CHORD, THETA, N, U, Vc)
-    T = integrate_dT_dA(r_ROTOR, dT, N)
+    dT, dQ, _ = solve_dT_2d(r_ROTOR, OMEGA*throttle, CHORD, THETA, N, U, Vc)
+    T = integrate_dT_2d(r_ROTOR, dT, N)
     Q = np.trapz(np.mean(dQ, axis=0), r_ROTOR) * N
     P = Q * OMEGA
     return T, P, Q
 
 
+def rotor_perf_T(T, v, alpha, max_iter=100, tol=1e-4):
+    U, Vc = np.cos(alpha) * v, -np.sin(alpha) * v
+    T_func = lambda throttle: rotor_perf(throttle, U, Vc)[0] - T
+    x0, x1 = 0.1, 1.1
+    x, ret = brentq(T_func, x0, x1, xtol=1e-3, rtol=1e-3, full_output=True)
+    # print(ret.function_calls)
+    return rotor_perf(x, U, Vc)[1]
+
+
 def plot_throttle_curve(U=0, Vc=0):
-    """Plot rotor performance at different throttle settings.
+    """
+    Plot rotor performance at different throttle settings.
     Parameters
     ----------
     U : float, optional
@@ -58,10 +73,11 @@ def plot_throttle_curve(U=0, Vc=0):
     Vc : float, optional
         Vertical climb velocity [m/s], by default 0
     """
-    throttle = np.linspace(0.2, 1.1, 20)
+    throttle = np.linspace(0.5, 1.05, 10)
     T, P, Q = np.array([rotor_perf(t, U, Vc) for t in throttle]).T
     fig, ax = plt.subplots(2, 1)
-    o = OMEGA * 60 / 2 / np.pi
+    o = OMEGA * throttle
+    Vtip = R * o
     ax[0].plot(throttle*o, T)
     ax[0].set_ylabel("Thrust [N]")
     ax[1].plot(throttle*o, P)
@@ -72,8 +88,17 @@ def plot_throttle_curve(U=0, Vc=0):
     plt.show()
 
 
+def interp_power():
+    """Interpolate power curve"""
+    throttle = np.linspace(0.5, 1.05, 1000)
+    U = np.linspace(0, 25, 10)
+    Vc = np.linspace(-6, 6, 10)
+    # omega = OMEGA * throttle
+    T, P, Q = np.array([rotor_perf(t) for t in throttle]).T
+
+
 def plot_rotor_2d(r, omega, chord, theta, N, U, Vc, z='inflow', highlight_crit=True):
-    dT, dQ, vi = solve_dT_dr_2d(r, omega, chord, theta, N, U, Vc)
+    dT, dQ, vi = solve_dT_2d(r, omega, chord, theta, N, U, Vc)
     psi = np.linspace(0, 2*np.pi, len(r)//2)
     r_grid, psi_grid = np.meshgrid(r, psi)
     M = np.sqrt((r_grid * omega + U*np.cos(psi_grid))**2 + (via + Vc)**2) / const.a
@@ -114,22 +139,29 @@ def plot_rotor_2d(r, omega, chord, theta, N, U, Vc, z='inflow', highlight_crit=T
     plt.show()
 
 
+# def solve_T()
+
+
 if __name__ == "__main__":
 
-    U = 5
-    Vc = 1
+    U = 1
+    Vc = 0
     
-    # OMEGA = OMEGA * 1.01
-    dT, dQ = solve_dT_dr(r_ROTOR, OMEGA, CHORD, THETA, N, which='theta')
-    T = integrate_dT_dr(r_ROTOR, dT, N)
-    print(f"T = {T:.3f} N")
-    dTA, dQa, via = solve_dT_dr_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc)
-    Ta = integrate_dT_dA(r_ROTOR, dTA, N)
-    Q = np.trapz(dQ, r_ROTOR) * N
+    OMEGA = OMEGA * 1
+    # dT, dQ = solve_dT_dr(r_ROTOR, OMEGA, CHORD, THETA, N, which='theta')
+    # T = integrate_dT_dr(r_ROTOR, dT, N)
+    # print(f"T = {T:.3f} N")
+    dTA, dQa, via = solve_dT_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc)
+    # dTA_new = dT_vi(r_ROTOR, via, N, U, Vc)
+    Ta = integrate_dT_2d(r_ROTOR, dTA, N)
+
+    Q = np.trapz(np.mean(dQa, axis=0), r_ROTOR) * N
     print(f"Q = {Q:.3f} Nm")
     print(f"P = {Q*OMEGA:.3f} W")
 
     print(f"Ta = {Ta:.3f} N")
 
-    plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='inflow', highlight_crit=True)
-    plot_throttle_curve()
+    # plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='inflow', highlight_crit=True)
+    # plot_throttle_curve()
+
+
