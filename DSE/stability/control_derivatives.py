@@ -216,20 +216,20 @@ if vtol:
     b = b
 
 else:
-    P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+    P_symm =np.matrix( [[-2 * mu_c * c_bar / V, 0, 0, 0],
          [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
          [0, 0, -c_bar / V, 0],
-         [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
+         [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]])
 
-    Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
+    Q_symm = np.matrix([[-CXu, -CXalpha, -CZ0, 0],
          [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
          [0, 0, 0, -1],
-         [-CMu, -Cmalpha, 0, -Cmq]]
+         [-CMu, -Cmalpha, 0, -Cmq]])
 
-    R_symm = [[-CXdelt_e,CXdelt_t],
+    R_symm = np.matrix([[-CXdelt_e,CXdelt_t],
          [-CZdelt_e,CYdelt_t],
          [0,0],
-         [-CMdelt_e, CMdelt_t]]
+         [-CMdelt_e, CMdelt_t]])
 
     #P_inv = np.linalg.inv(P_symm)
     #A = np.matmul(P_inv,Q_symm)
@@ -238,20 +238,17 @@ else:
     eig_val_symm = np.linalg.eig(A_symm)[0]
 
 
-
     #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
-    #C_symm = [[- , - , - , -],
-    #          [- , - , - , -],
-    #          [0 , 0 , 0 , V/c_bar],
-    #          [0 , 0 , 1 , 0],
-    #          [0 , 0 , 0 , 0],
+    C_symm = np.matrix([[1 , 0 , 0 , 0],
+              [0 , 1 , 0 , 0],
+              [0 , 0 , 0 , V/c_bar],
+              [0 , 0 , 1 , 0]])
 
-    #D_symm = [[- , -],
-    #          [- , -],
-    #          [0 , 0],
-    #          [0 , 0],
-    #          [1 , 0],
+    D_symm =np.matrix([[0 , 0],
+              [0 , 0],
+              [0 , 0],
+              [0 , 0]])
 
 
 
@@ -266,7 +263,7 @@ else:
 
 runn =True
 if runn == True:
-    x0 = np.array([[0],                     # initial codnitions for u, alpha, theta and q respectively
+    x0 = np.matrix([[0],                     # initial codnitions for u, alpha, theta and q respectively
                    [np.pi/180],
                    [0],
                    [0]])
@@ -278,12 +275,42 @@ if runn == True:
     # step response
     y,time = initial(sys, t, x0)
     plt.plot(t,y)
+    plt.plot(t, y[:, 0], label="u")
+    plt.plot(t, y[:, 1], label="alpha")
+    plt.plot(t, y[:, 2], label="theta")
+    plt.plot(t, y[:, 3], label="q")
+    #plt.plot(t, y[:, 4], label="?")
+    plt.legend()
     plt.title('Initial')
     plt.xlabel('t')
     plt.ylabel('y')
     plt.show()
+    print(sys)
+    print(pole(sys))
+    print(damp(sys))
 
-print(pole(sys))
+    Ku =  -0.2375
+    Kalpha = -0.2375
+    Ktheta =1
+    Kq = -1
+    K = [[Ku,Kalpha,Ktheta,Kq],
+         [0,0,0,0]]
+    sys_cl = sys.feedback(K)
+    yc, time = initial(sys_cl,t,x0)
+    plt.plot(t,yc)
+    plt.plot(t, yc[:, 0], label="u_damp")
+    plt.plot(t, yc[:, 1], label="alpha_damp")
+    plt.plot(t, yc[:, 2], label="theta_damp")
+    plt.plot(t, yc[:, 3], label="q_damp")
+    #plt.plot(t, yc[:, 4], label="?_damp")
+    plt.legend()
+    plt.title('test')
+    plt.xlabel('t')
+    plt.ylabel('y')
+    plt.show()
+    print(pole(sys))
+    print(damp(sys_cl))
+
 
 
 # print("""t
