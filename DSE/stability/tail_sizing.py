@@ -53,9 +53,10 @@ def find_intersection(x1, y1, x2, y2):
         print("Lines are parallel and don't intersect.")
         return None
 
-    # Calculate intersection point
-    x_intersect = (b2 - b1) / (m1 - m2)
-    y_intersect = m1 * x_intersect + b1
+    else:
+        # Calculate intersection point
+        x_intersect = (b2 - b1) / (m1 - m2)
+        y_intersect = m1 * x_intersect + b1
 
     return x_intersect, y_intersect
 
@@ -67,8 +68,9 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     A = b**2/S
     S_net = S - b_f*c_root
     # A_h = 2/3*A # Initial guess value for the aspect ratio of the wing is
-    # A_hh = np.arange(0.1, 10.6, 0.1)
-    A_hh = np.arange(6.7, 6.9, 0.1)
+    # A_hh = np.arange(4.1, 10.6, 0.1)
+    A_hh = [6.1, 6.2,6.3,6.4,6.5,6.6,6.7,6.8]
+    # A_hh = np.arange(6.5, 6.9, 0.1)
     Vh_V_2 = 1 # tail configuration is assumed to be t-tail
 
     m_tv = 2*dz_h/b
@@ -88,13 +90,14 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     dcg=0
     check_y =[]
     for i in range(len(A_hh)):
-       # print(i,len(A_hh))
-        # print(i,len(A_hh))
-        if A_hh[i] == 6.8:
+
+        A_h = A_hh[i]
+        if A_h == 6.8:
             PloT=True
+            print('tt',A_h)
         else:
             PloT=False
-        A_h = A_hh[i]
+            print(i,A_h)
         # # A_h = 2/3*36/3.5
         # # Cl_alpha_h is taken as 2pi, but it should be an input from aero
         # # CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
@@ -128,7 +131,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
         Cm_ac = Cm_ac_w + delta_f_Cm_ac + delta_fus_Cm_ac + delta_nac_Cm_ac
 
-        x_cg_bar_c = x_ac_bar - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / c_bar * Vh_V_2
+        x_cg_bar_c = x_ac_bar - Cm_ac / CL_A_h + CL_h / CL_A_h * Sh_S * l_h / (S*c_bar) * Vh_V_2
 
         x_cg_bar_min, x_cg_bar_max, xlemac_lf, slope_lemac = loading_diagram_extremes()
 
@@ -136,6 +139,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         y_datum_shift=0
         y_diff=5
 
+        x1,x2,y1,y2 = -9999, -9999, -9999, -9999
         x_i, y_i = find_intersection([x_cg_bar[0], x_cg_bar[5]], [Sh_S[0], Sh_S[5]], [x_cg_bar_c[0], x_cg_bar_c[5]], [Sh_S[0], Sh_S[5]])
         for i in range(len(y_offset)):
             y_shift = y_offset[i]
@@ -158,10 +162,15 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
             check_y.append(1000)
 
         delta_x_cg_bar = x1-x2
-        # print('dcg',x1,x2)
         d_xcg.append(delta_x_cg_bar)
 
+        if A_h==6.8:
+            m = (xlemac_lf[5]-xlemac_lf[0]) / (x_cg_bar_max[5]-x_cg_bar_max[0])
 
+            xlmac = xlemac_lf[0] + m * (x2 - x_cg_bar_max[0])
+
+
+            print('xlemac_lf',xlmac*6)
         # PloT = False
         # if x1>0 and x2>0:
         #     PloT = True
@@ -171,7 +180,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
         # surface_ratio = ((delta_x_cg_bar + SM- Cm_ac/CL_max) / ((CL_alpha_h/CL_alpha_A_h*(1-de_da)-CL_h/CL_max)*Vh_V_2*l_h/c_bar))
         # print('plot sr_h:',surface_ratio)
-        surface_ratio =np.maximum(y1, y2)
+        surface_ratio = np.maximum(y1, y2)
         sr.append(surface_ratio)
         # print('sur.r.:', surface_ratio+y_datum_shift)
 
@@ -184,9 +193,9 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         # print()
         xlemac_lf = [x-y_datum_shift for x in xlemac_lf]
         # xlemac_lf=xlemac_lf-1.57
-        PloT = False
+        # PloT = False
         if PloT == True:
-            print(surface_ratio*S/2.3,surface_ratio)
+            print(surface_ratio,'Surf.h',surface_ratio*S)
             plt.plot(x_cg_bar, Sh_S, label ='stab')
             # plt.plot(x_np_bar, Sh_S, label ='neutral')
             plt.plot(x_cg_bar_c, Sh_S, label ='cont')
@@ -204,57 +213,12 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     Sh_area = [x*S for x in sr]
 
-    Sh_area0, A_hh0 = np.meshgrid(Sh_area, A_hh)
-    span_h = np.sqrt(Sh_area0*A_hh0)
-    # chord=Sh_area0/span_h
-    N = 400
-
-    # fig, ax = plt.subplots()
-    # cp = ax.contourf(Sh_area0, A_hh0, span_h, N)
-    # cbar = fig.colorbar(cp)
-    # contour_line = ax.contour(Sh_area0, A_hh0, span_h, levels=[2.3], colors='r')
-    # ax.legend([contour_line.collections[0]], ['Span = 2.3 m'], loc='upper right')
-    # # Find the intersection points
-    # contour_data = contour_line.collections[0].get_paths()[0].vertices
-    # # intersection_point = contour_data[np.argmin(np.abs(contour_data[:, 1] - 6.8))]
-    # #
-    # # # Plot a point at the intersection,
-    # # ax.plot(intersection_point[0], intersection_point[1], 'o', color='pink', label='Intersection')
-    #
-    # ax.set_title('Span of the horizontal tail [m]')
-    # ax.set_xlabel('Surface area of horizontal tail [m^2]')
-    # ax.set_ylabel('Aspect ratio horizontal tail')
-    # plt.show()
-    # print(np.shape(Sh_area),np.shape(d_xcg))
-    #
-    # plt.scatter(Sh_area, d_xcg)
-    # plt.xlabel('Minimum optimal surface area of the horizontal tail')
-    # plt.ylabel('Optimum CG range')
-    # plt.show()
-
-    plot2=False
-    if plot2 == True:
-        fig, (ax, ay, az) = plt.subplots(1, 3)
-        cp = ax.contourf(Sh_area0,A_hh0,  span_h, N)
-        fig.colorbar(cp)  # Add a colorbar to a plot
-        contour_line = ax.contour(Sh_area0,A_hh0,  span_h, levels=[2.3], colors='r', label='Span = 2.3 m')
-        ax.set_title('Span of the horizontal tail')
-        ax.set_xlabel('Aspect ratio horizontal tail')
-        ax.set_ylabel('Surface area of horizontal tail')
-        plt.show()
-        #
-        cy = ay.contourf(A_hh, Sh_area,  d_xcg, N)
-        ay.clabel(cy, inline=True, fontsize=10)
-        fig.colorbar(cy)
-        ay.set_title('Stability margin [m]')
-        ax.set_xlabel('Aspect ratio horizontal tail')
-        ax.set_ylabel('Surface area of horizontal tail')
 
     # Sh = S*surface_ratio
     Sh = S*np.min(sr)
 
-    #print('AR', 2.3**2/Sh, Sh/2.3)
-    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da
+    print('AR', A_h)
+    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da,
 print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
@@ -351,7 +315,7 @@ rudder_surface_sizing(10.0, 43.0, 10.0, 1.0, 1.225, 120.0)
 
 def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, aileron_chord_frac = 0.23, deflection_up = 20.0, deflection_down = 20.0, b = aero_constants.b, CL_alpha_w = aero_constants.CL_alpha_wing, CD_0_wing = aero_constants.CD0_wing, taper_w = aero_constants.c_tip / aero_constants.c_root, C_root = aero_constants.c_root, S = aero_constants.S):
     """Aileron sizing for roll rate requirement, assumes a roll rate now, assumes that the aileron starts immediately beyond the propeller projection on the wing, deflects no more than 20 degrees, does not cause adverse yaw and takes up 27% of wing chord. Can all be changed if required"""
-    # Let's do this! давай!
+    # Let's do this!
 
     # Typical values:
     # S_a_S (aileron area to wing area) 0.05 - 0.1

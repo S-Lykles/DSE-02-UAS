@@ -323,3 +323,7 @@ print(pole(sys))
 # 2. The only relevant variables are yaw, roll and pitch. Therefore, CYr and CYp
 # can be neglected.
 
+
+
+
+
