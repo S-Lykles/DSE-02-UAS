@@ -264,23 +264,23 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
+def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL_0=aero_constants.CL_0,CL_alpha=aero_constants.CL_alpha_wing,c_bar=aero_constants.c_bar,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
     # speed range ( Stall <-> Max + safety margin)
-    Sh_S = horizontal_tail_sizing()[0]
-    Vh_V_2 = horizontal_tail_sizing()[3]
     eta_h = 0.9
-
     delta = 25  # Elevator deflection range ( -25 <-> 25 degrees)
 
     Vh_vol = (Sh*l_h) / (S*c_bar)
+    CL_l = 0.43
+
+    Tau_el_2 = (Cm_0 *CL_alpha + ( CL_l - CL_0)*Cm_alpha ) / ( delta*eta_h* ( -CL_alpha*CL_alpha_h*Vh_vol*(1/bh_be) - Cm_alpha* CL_alpha_h * Sh/S*(1/bh_be)))
     Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / delta
     Tau_el = -1*Cm_delta_el / ( CL_alpha_h * eta_h *Vh_vol *(1/bh_be))
 
-    S_a_S = np.linspace(0.0, 1.0, 2000)
+    S_a_S = np.linspace(0.0, 0.7, 100)
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
 
-    return Tau_el, Cm_delta_el
-
+    return Tau_el, Cm_delta_el, Tau_el_2
+print(elevator_surface_sizing()[0])
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
 def rudder_surface_sizing( V_cross, V_trans, S_fus_side, X_AreaCent, rho, V_max, C_L_v_alpha = 4.5, S_v =0.1811301138015332, l_v =  2.452651830421447, S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95, C_n_0 = 0.0, C_y_0 = 0.0, K_f_1 = 0.75, K_f_2 = 1.4):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
