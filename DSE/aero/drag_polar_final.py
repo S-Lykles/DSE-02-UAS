@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 #atmospheric constants
 rho = const.m2rho(500)
+print(rho)
 mu = 1.81*10**(-5)
 M = const.V_min / (const.R*const.T0*const.gamma)**0.5
 
@@ -120,7 +121,7 @@ Q_wing = 1.0
 Q_fus = 1.0
 Q_h = 1.08
 Q_v = 1.08
-Q_winglet = 1.08 #PLACEHOLDER
+Q_winglet = 1.0 #PLACEHOLDER
 
 FF_list = [FF_w, FF_fuselage, FF_h, FF_v,  FF_winglet]
 Q_list = [Q_wing, Q_fus, Q_h, Q_v, Q_winglet]
@@ -133,6 +134,7 @@ print('Q', Q_list)
 print('S_wet', S_wet_list)
 
 CD0 = CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)
+print(CD0)
 CD = drag_polar(C_L, AR, e, CD0)
 
 
