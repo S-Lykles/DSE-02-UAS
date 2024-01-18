@@ -198,49 +198,51 @@ else:
     CXq = 0
 
     CXdelt_e = 0
-    CZdelt_e = elevator_surface_sizing()[1] * (aero_constants.c_bar/l_h)
-    CMdelt_e = elevator_surface_sizing()[1]
+    CZdelt_e = elevator_surface_sizing()[1][0] * (aero_constants.c_bar/l_h)
+    CMdelt_e = elevator_surface_sizing()[1][0]
     CXdelt_t = 0
     CYdelt_t = 0
     CZdelt_t = 0
     CMdelt_t = 0
 
+if vtol:
+    b = b
 
-P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
-     [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
-     [0, 0, -c_bar / V, 0],
-     [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
+else:
+    P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+         [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
+         [0, 0, -c_bar / V, 0],
+         [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
 
-Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
-     [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
-     [0, 0, 0, -1],
-     [-CMu, -Cmalpha, 0, -Cmq]]
+    Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
+         [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
+         [0, 0, 0, -1],
+         [-CMu, -Cmalpha, 0, -Cmq]]
 
-R_symm = [[-CXdelt_e,CXdelt_t],
-     [-CZdelt_e,CYdelt_t],
-     [0,0],
-     [-CMdelt_e, CMdelt_t]]
+    R_symm = [[-CXdelt_e,CXdelt_t],
+         [-CZdelt_e,CYdelt_t],
+         [0,0],
+         [-CMdelt_e, CMdelt_t]]
 
-#P_inv = np.linalg.inv(P_symm)
-#A = np.matmul(P_inv,Q_symm)
-A = np.linalg.inv(P_symm) @ Q_symm
-B = np.linalg.inv(P_symm) @ R_symm
+    #P_inv = np.linalg.inv(P_symm)
+    #A = np.matmul(P_inv,Q_symm)
+    A_symm = np.linalg.inv(P_symm) @ Q_symm
+    B_symm = np.linalg.inv(P_symm) @ R_symm
+    eig_val_symm = np.linalg.eig(A_symm)[0]
 
+    #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
-#  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
+    #C_symm = [[- , - , - , -],
+    #          [- , - , - , -],
+    #          [0 , 0 , 0 , V/c_bar],
+    #          [0 , 0 , 1 , 0],
+    #          [0 , 0 , 0 , 0],
 
-#C_symm = [[- , - , - , -],
-#           [- , - , - , -],
- #          [0 , 0 , 0 , V/c_bar],
-  #         [0 , 0 , 1 , 0],
-   #        [0 , 0 , 0 , 0],
-
-
-#D_symm = [[- , -],
-#           [- , -],
- #          [0 , 0],
-  #         [0 , 0],
-   #        [1 , 0],
+    #D_symm = [[- , -],
+    #          [- , -],
+    #          [0 , 0],
+    #          [0 , 0],
+    #          [1 , 0],
 
 
 
