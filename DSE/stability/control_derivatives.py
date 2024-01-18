@@ -5,6 +5,8 @@ from DSE.aero import aero_constants
 from DSE.stability.tail_sizing import horizontal_tail_sizing, elevator_surface_sizing
 
 print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
+PRInt = False
+
 
 
 V = 42 # placeholder
@@ -77,7 +79,9 @@ Cl_alpha_h = aero_constants.Cl_alpha_h
 eta = 0.95
 de_da = horizontal_tail_sizing()[4]
 V_h = Vh
-
+beta = np.sqrt(1-M**2)
+sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad
+CL_alpha_h = Cl_alpha_h*AR_h/(2+np.sqrt(4+(AR_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
     # Vertical
 bv =  0.60188057586457
 Sv = 0.1811301138015332
@@ -99,7 +103,7 @@ eta = 0.95
 CT = 0.01
 CT_alpha = 0
 
-CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL / (np.pi * b*b/S*aero_constants.e)
+CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL_w / (np.pi * b*b/S*aero_constants.e)
 Ixx = -9999 # placeholder, input from structures
 Iyy = -9999 # placeholder, input from structures
 Ixz = -9999 # placeholder, input from structures
@@ -158,8 +162,8 @@ if vtol:
     CXq = 0
 
 else:
-    # CX0 = Tp / (0.5*rho*S*V**2) - Cd
-    # CZ0 = -CL - CL_h*(Sh/S) * (V_h/V**2)
+    CX0 = Tp / (0.5*rho*S*V**2) - Cd
+    CZ0 = -CL_w - CL_h*(Sh/S) * (V_h/V**2)
     CXalpha = CL_alpha_w * aero_constants.alpha_0 + aero_constants.CL_initial_conditions - Cd_alpha + CT_alpha
     CZalpha = - aero_constants.CL_alpha_wing - aero_constants.Cl_alpha_h * Sh / S
     Cmalpha = aero_constants.CL_alpha_wing * l_acw / aero_constants.c_bar - aero_constants.CL_alpha_h * l_h * Sh / S / aero_constants.c_bar - CD_alpha_w * Zac / aero_constants.c_bar  + CT_alpha * Zh / aero_constants.c_bar
@@ -174,15 +178,16 @@ else:
         print('CZq = ', CZq,'Cmq = ',  Cmq)
         print('CXalpha = ', CXalpha, 'CZalpha = ', CZalpha, 'Cmalpha = ', Cmalpha)
         print('CXalphadott = ', CXalphadott, 'CZalphadott = ', CZalphadott, 'Cmalphadott = ', Cmalphadott)
-    CYr_v1 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v1
-    CYr_v2 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v2
-    CYr = CYr_v1+CYr_v2 + 2*CY_alpha_p*(Vp/V)**2*Sv*lp/(S*b)*0
-    Clr = CL_w+CL_h*Sh*bh/(S*b)*(Vh/V)**2 - zv/b*(CYr_v1+CYr_v2)
-    Cnr = lv/b*CYr_v1+lv/b*CYr_v2
-    print('CYr:',CYr_v1, CYr_v2)
-    print('Clr:',CL_w,CL_h,Sh,bh,S,b,Vh,V,zv,b,CYr_v1,CYr_v2)
-    print('Cnr:',lv,b,CYr_v1,CYr_v2)
-    print('CYr_v1:',Vv,V,Sv,lv,S,b,CL_alpha_v2)
+    #CYr_v1 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v1
+    #CYr_v2 = 2*(Vv/V)**2*Sv*lv/(S*b)*CL_alpha_v2
+    #CYr = CYr_v1+CYr_v2 + 2*CY_alpha_p*(Vp/V)**2*Sv*lp/(S*b)*0
+    #Clr = CL_w+CL_h*Sh*bh/(S*b)*(Vh/V)**2 - zv/b*(CYr_v1+CYr_v2)
+    #Cnr = lv/b*CYr_v1+lv/b*CYr_v2
+    if PRInt == True:
+        print('CYr:',CYr_v1, CYr_v2)
+        print('Clr:',CL_w,CL_h,Sh,bh,S,b,Vh,V,zv,b,CYr_v1,CYr_v2)
+        print('Cnr:',lv,b,CYr_v1,CYr_v2)
+        print('CYr_v1:',Vv,V,Sv,lv,S,b,CL_alpha_v2)
 
     CYp = -2*  8/(np.pi*3) *eta_v**2 * (bv*Sv/(b*S))* (Cl_alpha_v * AR_v) / (2 + np.sqrt(4 + (((AR_v * beta) / eta) ** 2) * (((np.tan(sweep_v * const.deg2rad)) ** 2 / beta ** 2) + 1)))
     Clp = -1* (((CL_alpha_w + Cd0_w)*Cr_w*b)/(24*S) * (1+3*taper_w)) - (( (( (Cl_alpha_h*AR_h)/(2+np.sqrt(4+(AR_h*beta/eta)**2))) + Cd0_h))/6)  # Radians
@@ -204,12 +209,12 @@ else:
 P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
      [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
      [0, 0, -c_bar / V, 0],
-     [0, Cmalphadott * c_bar / V, 0 - 2 * mu_c * Ky_2 * c_bar / V]]
+     [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
 
 Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
-     [-CZu, -CZalpha, CX0, -(CZq + 2*mu_c, 0)],
+     [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
      [0, 0, 0, -1],
-     [-Cmu, -Cmalpha, 0, -Cmq]]
+     [-CMu, -Cmalpha, 0, -Cmq]]
 
 
 R_symm = [[-CXdelt_e,CXdelt_t],
@@ -217,25 +222,26 @@ R_symm = [[-CXdelt_e,CXdelt_t],
      [0,0],
      [-CMdelt_e, CMdelt_t]]
 
-A = np.linalg.inv(P_symm) @ Q_symm
-B = np.linalg.inv(P_symm) @ R_symm
+#P_inv = np.linalg.inv(P_symm)
+#A = np.matmul(P_inv,Q_symm)
+#A = np.linalg.inv(P_symm) @ Q_symm
+#B = np.linalg.inv(P_symm) @ R_symm
+print(Q_symm)
 
 #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
 #C_symm = [[- , - , - , -],
-           [- , - , - , -],
-           [0 , 0 , 0 , V/c_bar],
-           [0 , 0 , 1 , 0],
-           [0 , 0 , 0 , 0],
+#           [- , - , - , -],
+ #          [0 , 0 , 0 , V/c_bar],
+  #         [0 , 0 , 1 , 0],
+   #        [0 , 0 , 0 , 0],
 
 
 #D_symm = [[- , -],
-           [- , -],
-           [0 , 0],
-           [0 , 0],
-           [1 , 0],
-
-
+#           [- , -],
+ #          [0 , 0],
+  #         [0 , 0],
+   #        [1 , 0],
 
 
 
@@ -249,7 +255,7 @@ B = np.linalg.inv(P_symm) @ R_symm
 
 
 runn =False
-if runn = True:
+if runn == True:
     x0 = [0,0,0,0]
     start = 0
     stop = 30
