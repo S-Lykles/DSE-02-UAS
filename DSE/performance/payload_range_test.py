@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from DSE import const
 from DSE.performance.payload_range import *
-from DSE.aero.cl_cd import dragpolar_dual
+from DSE.aero.Old.cl_cd import dragpolar_dual
 from DSE import plot_setting
 
 
@@ -159,12 +159,37 @@ def run_payload_range_diagram():
     payload_range_diagram(OEW, Wf_max, Payload_max, CL, CD, S, eta, SFC, P_max, P_aux)
 
 
+def power_req(CL, CD, S, h_cruise=500, v_cruise=const.v_cruise):
+    rho = const.m2rho(50)
+    V = np.sqrt(2*const.MTOW/(rho*CL*S))
+    D = CD / CL * const.MTOW
+    P = D * V
+    iloiter = np.argmin(P)
+    print(f'Power required for loiter: {P[iloiter]/1e3:.3f} kW at {V[iloiter]:.3f} m/s')
+    print(f'Drag at loiter: {D[iloiter]:.3f} N')
+    rho = const.m2rho(h_cruise)
+    V = np.sqrt(2*const.MTOW/(rho*CL*S))
+    D = CD / CL * const.MTOW
+    P = D * V
+    icruise = np.argmin(np.where(v_cruise<V,P/V,np.inf))
+    print(f'Power required for cruise: {P[icruise]/1e3:.3f} kW at {V[icruise]:.3f} m/s')
+    print(f'Drag at cruise: {D[icruise]:.3f} N')
+
+
+def run_power_req():
+    eta = 0.75
+    S = 3.763
+    b = 6
+    SFC = 320 / (1e3 * 1e3 * 3600)
+    CL, CD = dragpolar_dual(b, S, CL_start=0.1, CL_end=1.2, CL_step=int(1e4))
+    power_req(CL, CD, S, 2000)
 
 if __name__ == '__main__':
     # run_Wf_loiter()
     # run_Wf_cruise()
     # run_Wf_payload()
-    plt.rcParams.update(plot_setting.report_tex)
-    run_Wf_endurance()
-    run_payload_range_diagram()
+    run_power_req()
+    # plt.rcParams.update(plot_setting.report_tex)
+    # run_Wf_endurance()
+    # run_payload_range_diagram()
     # pytest.main(["-s"])
