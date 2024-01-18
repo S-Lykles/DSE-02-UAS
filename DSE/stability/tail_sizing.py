@@ -228,7 +228,7 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
+def vertical_tail(Xcg=2.1547,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
@@ -242,8 +242,8 @@ def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constant
     number_vertical_tail = 2
     PRINT = False # Printing the optimal values
     # Constraints
-    min_span = 0.6
     min_AR_v = 1.0
+    min_span = 0.6
 
     # Resolution
     iteration = 100
@@ -363,7 +363,8 @@ def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constant
     for q in range(len(taper_v)):
         for p in range(len(AR_v)):
             for j in range(len(sweep_v)):
-                if Span[q][p][j] > min_span:
+                Min_span = 0.6/np.cos(sweep_v[j]*deg2rad)
+                if Span[q][p][j] > Min_span:
                     if AR_v[p] > min_AR_v:
 
                         H_opt = weight_taper * (taper_v[q] * Norm_taper) + weight_root_cord * (
@@ -603,10 +604,10 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
 
 
-testing = False
+testing = True
 if testing == True:
-    print(horizontal_tail_sizing())
-    print(elevator_surface_sizing())
+   # print(horizontal_tail_sizing())
+    #print(elevator_surface_sizing())
     print(vertical_tail())
-    print(rudder_surface_sizing())
-    print(aileron_surface_sizing())
+    #print(rudder_surface_sizing())
+    #print(aileron_surface_sizing())
