@@ -392,16 +392,25 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
     S_a_final = S_a_S * S
     maxforce = 0.5 * rho * V_man**2 * S * Cl_delta_A
 
-    return(span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce)
+    # Centre of area of aileron location
 
-# span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce = aileron_surface_sizing(42)[:]
+    a = b_a * (Ca_inner / (Ca_inner + Ca_outer))
+    y_ac_a = a + span_wise_inner
+    x_ac_a = 0.635 * (aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * y_ac_a))
+
+
+
+    return(span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce, x_ac_a, y_ac_a)
+
+# x_ac_a, y_ac_a = aileron_surface_sizing(42)[5:]
 # print("aileron inward spanwise location:", span_wise_inner_final)
 # print("aileron outward spanwise location:", span_wise_outer)
 # print("lift coefficient change in wing due to aileron deflection:", Cl_delta_A)
 # print("aileron deflection force:", maxforce)
 # print("aileron max deflection is 20 degrees up or down")
 # print("aileron effective chord-wise fraction is 23% (it is a frise aileron, which allows a smaller hinge, it will still take up about 27% of wing chord")
-
+# print("Aileron deflection force acts", y_ac_a, "m from plane of symmetry")
+# print("Aileron deflection force acts", x_ac_a, "m from wing quarter chord line")
 
 #def stab_con_int_structure():
     # """Keep in mind that these values are all subject to change due to interations"""
