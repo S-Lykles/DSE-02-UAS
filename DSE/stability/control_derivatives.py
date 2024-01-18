@@ -61,7 +61,6 @@ c_bar = aero_constants.c_bar
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
 CL_w = aero_constants.CL_cruise
 CL0 = aero_constants.CL_0
-CD0 = aero_constants.CD_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
@@ -134,6 +133,7 @@ Z_m = -9999
 
 
 zv = -9999
+CD0 = -9999
 
 vtol=False
 if vtol:
@@ -215,27 +215,26 @@ if vtol:
     b = b
 
 else:
-    P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+    P_symm =np.matrix( [[-2 * mu_c * c_bar / V, 0, 0, 0],
          [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
          [0, 0, -c_bar / V, 0],
-         [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
+         [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]])
 
-    Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
+    Q_symm = np.matrix([[-CXu, -CXalpha, -CZ0, 0],
          [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
          [0, 0, 0, -1],
-         [-CMu, -Cmalpha, 0, -Cmq]]
+         [-CMu, -Cmalpha, 0, -Cmq]])
 
-    R_symm = [[-CXdelt_e,CXdelt_t],
+    R_symm = np.matrix([[-CXdelt_e,CXdelt_t],
          [-CZdelt_e,CYdelt_t],
          [0,0],
-         [-CMdelt_e, CMdelt_t]]
+         [-CMdelt_e, CMdelt_t]])
 
     #P_inv = np.linalg.inv(P_symm)
     #A = np.matmul(P_inv,Q_symm)
     A_symm = np.linalg.inv(P_symm) @ Q_symm
     B_symm = np.linalg.inv(P_symm) @ R_symm
     eig_val_symm = np.linalg.eig(A_symm)[0]
-    print("asymm",A_symm)
 
 
     #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
@@ -338,4 +337,8 @@ if damping:
 # 1. Again due to the slow nature of the oscilation it can be assumed that all linear and angular accelerations are zero. Thus Db = 0
 # 2. The only relevant variables are yaw, roll and pitch. Therefore, CYr and CYp
 # can be neglected.
+
+
+
+
 

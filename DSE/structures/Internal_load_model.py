@@ -97,8 +97,8 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
         loading_distributionx = 0
     else:
         load_factor_manouvre = 3.8
-        loading_distributionz = load_factor_manouvre * lift_distribution + reac_force
-        torque_distribution = 3.8*torque_distribution + reac_torque
+        loading_distributionz = load_factor_manouvre * lift_distribution #+ reac_force
+        torque_distribution = 3.8*torque_distribution #+ reac_torque
         loading_distributionx = load_factor_manouvre * drag_distribution
     ax = plt.axes(projection='3d')
     ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
@@ -167,12 +167,13 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step)
     plt.xlabel('semi-spanwise location (m)')
     plt.ylabel('required rib spacing (m)')
     plt.show()
-    print(max(Ixxreq))
+    print("The maximum required moment of inertia along the wing span of the wing box is:", max(Ixxreq))
     print(max(tskinreq))
     print(mbox)
 
 
 moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 0.01)
+print(Ixxreq(moment_distributionx, point_range, 0.001, 300*10**6, 71*10**9, 2800, 0.01))
 
 #Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
 
