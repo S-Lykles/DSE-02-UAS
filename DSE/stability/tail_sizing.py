@@ -396,7 +396,7 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
     a = b_a * (Ca_inner / (Ca_inner + Ca_outer))
     y_ac_a = a + span_wise_inner
-    x_ac_a = 0.635 * (aileron_chord_frac * C_root * (1 + 2 * ((taper_w - 1) / b) * y_ac_a))
+    x_ac_a = 0.635 * C_root * (1 + 2 * ((taper_w - 1) / b) * y_ac_a)
 
 
 
