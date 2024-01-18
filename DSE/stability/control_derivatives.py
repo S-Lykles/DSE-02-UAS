@@ -3,6 +3,8 @@ from DSE import const
 from DSE.Locations import locations
 from DSE.aero import aero_constants
 from DSE.stability.tail_sizing import horizontal_tail_sizing, elevator_surface_sizing
+from control.matlab import *
+from matplotlib import pyplot as plt
 
 print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
 PRInt = False
@@ -16,7 +18,7 @@ T = 288.15 - 0.0065 * 500
 
 ##   !!! Imported Values !!!
 ##  !! still undifend and not placed !!
-Theta_0 = 9999 # placeholder
+Theta_0 = 2*np.pi/180 # placeholder
 CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
 CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
 Cd0_h = 9999 # placeholder, input from aerodynamics
@@ -59,6 +61,7 @@ c_bar = aero_constants.c_bar
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
 CL_w = aero_constants.CL_cruise
 CL0 = aero_constants.CL_0
+CD0 = aero_constants.CD_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
@@ -131,7 +134,6 @@ Z_m = -9999
 
 
 zv = -9999
-CD0 = -9999
 
 vtol=False
 if vtol:
@@ -196,79 +198,75 @@ else:
     # CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
     CMu = M0**2 / (1 - M0**2) * (CL_w * (l_acw/c_bar) - CL_h * ((l_h * S)/(c_bar * Sh)) - Cd0_w * (Zac/c_bar))
     CXq = 0
-
+    print("CD0",CD0)
+    print("CL0",CL0)
+    print("M0",M0)
+    print("CDm",CDM)
+    print("tehta0",Theta_0)
     CXdelt_e = 0
-    CZdelt_e = elevator_surface_sizing()[1] * (aero_constants.c_bar/l_h)
-    CMdelt_e = elevator_surface_sizing()[1]
+    CZdelt_e = elevator_surface_sizing()[1][0] * (aero_constants.c_bar/l_h)
+    CMdelt_e = elevator_surface_sizing()[1][0]
     CXdelt_t = 0
     CYdelt_t = 0
     CZdelt_t = 0
     CMdelt_t = 0
 
-
-P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+P_symm = np.array([[-2 * mu_c * c_bar / V, 0, 0, 0],
      [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
      [0, 0, -c_bar / V, 0],
-     [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]]
+     [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]])
 
-Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
+Q_symm = np.array([[-CXu, -CXalpha, -CZ0, 0],
      [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
      [0, 0, 0, -1],
-     [-CMu, -Cmalpha, 0, -Cmq]]
+     [-CMu, -Cmalpha, 0, -Cmq]])
 
-R_symm = [[-CXdelt_e,CXdelt_t],
-     [-CZdelt_e,CYdelt_t],
-     [0,0],
-     [-CMdelt_e, CMdelt_t]]
+R_symm = np.array([
+     [-CXdelt_e,CXdelt_t],
+     [-CZdelt_e, CYdelt_t],
+     [0        , 0],
+     [-CMdelt_e, CMdelt_t]])
 
-#P_inv = np.linalg.inv(P_symm)
-#A = np.matmul(P_inv,Q_symm)
-A = np.linalg.inv(P_symm) @ Q_symm
-B = np.linalg.inv(P_symm) @ R_symm
+A_symm = np.linalg.inv(P_symm) @ Q_symm
+B_symm = np.linalg.inv(P_symm) @ R_symm
 
-
+print("CXu", CXu)
 #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
-#C_symm = [[- , - , - , -],
-#           [- , - , - , -],
- #          [0 , 0 , 0 , V/c_bar],
-  #         [0 , 0 , 1 , 0],
-   #        [0 , 0 , 0 , 0],
+# output is [u, alpha, theta, q,]
+C_symm = np.array([
+          [1 , 0 , 0 , 0],                          
+          [0 , 1 , 0 , 0],
+          [0 , 0 , 1 , 0],
+          [0 , 0 , 0 , V/aero_constants.c_bar]])
 
 
-#D_symm = [[- , -],
-#           [- , -],
- #          [0 , 0],
-  #         [0 , 0],
-   #        [1 , 0],
+D_symm = np.array([
+          [0 , 0],
+          [0 , 0],
+          [0 , 0],
+          [1 , 0]])
 
-
-
-
-
-
-
-
-
-
-
-
-runn =False
+runn =True
 if runn == True:
-    x0 = [0,0,0,0]
+    x0 = np.array([[0],                     # initial codnitions for u, alpha, theta and q respectively
+                   [np.pi/180],
+                   [0],
+                   [0]])
     start = 0
-    stop = 30
-    step =1
-    t=np.arange(start,stop,step)
-    sys = signal.StateSpace(A,B,C,D)
+    stop = 30.1
+    steps = 0.1
+    t = np.arange(start,stop,steps)
+    sys = ss(A_symm,B_symm,C_symm,D_symm)
     # step response
-    t,y = signal.step(sys, x0,t)
+    y,time = initial(sys, t, x0)
     plt.plot(t,y)
-    plt.title('Step response ')
+    plt.title('Initial')
     plt.xlabel('t')
     plt.ylabel('y')
     plt.show()
 
+print(pole(sys))
 
 
 # print("""t
