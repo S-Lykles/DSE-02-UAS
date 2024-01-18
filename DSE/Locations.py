@@ -27,17 +27,17 @@ def locations():
     # Xac =1.1 #PLACEHOLDER,  guessed value
     # Xac_v = 3.2  #PLACEHOLDER,  guessed value
     # Xh =4.3 #PLACEHOLDER,  guessed value
-    Zp = 0.7 #PLACEHOLDER,  guessed value
-    Zac = 1 #PLACEHOLDER,  guessed value
-    Zh = 1.6 #PLACEHOLDER,  guessed value
+    # Zp = 0.7 #PLACEHOLDER,  guessed value
+    # Zac = 1 #PLACEHOLDER,  guessed value
+    # Zh = 1.6 #PLACEHOLDER,  guessed value
     Xfr = 0.5 #intial value
-    Xaft = 3.5 #intial value
-    Xac = 1.5 #intial value
-    Xac_v = 5.85  #intial value
-    Xh = 5.85 #intial value
-    Zp = 0.725 #intial value
-    Zac = 0.85 #intial value
-    Zh = 1.15 #intial value
+    Xaft = 3 #intial value
+    Xac = 2.0828 #intial value
+    Xac_v = 5  #intial value
+    Xh = 5.1 #intial value
+    Zp = -0.165 #intial value
+    Zac = 0.17 #intial value
+    Zh = 0.79 #intial value
 
 
     # print("Caution: The values about about distances are just guessed values, must be revisited. python file: DSE/structures/locations")

@@ -160,7 +160,7 @@ print(class_two_cg_estimation(True, False, False, False))
 
 
 #Updated version of the above code
-components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
+components_dict_old = {'component name': '[W, x_cg, y_cg, z_cg]',
                    'WingL': [10, 1.5, 1.2, 0.85],
                    'WingR': [10, 1.5, -1.2, 0.85],
                    'BoomL': [5, 2.75, 1, 0.75],
@@ -179,15 +179,66 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                     'Payload_pd': [50,1.5,0,0.3],
                     'Payload_le': [20,1.5,0,0.3],
                    'Fuel_pd': [14,1.5, 0, 0.3],
-                   'Fuel_le': [34,1.5, 0, 0.3]}
-
+                   'Fuel_le': [34,1.5, 0, 0.3]
+                                      }
+components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
+                       'Air data boom':[0.142,0.23,0,0],
+                        'Iridium Antenna':[0.1,0.5225,-0.027,0],
+                        'Iridium Satellite communication module':[0.73,0.6875,0,0],
+                        'GNSS Antenna 1':[0.011,0.56,0.00925,0],
+                        'GNSS Antenna 2':[0.011,0.56,0.0185,0],
+                        'GNSS Antenna 3':[0.011,0.56,0.02775,0],
+                        'ADSB Transponder':[0.05,0.612,0.05,0],
+                        'Landing Visual Sensor':[0.0215,0.765,0.035,-0.0275],
+                        'Flight Computer + Short Range Transceiver':[0.1,0.74,-0.015,0.0425],
+                        'Polar IMU + Magnetometer + GNSS':[0.17,0.645,0,0.0575],
+                        'Flight Data Recorder':[0.07,0.735,0.029,0.056],
+                        'WingL':[9,2.2731,-1.226,0.17],
+                        'WingR':[9,2.2731,1.226,0.17],
+                        # 'WingL':[9,2.0828,-1.226,0.17],
+                        # 'WingR':[9,2.0828,1.226,0.17],
+                        'Power Management module':[6,1.6401,0,-0.1],
+                        'Emergency Battery':[2,0.8,0,0],
+                        'Combustion Engine':[35,1.8401,0,-0.165],
+                        'Alternator':[9,2.0701,0,-0.165],
+                        'Clutch':[1,2.1201,0,-0.165],
+                        'Push-prop':[0.6,2.2201,0,-0.165],
+                        'ECU':[1,1.6401,0,-0.05],
+                        'Fuselage structure/Shell':[3,1.845,0,-0.17],
+                        'ESC1':[0.62,0.1,-1.15,-0.06],
+                        'ESC2':[0.62,2.6,-1.15,-0.06],
+                        'ESC3':[0.62,0.1,1.15,-0.06],
+                        'ESC4':[0.62,2.6,1.15,-0.06],
+                        'Emotor1':[1.68,0.5,-1.15,-0.1],
+                        'Emotor2':[1.68,3,-1.15,-0.1],
+                        'Emotor3':[1.68,0.5,1.15,-0.1],
+                        'Emotor4':[1.68,3,1.15,-0.1],
+                        'Liftprops1':[0.4,0.5,-1.15,-0.1],
+                        'Liftprops2':[0.4,3,-1.15,-0.1],
+                        'Liftprops3':[0.4,0.5,1.15,-0.1],
+                        'Liftprops4':[0.4,3,1.15,-0.1],
+                        'Tailboom L':[7,2.65,-1.15,-0.1],
+                        'Tailboom R':[7,2.65,1.15,-0.1],
+                        'Hor Tail':[4,5.1,0,0.79],
+                        'Vert Tail 1':[1,5,-1.15,0.163333333],
+                        'Vert Tail 2':[1,5,1.15,0.163333333],
+                        'Fuel Pump 1':[0.07,1.215,-0.1,-0.12],
+                        'Fuel Pump 2':[0.07,1.0875,0.1,-0.12],
+                        'Emergency Battery':[2,0.8,0,0],
+                        'Payload_pd': [50,1.5,0,0.3],
+                        'Payload_le': [20,1.5,0,0.3],
+                       'Fuel_pd': [14,1.5, 0, 0.3],
+                       'Fuel_le': [34,1.5, 0, 0.3]
+                                      }
 
 
 
 def OEW(oew = True):
 
     if oew:
-        oew_data = ['WingL', 'WingR', 'BoomL', 'BoomR', 'Generator', 'Tailsurface', 'Fuselage', 'FCU', 'Comms']
+        # oew_data = ['WingL', 'WingR', 'BoomL', 'BoomR', 'Generator', 'Tailsurface', 'Fuselage', 'FCU', 'Comms']
+
+        oew_data = ['Air data boom', 'Iridium Antenna', 'Iridium Satellite communication module', 'GNSS Antenna 1', 'GNSS Antenna 2', 'GNSS Antenna 3', 'ADSB Transponder', 'Landing Visual Sensor', 'Flight Computer + Short Range Transceiver', 'Polar IMU + Magnetometer + GNSS', 'Flight Data Recorder', 'WingL', 'WingR', 'Power Management module', 'Emergency Battery', 'Combustion Engine', 'Alternator', 'Clutch', 'Push-prop', 'ECU', 'Fuselage structure/Shell', 'ESC1', 'ESC2', 'ESC3', 'ESC4', 'Emotor1', 'Emotor2', 'Emotor3', 'Emotor4', 'Liftprops1', 'Liftprops2', 'Liftprops3', 'Liftprops4', 'Tailboom L', 'Tailboom R', 'Hor Tail', 'Vert Tail 1', 'Vert Tail 2']
 
     return oew_data
 
@@ -210,10 +261,12 @@ def payload(payload_supply, payload_relay, components):
 def propulsion(fuel_supply, fuel_relay, components):
 
     if fuel_supply:
-        prop_data = ['Engine', 'Generator', 'Fuel_pd']
+        # prop_data = ['Engine', 'Generator', 'Fuel_pd']
+        prop_data = ['Fuel Pump 1', 'Fuel_pd']
         # return prop_data
     elif fuel_relay:
-        prop_data = ['Engine', 'Generator', 'Fuel_le', 'Battery']
+        # prop_data = ['Engine', 'Generator', 'Fuel_le', 'Battery']
+        prop_data = ['Fuel Pump 2', 'Fuel_le','Emergency Battery']
     else:
         prop_data = []
 
@@ -266,5 +319,8 @@ def cg_per_mission(oew, fuel_supply, fuel_relay, payload_supply, payload_relay, 
 
     return cal_cg
 
-test = cg_per_mission(True, True, False, False, False)
-print('fuel supply',test[1])
+test1 = cg_per_mission(True, False, False, False, False)
+test2 = cg_per_mission(True, False, True, False, False)
+test3 = cg_per_mission(True, False, False, False, True)
+test4 = cg_per_mission(True, False, True, False, True)
+print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
