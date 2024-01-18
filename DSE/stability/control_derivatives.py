@@ -235,54 +235,71 @@ else:
     A_symm = np.linalg.inv(P_symm) @ Q_symm
     B_symm = np.linalg.inv(P_symm) @ R_symm
     eig_val_symm = np.linalg.eig(A_symm)[0]
-
+    print("asymm",A_symm)
 
 
     #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
-    #C_symm = [[- , - , - , -],
-    #          [- , - , - , -],
-    #          [0 , 0 , 0 , V/c_bar],
-    #          [0 , 0 , 1 , 0],
-    #          [0 , 0 , 0 , 0],
+    C_symm = [[1 , 0 , 0 , 0],
+              [0 , 1 , 0 , 0],
+              [0 , 0 , 1 , 0],
+              [0 , 0 , 0 , V/aero_constants.c_bar]]
 
-    #D_symm = [[- , -],
-    #          [- , -],
-    #          [0 , 0],
-    #          [0 , 0],
-    #          [1 , 0],
+    D_symm = [[0 , 0],
+              [0 , 0],
+              [0 , 0],
+              [1 , 0]]
+    
+damping = True
+if damping:
+    sys = ss(A_symm,B_symm,C_symm,D_symm)    
+    state_matrix = np.eye(4)
+    input_matrix = np.eye(2)
+    K, S, E = lqr(sys, state_matrix, input_matrix)
+    A_cl = A_symm - B_symm @ K
+    sys_cl = ss(A_cl,B_symm,C_symm,D_symm)
+    damping_system = sys_cl.feedback(K)
 
-
-
-
-
-
-
-
-
-
-
-
-runn =True
-if runn == True:
-    x0 = np.array([[0],                     # initial codnitions for u, alpha, theta and q respectively
-                   [np.pi/180],
-                   [0],
-                   [0]])
-    start = 0
-    stop = 30.1
-    steps = 0.1
-    t = np.arange(start,stop,steps)
-    sys = ss(A_symm,B_symm,C_symm,D_symm)
-    # step response
-    y,time = initial(sys, t, x0)
-    plt.plot(t,y)
+    # The time vector
+    tend = 50
+    dt = 0.1
+    t = np.arange(0,tend+dt, dt)
+    #==============================================================================
+    # Step input or initial condition?
+    step_input = False
+    initial_condition = True
+    if step_input:    
+        # The input vector.
+        ttussen = 1  # ttussen is the time that 1 should be present.
+        u01 = np.zeros(len(t))
+        for i in range(int(ttussen/dt)):
+            u01[i] = 10 *np.pi/180
+        #print('check number of ones in x01',sum(x01))
+        u02 = np.zeros(len(t))
+        s = (len(t),2)
+        u0 = np.zeros(s)
+        for i in range(len(t)):
+            u0[i] = u01[i],u02[i]
+        y, time, x = lsim(damping_system, u0, t)
+    if initial_condition:
+        x0 = np.array([[1],          # initial codnitions for u, alpha, theta and q respectively
+                       [1],
+                       [1],
+                       [0]])
+        
+        y, time = initial(sys_cl, t, x0)                  
+    plt.plot(t,y[:,0],label = "u")
+    plt.plot(t,y[:,1],label = "alpha")
+    plt.plot(t,y[:,2],label = "theta")
+    plt.plot(t,y[:,3],label = "q")
     plt.title('Initial')
     plt.xlabel('t')
     plt.ylabel('y')
+    plt.legend()
     plt.show()
-
-print(pole(sys))
+    print(y[0],y[1])
+    print(pole(sys_cl))
+    
 
 
 # print("""t
