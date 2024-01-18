@@ -57,8 +57,7 @@ de_da = 0.42313505699610365
 b = aero_constants.b
 c_bar = aero_constants.c_bar
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
-CL_w = aero_constants.CL_cruise[0]
-CL_w = aero_constants.CL_cruise[0]
+CL_w = aero_constants.CL_cruise
 CL0 = aero_constants.CL_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
@@ -206,6 +205,7 @@ else:
     CZdelt_t = 0
     CMdelt_t = 0
 
+
 P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
      [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
      [0, 0, -c_bar / V, 0],
@@ -216,7 +216,6 @@ Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
      [0, 0, 0, -1],
      [-CMu, -Cmalpha, 0, -Cmq]]
 
-
 R_symm = [[-CXdelt_e,CXdelt_t],
      [-CZdelt_e,CYdelt_t],
      [0,0],
@@ -224,9 +223,9 @@ R_symm = [[-CXdelt_e,CXdelt_t],
 
 #P_inv = np.linalg.inv(P_symm)
 #A = np.matmul(P_inv,Q_symm)
-#A = np.linalg.inv(P_symm) @ Q_symm
-#B = np.linalg.inv(P_symm) @ R_symm
-print(Q_symm)
+A = np.linalg.inv(P_symm) @ Q_symm
+B = np.linalg.inv(P_symm) @ R_symm
+
 
 #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
