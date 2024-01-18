@@ -24,8 +24,8 @@ CL_initial_conditions = cl_23012_wing[index_ic]
 Cd_initial_conditions = cd_23012_wing[index_ic]
 CD0_wing = 0.0077
 CD_alpha_wing = (cd_23012_wing[20]-cd_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
-CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)]
-CD_0 = cd_23012_wing[np.where(alpha_23012_wing == 0)]
+CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)][0]
+CD_0 = cd_23012_wing[np.where(alpha_23012_wing == 0)][0]
 CL_alpha_wing = (cl_23012_wing[20]-cl_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
 Cl_alpha_wing = (cl_23012_airfoil[20]-cl_23012_airfoil[0])/((alpha_23012_airfoil[20]-alpha_23012_airfoil[0])*pi/180)
 CL_alpha_h = (cl_0012_wing[20]-cl_0012_wing[0])/((alpha_0012_wing[20]-alpha_0012_wing[0])*pi/180)
