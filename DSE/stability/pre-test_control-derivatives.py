@@ -3,12 +3,13 @@ from DSE.aero.aero_constants import *
 from DSE.Locations import *
 from math import *
 import numpy as np
+from DSE.const import deg2rad, rad2deg
 
 CL = CL_cruise
 # initial equilibrium condition at 2 deg before cruise angle
-alpha_initial_eq = 2
-CD_initial_eq = 2
-CL_initial_eq = 2
+alpha_initial_eq = 2 * deg2rad
+CD_initial_eq = 0.0077
+CL_initial_eq = 1.2
 
 gamma0 = 2*pi/180
 

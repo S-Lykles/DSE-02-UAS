@@ -16,6 +16,7 @@ data_23012_airfoil = np.loadtxt(file_dir/r"NACA23012_RE_2E6.txt", skiprows=11)
 data_23012_wing = np.loadtxt(file_dir/r"NACA23012_Wing.txt", skiprows=8)
 data_0012_airfoil = np.loadtxt(file_dir/r"NACA0012_RE_2E6.txt", skiprows=11)
 data_0012_wing = np.loadtxt(file_dir/r"NACA0012_Wing.txt", skiprows=8)
+data_0012_wing_v = np.loadtxt(file_dir/r"NACA0012_vertical_tail.txt", skiprows=8)
 
 # Extract columns
 alpha_23012_airfoil = data_23012_airfoil[:, 0]    # Angle of attack
@@ -28,11 +29,24 @@ cl_23012_wing = data_23012_wing[:, 2]       # Lift coefficient
 cd_23012_wing = data_23012_wing[:, 5]       # Drag coefficient
 cm_23012_wing = data_23012_wing[:, 8]       # Moment coefficient
 
+alpha_0012_wing = data_0012_wing[:, 0]    # Angle of attack
+cl_0012_wing = data_0012_wing[:, 2]       # Lift coefficient
+cd_0012_wing = data_0012_wing[:, 5]       # Drag coefficient
+cm_0012_wing = data_0012_wing[:, 8]       # Moment coefficient
+
 alpha_0012_airfoil = data_0012_airfoil[:, 0]    # Angle of attack
 cl_0012_airfoil = data_0012_airfoil[:, 1]       # Lift coefficient
 cd_0012_airfoil = data_0012_airfoil[:, 2]       # Drag coefficient
 cm_0012_airfoil = data_0012_airfoil[:, 4]       # Moment coefficient
 
+alpha_0012_v = data_0012_wing_v[:, 0]    # Angle of attack
+alpha_0012_wing_v = [i * 0.5 for i in alpha_0012_v]
+cl_0012_v = data_0012_wing_v[:, 2]       # Lift coefficient
+cl_0012_wing_v = [i * 0.5 for i in cl_0012_v]
+cd_0012_v = data_0012_wing_v[:, 5]       # Drag coefficient
+cd_0012_wing_v = [i * 0.5 for i in cd_0012_v]
+cm_0012_v = data_0012_wing_v[:, 8]       # Moment coefficient
+cm_0012_wing_v = [i * 0.5 for i in cm_0012_v]
 
 # Plot the data Dual Phase
 if __name__ == "__main__":

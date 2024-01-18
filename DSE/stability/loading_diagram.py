@@ -19,7 +19,7 @@ def centre_of_gravity(OEM, fuel_pd, fuel_le, payload_pd, payload_le):
     return cg, mass
 
 def loading_diagram_extremes():
-    l_f = 2
+    l_f = 6
     xlemac_lf = []
     x_lemac= np.arange(1,4,0.01)
 

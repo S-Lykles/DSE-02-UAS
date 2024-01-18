@@ -3,7 +3,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from pathlib import Path
-from Internal_load_model import moment_distribution
+#from Internal_load_model import moment_distribution
 
 # This tool can be used to compute the moment of inertia of various cross-sectional shapes
 # The formula's were obtained from course AE2135-I or
@@ -280,7 +280,7 @@ def compute_buckling(E, Ixx, buckling, L, v, t, b):
 # Max sheet height from point in which moment acts
 
 
-def number_of_stringers_computation(K_c, s, t, E, t_c):
+def number_of_stringers_computation(K_c, s, t, E, t_c): #, mu):
     E = E * 0.000145037738
     t = t * 39.3700787
     h = (0.833 - s / 6) * t_c * 39.3700787
@@ -293,7 +293,8 @@ def number_of_stringers_computation(K_c, s, t, E, t_c):
     # Compute the maximum compressive force acting on the wing box section
     Fmax = M / h
     sigma_cr = Fmax / (t * L)
-    L_check = t / np.sqrt(sigma_cr/(K_c * E))
+    L_check = t / np.sqrt(sigma_cr / (K_c * E))
+    #L_check = t / np.sqrt(12 * sigma_cr * (1 - mu**2)/(K_c * E * np.pi**2))
     # Compute the maximum spacing between stringers
     N_req = L/L_check
     print(N_req, "Nreq")
@@ -314,16 +315,20 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
     # Compute the maximum compressive force acting on the wing box section
     Fmax = T / h
     sigma_cr = Fmax / (t * L)
-    L_check = t / np.sqrt(sigma_cr / (K_c * E))
+    L_check = t / np.sqrt(12 * sigma_cr * (1 - mu**2)/(K_c * E * np.pi**2))
     # Compute the maximum spacing between stringers
     N_req = L / L_check
     print(N_req, "Nreq")
     # return N_stringers
 
 
-print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 0, 0.001, 71*10**9, 0.12))
+print("Compute number of stringers required at s = 1:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
+                                                                                        0.12))#, 0.3))
 
-
+# print("The sizing of the moment of inertia for the horizontal tail wing is:"
+#       , I_xx_wing_box(0.01, 0.002,0.004,0.008,0.01,0.002,
+#                       0.004,0.008,0,0,0,0,0.001,
+#                       0.234*0.5, 0.001, 0.234*0.5, 2))
 # print("Compute number of stringers required:", number_of_stringers_computation(3.62, 0.833*0.52, 0.001, 71*10**9,
 #                                                                                4000, 0.833*0.12))
 # print("Compute number of ribs required "
