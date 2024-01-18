@@ -274,6 +274,9 @@ def elevator_surface_sizing(l_h=locations()[3],c_bar=aero_constants.c_bar,Cm_0=a
     Cm_delta_el = -1*(Cm_0 + Cm_alpha*(alpha - alpha_0)) / delta
     Tau_el = -1*Cm_delta_el / CL_alpha_h * (bh_be) * 1/Sh_S * c_bar/l_h * (1/Vh_V_2)**2
 
+    S_a_S = np.linspace(0.0, 1.0, 2000)
+    tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
+
     return Tau_el, Cm_delta_el
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
