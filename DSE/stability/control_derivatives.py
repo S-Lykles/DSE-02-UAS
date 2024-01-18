@@ -198,8 +198,8 @@ else:
     CXq = 0
 
     CXdelt_e = 0
-    CZdelt_e = elevator_surface_sizing()[1][0] * (aero_constants.c_bar/l_h)
-    CMdelt_e = elevator_surface_sizing()[1][0]
+    CZdelt_e = -CL_alpha_h*0.95*Sh*l_h/S*c_bar* elevator_surface_sizing()[0] * (aero_constants.c_bar/l_h)
+    CMdelt_e = -CL_alpha_h*0.95*Sh*l_h/S*c_bar* elevator_surface_sizing()[0]
     CXdelt_t = 0
     CYdelt_t = 0
     CZdelt_t = 0
@@ -229,6 +229,8 @@ else:
     A_symm = np.linalg.inv(P_symm) @ Q_symm
     B_symm = np.linalg.inv(P_symm) @ R_symm
     eig_val_symm = np.linalg.eig(A_symm)[0]
+
+
 
     #  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
 
