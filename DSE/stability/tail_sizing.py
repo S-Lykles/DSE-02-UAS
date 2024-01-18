@@ -394,12 +394,13 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
     return(span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce)
 
-span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce = aileron_surface_sizing(42)[:]
-print("aileron inward spanwise location:", span_wise_inner_final,
-      "aileron outward spanwise location:", span_wise_outer,
-      "lift coefficient change in wing due to aileron deflection:", Cl_delta_A,
-      "aileron deflection force:", maxforce,
-      "aileron max deflection is 20 degrees up or down")
+# span_wise_inner_final, span_wise_outer, S_a_final, Cl_delta_A, maxforce = aileron_surface_sizing(42)[:]
+# print("aileron inward spanwise location:", span_wise_inner_final)
+# print("aileron outward spanwise location:", span_wise_outer)
+# print("lift coefficient change in wing due to aileron deflection:", Cl_delta_A)
+# print("aileron deflection force:", maxforce)
+# print("aileron max deflection is 20 degrees up or down")
+# print("aileron effective chord-wise fraction is 23% (it is a frise aileron, which allows a smaller hinge, it will still take up about 27% of wing chord")
 
 
 #def stab_con_int_structure():
