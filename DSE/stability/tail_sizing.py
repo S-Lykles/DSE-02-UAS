@@ -425,8 +425,8 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
     tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
 
     print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check wiht "Jakob or Bas"')
-    Ce_Ch = 0.25
-    Se_Sh = Ce_Ch * (1/bh_be)
+    Ce_Ch = 0.25 #*Ch
+    Se_Sh = Ce_Ch * (1/bh_be) #*Sh
     return Tau_el[0], Ce_Ch, Se_Sh
 
 
