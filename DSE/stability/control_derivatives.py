@@ -201,34 +201,43 @@ else:
     CZdelt_t = 0
     CMdelt_t = 0
 
-P = [[-2 * mu_c * c_bar / V, 0, 0, 0],
-     [0, (CZ_alphadott - 2 * mu_c) * c_bar / V, 0, 0],
+P_symm = [[-2 * mu_c * c_bar / V, 0, 0, 0],
+     [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
      [0, 0, -c_bar / V, 0],
-     [0, CM_alphadott * c_bar / V, 0 - 2 * mu_c * Ky_2 * c_bar / V]]
+     [0, Cmalphadott * c_bar / V, 0 - 2 * mu_c * Ky_2 * c_bar / V]]
 
 Q_symm = [[-CXu, -CXalpha, -CZ0, 0],
      [-CZu, -CZalpha, CX0, -(CZq + 2*mu_c, 0)],
      [0, 0, 0, -1],
-     [-Cmu, -Cmalpha, 0, -Cmq]
+     [-Cmu, -Cmalpha, 0, -Cmq]]
 
 
-R = [[-CXdelt_e,CXdelt_t],
+R_symm = [[-CXdelt_e,CXdelt_t],
      [-CZdelt_e,CYdelt_t],
      [0,0],
-     [-Cmdel_e, CMdelt_t]]
+     [-CMdelt_e, CMdelt_t]]
 
-A = np.linalg.inv(P) @ Q
-B = np.linalg.inv(P) @ R
+A = np.linalg.inv(P_symm) @ Q_symm
+B = np.linalg.inv(P_symm) @ R_symm
 
-C = [[1,0,0,0],
-     [0,1,0,0],
-     [0,0,1,0],
-     [0,0,0,1]]
 
-D = [[0,0,0,0],
-     [0,0,0,0],
-     [0,0,0,0],
-     [0,0,0,0]]
+#  Y = u_dott, w_dott, theta_dott, thata, delta_ele, delta_trim,
+
+#C_symm = [[- , - , - , -],
+           [- , - , - , -],
+           [0 , 0 , 0 , V/c_bar],
+           [0 , 0 , 1 , 0],
+           [0 , 0 , 0 , 0],
+           [0 , 0 , 0 , 0]]
+
+#D_symm = [[- , -],
+           [- , -],
+           [0 , 0],
+           [0 , 0],
+           [1 , 0],
+           [0 , 1]]
+
+
 
 x0 = [0,0,0,0]
 start = 0
