@@ -20,14 +20,14 @@ def integrate_dT(r, dT, N):
     return np.trapz(np.where((r>=0.25*R) & (r<=0.95*R), dT, 0), r) * N
 
 
-def vi_bem(r, dT_dr, N, Vc, rho=const.rho0):
+def vi_bem(r, dT_dr, N, Vc, rho=const.rho0, f=1.15):
     """Calculate induced velocity using momentum theory"""
-    return np.sqrt(dT_dr * N / (4 * np.pi * rho * r)) * 1.15 # 1.15 is for tip and 3d effects
+    return np.sqrt(dT_dr * N / (4 * np.pi * rho * r)) * f # 1.15 is for tip and 3d effects
 
 
-def dT_vi(r, Vi, Vc, N, rho=const.rho0):
+def dT_vi(r, Vi, Vc, N, rho=const.rho0, f=1.15):
     """Calculate thrust distribution using momentum theory"""
-    return 2 * (2*np.pi*r) * rho * Vi * (Vi + Vc) / N / 1.15**2
+    return 2 * (2*np.pi*r) * rho * Vi * np.abs(Vi + Vc) / N / f**2
 
 
 def dT_be(r, omega, chord, twist, vi, Vc=0, rho=const.rho0, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky, which='alpha'):
@@ -65,13 +65,11 @@ def solve_dT(r, omega, chord, twist, N, Cl_func=Cl_func_clarky, Cd_func=Cd_func_
         raise ValueError("Failed to converge")
     return dT2, dQ
 
-
-def solve_c_mean(r, omega, c_mean0, chord, alpha, N, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_iter=100, tol=1e-6):
+CMEAN = 0.05
+def solve_c_mean(r, omega, chord, alpha, N, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_iter=100, tol=1e-6):
     """Itteratively solve for mean chord needed to get required thrust"""
-    if hasattr(solve_c_mean, "c_mean0"):
-        c_mean = solve_c_mean.c_mean0
-    else:
-        c_mean = c_mean0
+    global CMEAN
+    c_mean = CMEAN
     for _ in range(max_iter):
         c = np.mean(chord)
         dT, _ = solve_dT(r, omega, c_mean/c*chord, alpha, N)
@@ -81,7 +79,7 @@ def solve_c_mean(r, omega, c_mean0, chord, alpha, N, T_req=1.1*const.MTOW/4, tip
         c_mean = c_mean * (1 + T_req/T) / 2
     else:
         raise ValueError("Failed to converge")
-    solve_c_mean.c_mean0 = c_mean
+    CMEAN = c_mean
     return c_mean
 
 
@@ -95,7 +93,7 @@ def figure_of_merit(x, omega, N=2, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_it
     chord = chord_dist(r, P_chord)
     alpha = twist_dist(r, P_alpha)
 
-    c_mean = solve_c_mean(r, omega, c_mean0, chord, alpha, N, T_req=T_req, tip_frac=tip_frac, max_iter=max_iter, tol=tol)
+    c_mean = solve_c_mean(r, omega, chord, alpha, N, T_req=T_req, tip_frac=tip_frac, max_iter=max_iter, tol=tol)
     c = np.mean(chord)
     dT, dQ = solve_dT(r, omega, c_mean/c*chord, alpha, N)
     T = integrate_dT(r, dT, N)
@@ -130,7 +128,7 @@ if __name__ == "__main__":
     chord = chord_dist(r, P_chord)
     alpha = twist_dist(r, P_twist)
 
-    c_mean = solve_c_mean(r, 4000*2*np.pi/60, c_mean0, chord, alpha, N=N, T_req=1.1*const.MTOW/4, max_iter=1000)
+    c_mean = solve_c_mean(r, 4000*2*np.pi/60, chord, alpha, N=N, T_req=1.1*const.MTOW/4, max_iter=1000)
     fac = c_mean / np.mean(chord)
     chord *= fac
     print(np.sum(chord))
