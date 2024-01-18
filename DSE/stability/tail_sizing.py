@@ -421,18 +421,13 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
 
     Tau_el = (Cm_0 *CL_alpha + (CL_l - CL_0)*Cm_alpha ) / ( delta*eta_h* ( -CL_alpha*CL_alpha_h*Vh_vol*(1/bh_be) - Cm_alpha* CL_alpha_h * Sh/S*(1/bh_be)))
 
-    # S_a_S = np.linspace(0.0, 0.7, 100)
-    # tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
+    S_a_S = np.linspace(0.0, 0.7, 100)
+    tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
 
-    print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check with "Jakob or Bas"')
+    print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check wiht "Jakob or Bas"')
     Ce_Ch = 0.25
     Se_Sh = Ce_Ch * (1/bh_be)
-
-    C_L_de = CL_alpha_h * eta_h * (Sh/S) * (1/bh_be) * Tau_el[0]
-
     return Tau_el[0], Ce_Ch, Se_Sh
-
-elevator_surface_sizing()
 
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
@@ -610,10 +605,10 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
 
 
-
-
-print(horizontal_tail_sizing())
-print(elevator_surface_sizing())
-print(vertical_tail())
-print(rudder_surface_sizing())
-print(aileron_surface_sizing())
+testing = False
+if testing == True:
+    print(horizontal_tail_sizing())
+    print(elevator_surface_sizing())
+    print(vertical_tail())
+    print(rudder_surface_sizing())
+    print(aileron_surface_sizing())
