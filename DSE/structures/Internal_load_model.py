@@ -9,7 +9,7 @@ def aero_data_to_numpy(file_name):
     file_dir = Path(__file__).parent
     data = np.loadtxt(file_dir/f"{file_name}")
     data = np.transpose(data)
-    y = data[0]
+    y = data[0] + 1.15
     chord = data[1]
     cl = data[3]
     cd = data[4] + data[5]
@@ -90,24 +90,26 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     load_factor_vtol = 1.1
     Upwards_load = (load_factor_vtol * const.MTOW) / 2
     Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
-    reac_torque = load_distribution(0.2, Boom_from_centerline, step, -1700/step, -1700/step, 'linear', point_range)
-    reac_torque_2 = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
-    reac_force = load_distribution(0.2, Boom_from_centerline, step, 800, 800, 'linear', point_range)
+    # reac_torque = load_distribution(0.2, Boom_from_centerline, step, -1700/step, -1700/step, 'linear', point_range)
+    # reac_torque_aileron = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
+    elevator_torque = load_distribution(1.15, 2.3, step, -0.5* 0.109 * 240.55 / step, 0, 'linear', point_range)
+    elevator_torque_2 = load_distribution(0, 1.15, step, 0, -0.5 * 0.109 * 240.55 / step, 'linear', point_range)
+    #reac_force = load_distribution(0, Boom_from_centerline, step, 800, 800, 'linear', point_range)
     if VTOL:
         loading_distribution = Upwards_pointload
         loading_distributionx = 0
     else:
         load_factor_manouvre = 1.5
         loading_distributionz = load_factor_manouvre * lift_distribution #+ reac_force
-        torque_distribution = 3.8*torque_distribution + reac_torque + reac_torque_2
+        torque_distribution = 3.8*torque_distribution + elevator_torque + elevator_torque_2 #+ reac_torque + reac_torque_aileron
         loading_distributionx = load_factor_manouvre * drag_distribution
-    ax = plt.axes(projection='3d')
-    ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
-    ax.plot3D(point_range, zeros, loading_distributionz/step, 'red')
-    ax.set_xlabel('semi-spanwise location (m)')
-    ax.set_ylabel('internal force (drag) (N)')
-    ax.set_zlabel('internal force (lift) (N)')
-    plt.show()
+    # ax = plt.axes(projection='3d')
+    # ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
+    # ax.plot3D(point_range, zeros, loading_distributionz/step, 'red')
+    # ax.set_xlabel('semi-spanwise location (m)')
+    # ax.set_ylabel('internal force (drag) (N)')
+    # ax.set_zlabel('internal force (lift) (N)')
+    # plt.show()
     plt.plot(point_range, torque_distribution)
     plt.xlabel('semi-spanwise location (m)')
     plt.ylabel('Internal Torque (Nm)')
@@ -115,7 +117,7 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     return loading_distributionx, loading_distributionz, torque_distribution, point_range, max_th
 
 
-loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 3, 1/128, False)
+loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 2.3, 1/128, False)
 
 
 def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step):
@@ -134,13 +136,13 @@ def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_r
         momentx_distribution = np.append(momentx_distribution, momentx/step)
         momentz_distribution = np.append(momentz_distribution, momentz/ step)
     #print(momentx_distribution[0], momentz_distribution[0])
-    ax = plt.axes(projection='3d')
-    ax.plot3D(point_range, momentx_distribution, zeros, 'blue')
-    ax.plot3D(point_range, zeros, momentz_distribution, 'red')
-    ax.set_xlabel('semi-spanwise location (m)')
-    ax.set_ylabel('internal moment (x) (Nm)')
-    ax.set_zlabel('internal moment (z) (Nm)')
-    plt.show()
+    # ax = plt.axes(projection='3d')
+    # ax.plot3D(point_range, momentx_distribution, zeros, 'blue')
+    # ax.plot3D(point_range, zeros, momentz_distribution, 'red')
+    # ax.set_xlabel('semi-spanwise location (m)')
+    # ax.set_ylabel('internal moment (x) (Nm)')
+    # ax.set_zlabel('internal moment (z) (Nm)')
+    # plt.show()
     return momentx_distribution, momentz_distribution, point_range
 
 
