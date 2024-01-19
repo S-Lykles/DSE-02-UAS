@@ -85,20 +85,21 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     """
     point_range = np.arange(beam_start, beam_stop + step, step)
     zeros = np.zeros(len(point_range))
-    lift_distribution, drag_distribution, torque_distribution, max_th = distribution_from_aero_data(0.2, beam_stop, step, 'external files/wing_data.txt', point_range)
-    Boom_from_centerline = 1.3
+    lift_distribution, drag_distribution, torque_distribution, max_th = distribution_from_aero_data(0, beam_stop, step, 'external files/wing_data.txt', point_range)
+    Boom_from_centerline = 1.15
     load_factor_vtol = 1.1
     Upwards_load = (load_factor_vtol * const.MTOW) / 2
     Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
-    reac_torque = load_distribution(0, Boom_from_centerline, step, 1700/step, 1700/step, 'linear', point_range)
-    reac_force = load_distribution(0, Boom_from_centerline, step, 800, 800, 'linear', point_range)
+    reac_torque = load_distribution(0.2, Boom_from_centerline, step, -1700/step, -1700/step, 'linear', point_range)
+    reac_torque_2 = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
+    reac_force = load_distribution(0.2, Boom_from_centerline, step, 800, 800, 'linear', point_range)
     if VTOL:
         loading_distribution = Upwards_pointload
         loading_distributionx = 0
     else:
-        load_factor_manouvre = 3.8
-        loading_distributionz = load_factor_manouvre * lift_distribution + reac_force
-        torque_distribution = 3.8*torque_distribution + reac_torque
+        load_factor_manouvre = 1.5
+        loading_distributionz = load_factor_manouvre * lift_distribution #+ reac_force
+        torque_distribution = 3.8*torque_distribution + reac_torque + reac_torque_2
         loading_distributionx = load_factor_manouvre * drag_distribution
     ax = plt.axes(projection='3d')
     ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
@@ -114,7 +115,7 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     return loading_distributionx, loading_distributionz, torque_distribution, point_range, max_th
 
 
-loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 3, 0.01, False)
+loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 3, 1/128, False)
 
 
 def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step):
@@ -151,28 +152,33 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step)
     across = tskinreq*0.52*max_th/0.12
     vbox = across*step
     mbox = sum(vbox)*rho
-    plt.plot(point_range, Ixxreq)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('required Ixx (m^4)')
-    plt.show()
-    plt.plot(point_range, tskinreq)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('required skin thickness (m)')
-    plt.show()
-    plt.plot(point_range, across)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('predicted cross-sectional area structural members (m^2)')
-    plt.show()
-    plt.plot(point_range, req_spar_space)
-    plt.xlabel('semi-spanwise location (m)')
-    plt.ylabel('required rib spacing (m)')
-    plt.show()
-    print(max(Ixxreq))
+    # plt.plot(point_range, Ixxreq)
+    # plt.xlabel('semi-spanwise location (m)')
+    # plt.ylabel('required Ixx (m^4)')
+    # plt.show()
+    # plt.plot(point_range, tskinreq)
+    # plt.xlabel('semi-spanwise location (m)')
+    # plt.ylabel('required skin thickness (m)')
+    # plt.show()
+    # plt.plot(point_range, across)
+    # plt.xlabel('semi-spanwise location (m)')
+    # plt.ylabel('predicted cross-sectional area structural members (m^2)')
+    # plt.show()
+    # plt.plot(point_range, req_spar_space)
+    # plt.xlabel('semi-spanwise location (m)')
+    # plt.ylabel('required rib spacing (m)')
+    # plt.show()
+    print("The maximum required moment of inertia along the wing span of the wing box is:", max(Ixxreq))
     print(max(tskinreq))
     print(mbox)
 
 
-moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 0.01)
+moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
+#print(Ixxreq(moment_distributionx, point_range, 0.001, 300*10**6, 71*10**9, 2800, 0.01))
+
+
+#print("The maximum moment experienced is:", momentdistributionz[0])
+
 
 #Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
 

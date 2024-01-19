@@ -8,36 +8,30 @@ from DSE.Rotor_Sizing.airfoil import Cl_func_clarky, Cd_func_clarky, Cp_func_cla
 import pickle
 
 file_dir = Path(__file__).parent
-Cl_func_clarky0 = lambda M, a: Cl_func_clarky(M, a)
-Cd_func_clarky0 = lambda M, a: Cd_func_clarky(M, a)
+
 
 def solidity(R, r, chord, N):
     return N * np.trapz(chord, r) / (np.pi * R**2)
 
-def integrate_dT_dr(r, dT, N):
+
+def integrate_dT(r, dT, N):
+    """Integrate thrust distribution to get total thrust, hub and tip are not integrated"""
     R = r[-1]
     return np.trapz(np.where((r>=0.25*R) & (r<=0.95*R), dT, 0), r) * N
 
-def integrate_dT_dA(r, dT, N):
-    R = np.max(r)
-    dT = np.mean(dT, axis=0)
-    return np.trapz(np.where((r>=0.25*R) & (r<=0.95*R), dT, 0), r) * N
 
-# def dT_vi(r, vi, rho=const.rho0):
-#     return 4 * np.pi * rho * vi**2 * r
-
-def vi_bem(r, dT_dr, N, Vc, rho=const.rho0):
-    return np.sqrt(dT_dr * N / (4 * np.pi * rho * r)) * 1.15 # 1.15 is for tip and 3d effects
-
-def dT_vi_2d(r, Vi, N, U, Vc, rho=const.rho0):
-    """return dT/dA"""
-    # Vi *= 1.15
-    V = np.sqrt(U**2 + (Vc+Vi)**2)
-    V = Vi
-    return 2 * (2*np.pi*r) * rho * V * (Vi + Vc) / N / 1.15**2
+def vi_bem(r, dT_dr, N, Vc, rho=const.rho0, f=1.15):
+    """Calculate induced velocity using momentum theory"""
+    return np.sqrt(dT_dr * N / (4 * np.pi * rho * r)) * f # 1.15 is for tip and 3d effects
 
 
-def dT_dr_bem(r, omega, chord, twist, vi, Vc=0, rho=const.rho0, Cl_func=Cl_func_clarky0, Cd_func=Cd_func_clarky0, which='alpha'):
+def dT_vi(r, Vi, Vc, N, rho=const.rho0, f=1.15):
+    """Calculate thrust distribution using momentum theory"""
+    return 2 * (2*np.pi*r) * rho * Vi * np.abs(Vi + Vc) / N / f**2
+
+
+def dT_be(r, omega, chord, twist, vi, Vc=0, rho=const.rho0, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky, which='alpha'):
+    """Calculate thrust and torque distribution using blade element theory"""
     phi = np.arctan((Vc + vi) / (omega * r))
     if which == 'alpha':
         alpha = twist
@@ -48,36 +42,21 @@ def dT_dr_bem(r, omega, chord, twist, vi, Vc=0, rho=const.rho0, Cl_func=Cl_func_
     V = np.sqrt((omega * r)**2 + (Vc + vi)**2)
     M = V / const.a
     dL = 0.5 * rho * V**2 * chord * Cl_func(M, np.rad2deg(alpha))
-    # print(Cl_func(M, np.rad2deg(alpha)))
     dD = 0.5 * rho * V**2 * chord * Cd_func(M, np.rad2deg(alpha))
     dT = dL * np.cos(phi) - dD * np.sin(phi)
     dQ = (dL * np.sin(phi) + dD * np.cos(phi)) * r
     return dT, dQ
 
-def dT_dA_bem(r, psi, omega, chord, theta, vi, U, Vc, rho=const.rho0, Cl_func=Cl_func_clarky0, Cd_func=Cd_func_clarky0):
-    U_tot = omega * r + U * np.cos(psi)
-    phi = np.arctan((Vc + vi) / U_tot)
-    alpha = theta - phi
-    V = np.sqrt((U_tot**2 + (Vc + vi)**2))
-    M = V / const.a
-    shape = M.shape
-    dL = 0.5 * rho * V**2 * chord * Cl_func(M.flatten(), np.rad2deg(alpha).flatten()).reshape(shape)
-    # print(Cl_func(M.flatten(), np.rad2deg(alpha).flatten()).reshape(shape)[0,:])
-    dD = 0.5 * rho * V**2 * chord * Cd_func(M.flatten(), np.rad2deg(alpha).flatten()).reshape(shape)
-    dT = dL * np.cos(phi) - dD * np.sin(phi)
-    dQ = (dL * np.sin(phi) + dD * np.cos(phi)) * r
-    return dT, dQ
 
-
-def solve_dT_dr(r, omega, chord, twist, N, Cl_func=Cl_func_clarky0, Cd_func=Cd_func_clarky0, max_iter=100, tol=1e-6, which='alpha'):
-    # print(sum([hash(np.sum(x)) for x in [r, omega, chord, twist, N]]))
+def solve_dT(r, omega, chord, twist, N, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky, max_iter=100, tol=1e-6, which='alpha'):
+    """Itteratively solve for dT and vi"""
     vi1 = np.zeros_like(r)
 
     for _ in range(max_iter):
-        dT1, dQ = dT_dr_bem(r, omega, chord, twist, vi1, Cl_func=Cl_func, Cd_func=Cd_func, which=which)
+        dT1, dQ = dT_be(r, omega, chord, twist, vi1, Cl_func=Cl_func, Cd_func=Cd_func, which=which)
         vi2 = vi_bem(r, dT1, N, 0)
         vi = (vi1*2 + vi2) / 3
-        dT2, dQ = dT_dr_bem(r, omega, chord, twist, vi, Cl_func=Cl_func, Cd_func=Cd_func, which=which)
+        dT2, dQ = dT_be(r, omega, chord, twist, vi, Cl_func=Cl_func, Cd_func=Cd_func, which=which)
         if np.linalg.norm(dT1 - dT2)/len(r) < tol:
             break
         vi1 = vi
@@ -86,48 +65,21 @@ def solve_dT_dr(r, omega, chord, twist, N, Cl_func=Cl_func_clarky0, Cd_func=Cd_f
         raise ValueError("Failed to converge")
     return dT2, dQ
 
-def solve_dT_dr_2d(r, omega, chord, theta, N, U, Vc, Cl_func=Cl_func_clarky0, Cd_func=Cd_func_clarky0, max_iter=500, tol=1e-8):
-    psi = np.linspace(0, 2*np.pi, len(r)//2)
-    r, psi = np.meshgrid(r, psi)
-    vi1 = np.full_like(r, 0)
-    vi2 = np.full_like(r, 30)
-    # vi2 = vi_bem(r, 2*(2*np.pi*r)*dT_dA_bem(r, psi, omega, chord, theta, vi1, U, Vc), N, Vc)
-
-    for _ in range(max_iter):
-        dT1, dQ = dT_dA_bem(r, psi, omega, chord, theta, vi1, U, Vc, Cl_func=Cl_func, Cd_func=Cd_func)
-        dT2, dQ = dT_dA_bem(r, psi, omega, chord, theta, vi2, U, Vc, Cl_func=Cl_func, Cd_func=Cd_func)
-        dT1v = dT_vi_2d(r, vi1, N, U, Vc)
-        dT2v = dT_vi_2d(r, vi2, N, U, Vc)
-        y1 = dT1 - dT1v
-        y2 = dT2 - dT2v
-        assert (y1 * y2 < 1e-3).all()  # assert root is between r1 and r2
-        vi = (vi1 + vi2) / 2
-        dT, _ = dT_dA_bem(r, psi, omega, chord, theta, vi, U, Vc, Cl_func=Cl_func, Cd_func=Cd_func)
-        dTv = dT_vi_2d(r, vi, N, U, Vc)
-        ym = dT - dTv
-        if np.linalg.norm(ym)/len(r) < tol:
-            break
-        vi1 = np.where(ym > 0, vi, vi1)
-        vi2 = np.where(ym < 0, vi, vi2)
-    else:
-        raise ValueError("Failed to converge")
-    return dT2, dQ, vi
-
-def solve_c_mean(r, omega, c_mean0, chord, alpha, N, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_iter=100, tol=1e-6):
-    if hasattr(solve_c_mean, "c_mean0"):
-        c_mean = solve_c_mean.c_mean0
-    else:
-        c_mean = c_mean0
+CMEAN = 0.05
+def solve_c_mean(r, omega, chord, alpha, N, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_iter=100, tol=1e-6):
+    """Itteratively solve for mean chord needed to get required thrust"""
+    global CMEAN
+    c_mean = CMEAN
     for _ in range(max_iter):
         c = np.mean(chord)
-        dT, _ = solve_dT_dr(r, omega, c_mean/c*chord, alpha, N)
-        T = integrate_dT_dr(r, dT, N)
+        dT, _ = solve_dT(r, omega, c_mean/c*chord, alpha, N)
+        T = integrate_dT(r, dT, N)
         if np.abs((T - T_req)/T_req) < tol:
             break
         c_mean = c_mean * (1 + T_req/T) / 2
     else:
         raise ValueError("Failed to converge")
-    solve_c_mean.c_mean0 = c_mean
+    CMEAN = c_mean
     return c_mean
 
 
@@ -141,10 +93,10 @@ def figure_of_merit(x, omega, N=2, T_req=1.1*const.MTOW/4, tip_frac=0.95, max_it
     chord = chord_dist(r, P_chord)
     alpha = twist_dist(r, P_alpha)
 
-    c_mean = solve_c_mean(r, omega, c_mean0, chord, alpha, N, T_req=T_req, tip_frac=tip_frac, max_iter=max_iter, tol=tol)
+    c_mean = solve_c_mean(r, omega, chord, alpha, N, T_req=T_req, tip_frac=tip_frac, max_iter=max_iter, tol=tol)
     c = np.mean(chord)
-    dT, dQ = solve_dT_dr(r, omega, c_mean/c*chord, alpha, N)
-    T = integrate_dT_dr(r, dT, N)
+    dT, dQ = solve_dT(r, omega, c_mean/c*chord, alpha, N)
+    T = integrate_dT(r, dT, N)
     Q = np.trapz(dQ, r) * N
     P = Q * omega
     Ct = T / (const.rho0 * A * Vtip**2)
@@ -176,14 +128,14 @@ if __name__ == "__main__":
     chord = chord_dist(r, P_chord)
     alpha = twist_dist(r, P_twist)
 
-    c_mean = solve_c_mean(r, 4000*2*np.pi/60, c_mean0, chord, alpha, N=N, T_req=1.1*const.MTOW/4, max_iter=1000)
+    c_mean = solve_c_mean(r, 4000*2*np.pi/60, chord, alpha, N=N, T_req=1.1*const.MTOW/4, max_iter=1000)
     fac = c_mean / np.mean(chord)
     chord *= fac
     print(np.sum(chord))
     print(np.sum(alpha))
-    dT, dQ = solve_dT_dr(r, omega, chord, alpha, N)
+    dT, dQ = solve_dT(r, omega, chord, alpha, N)
     vi_test = vi_bem(r, dT, N, 0)
-    dT_test, _ = dT_dr_bem(r, omega, chord, alpha, vi=vi_test, which='alpha')
+    dT_test, _ = dT_be(r, omega, chord, alpha, vi=vi_test, which='alpha')
     print(sum([hash(np.sum(x)) for x in [r, omega, chord, alpha, N]]))
     plt.plot(r, dT)
     plt.show()
@@ -204,7 +156,7 @@ if __name__ == "__main__":
     Vtip = omega * R
     print(f"Mtip = {Vtip/const.a:.3f}")
     print(f"rpm: {omega*60/(2*np.pi):.3f}")
-    T = integrate_dT_dr(r, dT, N)
+    T = integrate_dT(r, dT, N)
     print(f"T = {T:.3f} N")
     print(f'Tip and hub loss: {1 - T/(np.trapz(dT, r)*N):.3f}')
     print(f'Disk loading [N/m^2]: {T/A:.3f}')
@@ -227,7 +179,7 @@ if __name__ == "__main__":
     print(f"R: {R:.3f}")
 
     M = (omega * r) / const.a
-    print(f'mean cl: {Cl_func_clarky0(M, np.rad2deg(alpha)).mean()}')
+    print(f'mean cl: {Cl_func_clarky(M, np.rad2deg(alpha)).mean()}')
 
 
     r = np.linspace(0., R, 100)

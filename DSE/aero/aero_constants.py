@@ -9,6 +9,7 @@ c = cl_list/cd_list
 
 # Get index from cruise condition
 index_cruise_airfoil = np.argmax(c)
+index_ic = index_cruise_airfoil - 4
 alpha_cruise_airfoil = alpha_23012_airfoil[index_cruise_airfoil]
 index_cruise_wing = np.where(alpha_23012_wing == alpha_cruise_airfoil)
 index_cruise_airfoil_h = np.where(alpha_0012_airfoil == alpha_cruise_airfoil)
@@ -19,19 +20,24 @@ b = 6
 #c_bar = 0.598
 
 # Cl relates to airfoil only, CL to the entire wing. Same for Cd and CD about drag
-
+CL_initial_conditions = cl_23012_wing[index_ic]
+Cd_initial_conditions = cd_23012_wing[index_ic]
 CD0_wing = 0.0077
 CD_alpha_wing = (cd_23012_wing[20]-cd_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
-CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)]
+CL_0 = cl_23012_wing[np.where(alpha_23012_wing == 0)][0]
+CD_0 = cd_23012_wing[np.where(alpha_23012_wing == 0)][0]
 CL_alpha_wing = (cl_23012_wing[20]-cl_23012_wing[0])/((alpha_23012_wing[20]-alpha_23012_wing[0])*pi/180)
-Cl_alpha_v = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
-Cl_alpha_h = Cl_alpha_v
-CL_cruise = cl_23012_wing[index_cruise_wing]
+Cl_alpha_wing = (cl_23012_airfoil[20]-cl_23012_airfoil[0])/((alpha_23012_airfoil[20]-alpha_23012_airfoil[0])*pi/180)
+CL_alpha_h = (cl_0012_wing[20]-cl_0012_wing[0])/((alpha_0012_wing[20]-alpha_0012_wing[0])*pi/180)
+Cl_alpha_h = (cl_0012_airfoil[20]-cl_0012_airfoil[0])/((alpha_0012_airfoil[20]-alpha_0012_airfoil[0])*pi/180)
+CL_alpha_v = (cl_0012_wing_v[20]-cl_0012_wing_v[0])/((alpha_0012_wing_v[20]-alpha_0012_wing_v[0])*pi/180)
+Cl_alpha_v = Cl_alpha_h
+CL_cruise = cl_23012_wing[index_cruise_wing][0]
 CD_cruise = cd_23012_wing[index_cruise_wing]
-print(CD_cruise)
 Cl_cruise = cl_23012_airfoil[index_cruise_airfoil]
-Cl_cruise_h = cl_0012_airfoil[index_cruise_airfoil_h]
+Cl_cruise_h = cl_0012_airfoil[index_cruise_airfoil_h][0]
 CL_max = max(cl_23012_wing)
+CL_max_h = max(cl_0012_wing)
 Cl_max_h = max(cl_0012_airfoil)
 
 Cm_0_airfoil= cm_23012_airfoil[np.where(alpha_23012_airfoil == 0)]
@@ -61,5 +67,3 @@ S_winglet = 0.21
 b_winglet = 0.45
 c_root_winglet = 0.333
 
-Cl_alpha_wing = (cl_23012_airfoil[20]-cl_23012_airfoil[0])/((alpha_23012_airfoil[20]-alpha_23012_airfoil[0])*pi/180)
-print(Cl_alpha_h)
