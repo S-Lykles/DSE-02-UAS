@@ -77,52 +77,52 @@ def shear_bending_diagram(length, distributed_loads, point_loads, point_moment, 
 n_pos = 3.8
 n_neg = -1.52
 
-l_fuselage = 2
-l_wing = 0.5 * l_fuselage
-l_eng = l_fuselage - 0.4
-l_gen = l_fuselage - 0.8
+l_fuselage = 1.7
+l_wing = 0.56 * l_fuselage
+l_eng = l_fuselage - 0.26
+l_gen = l_fuselage - 0.03
 l_plmod1 = 0.25 * l_fuselage
 l_plmod2 = 0.75 * l_fuselage
 l_prop = l_fuselage
-l_bat = 0.4
-l_avionics = 0.3
+l_bat = 0.3 * l_fuselage
+l_avionics = 0.15 * l_fuselage
 
 w_wing = -160
 w_eng = 35
-w_gen = 4
+w_gen = 9  +5
 w_plmod = 50
-w_prop = 0
+w_prop = 2
 w_bat = 2
-w_avionics = 1
-q_fuse = 66 / l_fuselage
+w_avionics = 1.6
+q_fuse = (-w_wing - (w_eng + w_gen + w_plmod + w_prop + w_bat + w_avionics)) / l_fuselage
 
 ## fuselage plots
 #input
-distributed_loads = np.array([[0, 2, q_fuse]])
+distributed_loads = np.array([[0, l_fuselage, q_fuse]])
 point_loads = np.array([[l_wing, w_wing], [l_eng, w_eng], [l_gen, w_gen], [l_plmod1, 0.5*w_plmod],
                         [l_plmod2, 0.5*w_plmod], [l_prop, w_prop], [l_bat, w_bat], [l_avionics, w_avionics]])
-moment_points_pos = np.array((l_wing, 200*n_pos))
-moment_points_neg = np.array((l_wing, 200*n_neg))
+moment_points_pos = np.array((l_wing, 160*n_pos))
+moment_points_neg = np.array((l_wing, 160*n_neg))
 
 #diagrams
 cg_fuse = shear_bending_diagram(l_fuselage, distributed_loads, point_loads, moment_points_pos, n_pos, 'fuselage')
 shear_bending_diagram(l_fuselage, distributed_loads, point_loads, moment_points_neg, n_neg, 'fuselage')
 
 ## Boom plots
-n_hov = 1.2
+n_hov = 1
 
 l_front_rot = 0.01
-l_prop_spacing = 0.5
-l_wing = cg_fuse + l_prop_spacing
-l_rear_rot = l_wing + (l_fuselage-cg_fuse) + l_prop_spacing
-l_tail = 3.99
-l_boom =4
+l_prop_spacing = 0.6
+l_wing = l_wing
+l_rear_rot = l_fuselage + l_prop_spacing
+l_boom = 3.3
+l_tail = l_boom - 0.01
 
 MTOW = 160/2
 L_prop = -(1/2) * MTOW
-w_prop = 5
+w_prop = 1.68 + 0.62 + 2
 w_tail = 5/2
-w_boom = 5
+w_boom = 10
 w_wing_fw = -(2*w_prop + 0.5*w_tail + w_boom)
 w_wing_hov = (MTOW + (w_wing_fw))
 f_emp = -0.5*(567/9.81)
@@ -131,15 +131,15 @@ q_boom = w_boom / l_boom
 #hover
 distributed_loads_boom_hover = np.array([[0,l_boom,q_boom]])
 point_loads_boom_hover = np.array([[l_front_rot, L_prop], [l_front_rot, w_prop], [l_wing, w_wing_hov], [l_rear_rot, L_prop], [l_rear_rot, w_prop],[l_tail,w_tail]])
-moment_points_boom_hover_pos = np.array((l_wing, 70*n_hov))
+moment_points_boom_hover_pos = np.array((l_wing, -50*n_hov))
 
 shear_bending_diagram(l_boom, distributed_loads_boom_hover, point_loads_boom_hover, moment_points_boom_hover_pos, n_hov, 'boom in hover')
 
 #fw flight
 distributed_loads_boom_fw = np.array([[0,l_boom,q_boom]])
 point_loads_boom_fw = np.array([[l_front_rot, w_prop], [l_wing, w_wing_fw], [l_rear_rot, w_prop],[l_tail,w_tail], [l_tail,-1]])
-moment_points_boom_fw_pos = np.array((l_wing, 50*n_pos))
-moment_points_boom_fw_neg = np.array((l_wing, 50*n_neg))
+moment_points_boom_fw_pos = np.array((l_wing, 115*n_pos))
+moment_points_boom_fw_neg = np.array((l_wing, 115*n_neg))
 
 shear_bending_diagram(l_boom, distributed_loads_boom_fw, point_loads_boom_fw, moment_points_boom_fw_pos, n_pos, 'boom in fw flight')
 shear_bending_diagram(l_boom, distributed_loads_boom_fw, point_loads_boom_fw, moment_points_boom_fw_neg, n_neg, 'boom in fw flight')
