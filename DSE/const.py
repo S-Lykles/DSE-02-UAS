@@ -1,5 +1,7 @@
 import numpy as np
 
+
+xlemac = 2.27
 g0 = 9.81  # [m/s^2]
 rho0 = 1.225  # [kg/m^3]
 T0 = 288.15  # [K]
