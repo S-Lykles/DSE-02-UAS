@@ -48,7 +48,7 @@ c_tip = 0.333
 tc = 0.12
 taper = 0.4
 c_bar = c_root * (2/3) * ((1+taper+taper**2)/(1+taper))
-
+print(c_bar)
 
 sweep_ang_rad = atan(0.125/3)
 sweep_ang_25_c_rad = 0*pi/180
