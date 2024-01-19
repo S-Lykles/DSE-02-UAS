@@ -45,9 +45,10 @@ Lambda_m_winglet = np.arctan(np.tan(sweep_ang_25_c_rad_winglet)-(4 / AR) * ((xc_
 c_bar_winglet = c_root_winglet * (2/3) * ((1+taper_winglet+taper_winglet**2)/(1+taper_winglet))
 
 #fuselage constants
-l_fus = 2.0
+l_fus = 1.85
 d_fus = 0.8
-S_wet_fus = pi * d_fus * 2 * l_fus
+S_wet_fus = 6.764
+print('wetted area fuselage', S_wet_fus)
 
 #other drag components
 CD_misc_prop = 0.02
