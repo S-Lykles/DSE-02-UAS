@@ -237,11 +237,10 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                         'Vert Tail 2':[1,x_tail,1.15,0.163333333],
                         'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
                         'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
-                        'Emergency Battery':[2,0.8,0,0],
                         'Payload_pd': [50,1.5,0,0.3],
                         'Payload_le': [20,1.5,0,0.3],
-                       'Fuel_pd': [14,1.5, 0, 0.3],
-                       'Fuel_le': [34,1.5, 0, 0.3]
+                        'Fuel_pd': [14,1.5, 0, 0.3],
+                        'Fuel_le': [34,1.5, 0, 0.3]
                                       }
 
 
