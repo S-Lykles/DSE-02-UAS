@@ -6,18 +6,20 @@ from DSE.stability import rotor_placement as rp
 
 
 
-x_tail =
+x_tail = 4.14
 x_lemac = 2.181
 mac = aero_constants.c_bar
 x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
 c_wing_root = aero_constants.c_root
-l_engine =
-l_alternator =
-l_clutch =
-l_prop =
-l_fus =
-l_aeroboom =
+l_engine = 0.400
+l_alternator = 0.060
+l_clutch = 0.032
+l_prop = 0.18
+l_aeroboom = 0.5
+l_fus = x_lemac - l_aeroboom + l_alternator + c_wing_root + l_engine + l_clutch
+print('L_fus =', l_fus, 'm')
+
 
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                        'Air data boom':[0.142,0.23,0,0],
@@ -35,13 +37,13 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                         'WingR':[9,x_ac_wing,1.226,0.17],
                         # 'WingL':[9,2.0828,-1.226,0.17],
                         # 'WingR':[9,2.0828,1.226,0.17],
-                        'Power Management module':[6,x_ac_wing + c_wing_root/2,0,-0.1],
+                        'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
                         'Emergency Battery':[2,0.8,0,0],
-                        'Combustion Engine':[35,x_ac_wing + c_wing_root/2 +l_engine/2,0,-0.165],
-                        'Alternator':[9,x_ac_wing + c_wing_root/2 + l_engine + l_alternator/2,0,-0.165],
-                        'Clutch':[1,x_ac_wing + c_wing_root/2 + l_engine + l_alternator + l_clutch/2,0,-0.165],
-                        'Push-prop':[0.6,x_ac_wing + c_wing_root/2 + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
-                        'ECU':[1,x_ac_wing + c_wing_root/2,0,-0.05],
+                        'Combustion Engine':[35,x_lemac + c_wing_root + l_engine/2,0,-0.165],
+                        'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
+                        'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
+                        'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
+                        'ECU':[1,x_lemac + c_wing_root,0,-0.05],
                         'Fuselage structure/Shell':[3,l_fus/2 + l_aeroboom,0,-0.17],
                         'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
                         'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
