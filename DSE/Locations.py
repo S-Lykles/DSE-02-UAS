@@ -1,5 +1,5 @@
 from DSE import const
-from DSE.structures.center_of_gravity import class_two_cg_estimation
+# from DSE.structures.center_of_gravity import class_two_cg_estimation
 from DSE.structures.center_of_gravity import cg_per_mission
 import numpy as np
 # from DSE.

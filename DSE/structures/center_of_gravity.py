@@ -1,7 +1,7 @@
 import DSE
 import numpy as np
 from DSE import const
-
+#
 """The following code is based on the aircraft design book by Roskam:
 airplane-design-part-v-component-weight-estimation."""
 
@@ -153,34 +153,47 @@ def class_two_cg_estimation(empty, fuel, payload_supply, payload_relay):
 
     return w_total, [x_cg, y_cg, z_cg], sensitivity  # [Ixx, Iyy, Izz]
 
-
-print(class_two_cg_estimation(True, False, False, False))
+#
+# print(class_two_cg_estimation(True, False, False, False))
 
 """After this a weight-cg diagram can be drawn by varying weight conditions"""
 
 
 #Updated version of the above code
-components_dict_old = {'component name': '[W, x_cg, y_cg, z_cg]',
-                   'WingL': [10, 1.5, 1.2, 0.85],
-                   'WingR': [10, 1.5, -1.2, 0.85],
-                   'BoomL': [5, 2.75, 1, 0.75],
-                   'BoomR': [5, 2.75, -1, 0.75],
-                   'Engine': [30, 2.5, 0, 0.725],
-                   'LiftMotorLF': [5, 0.5, 1, 0.85],
-                   'LiftMotorRF': [5, 0.5, -1, 0.85],
-                   'LiftMotorLR': [5, 3.5, 1, 0.85],
-                   'LiftMotorRR': [5, 3.5, -1, 0.85],
-                   'Generator': [4, 2.5, -0.2, 0.725],
-                   'Tailsurface': [5, 5.85, 0, 1.15],
-                   'Fuselage': [5, 1.5, 0, 0.725],
-                   'FCU': [0.1, 0.5, 0, 0.725],
-                   'Comms': [1, 0.5, 0, 0.725],
-                   'Battery': [2, 1, 0, 0.725],
-                    'Payload_pd': [50,1.5,0,0.3],
-                    'Payload_le': [20,1.5,0,0.3],
-                   'Fuel_pd': [14,1.5, 0, 0.3],
-                   'Fuel_le': [34,1.5, 0, 0.3]
-                                      }
+# components_dict_old = {'component name': '[W, x_cg, y_cg, z_cg]',
+#                    'WingL': [10, 1.5, 1.2, 0.85],
+#                    'WingR': [10, 1.5, -1.2, 0.85],
+#                    'BoomL': [5, 2.75, 1, 0.75],
+#                    'BoomR': [5, 2.75, -1, 0.75],
+#                    'Engine': [30, 2.5, 0, 0.725],
+#                    'LiftMotorLF': [5, 0.5, 1, 0.85],
+#                    'LiftMotorRF': [5, 0.5, -1, 0.85],
+#                    'LiftMotorLR': [5, 3.5, 1, 0.85],
+#                    'LiftMotorRR': [5, 3.5, -1, 0.85],
+#                    'Generator': [4, 2.5, -0.2, 0.725],
+#                    'Tailsurface': [5, 5.85, 0, 1.15],
+#                    'Fuselage': [5, 1.5, 0, 0.725],
+#                    'FCU': [0.1, 0.5, 0, 0.725],
+#                    'Comms': [1, 0.5, 0, 0.725],
+#                    'Battery': [2, 1, 0, 0.725],
+#                     'Payload_pd': [50,1.5,0,0.3],
+#                     'Payload_le': [20,1.5,0,0.3],
+#                    'Fuel_pd': [14,1.5, 0, 0.3],
+#                    'Fuel_le': [34,1.5, 0, 0.3]}
+
+x_ac_wing = 2.15
+x_rot_front = 1.273
+x_rot_rear = 2.976
+c_wing_root = 0.833
+l_aeroboom = 0.50
+l_engine = 0.40
+l_alternator = 0.06
+l_clutch = 0.032
+l_prop = 0.2
+x_tail = 4.140
+l_fus = x_ac_wing - l_aeroboom + c_wing_root/2 + l_engine + l_alternator + l_clutch
+
+
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                        'Air data boom':[0.142,0.23,0,0],
                         'Iridium Antenna':[0.1,0.5225,-0.027,0],
@@ -193,37 +206,37 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                         'Flight Computer + Short Range Transceiver':[0.1,0.74,-0.015,0.0425],
                         'Polar IMU + Magnetometer + GNSS':[0.17,0.645,0,0.0575],
                         'Flight Data Recorder':[0.07,0.735,0.029,0.056],
-                        'WingL':[9,2.2731,-1.226,0.17],
-                        'WingR':[9,2.2731,1.226,0.17],
+                        'WingL':[9,x_ac_wing,-1.226,0.17],
+                        'WingR':[9,x_ac_wing,1.226,0.17],
                         # 'WingL':[9,2.0828,-1.226,0.17],
                         # 'WingR':[9,2.0828,1.226,0.17],
-                        'Power Management module':[6,1.6401,0,-0.1],
+                        'Power Management module':[6,x_ac_wing + c_wing_root/2,0,-0.1],
                         'Emergency Battery':[2,0.8,0,0],
-                        'Combustion Engine':[35,1.8401,0,-0.165],
-                        'Alternator':[9,2.0701,0,-0.165],
-                        'Clutch':[1,2.1201,0,-0.165],
-                        'Push-prop':[0.6,2.2201,0,-0.165],
-                        'ECU':[1,1.6401,0,-0.05],
-                        'Fuselage structure/Shell':[3,1.845,0,-0.17],
-                        'ESC1':[0.62,0.1,-1.15,-0.06],
-                        'ESC2':[0.62,2.6,-1.15,-0.06],
-                        'ESC3':[0.62,0.1,1.15,-0.06],
-                        'ESC4':[0.62,2.6,1.15,-0.06],
-                        'Emotor1':[1.68,0.5,-1.15,-0.1],
-                        'Emotor2':[1.68,3,-1.15,-0.1],
-                        'Emotor3':[1.68,0.5,1.15,-0.1],
-                        'Emotor4':[1.68,3,1.15,-0.1],
-                        'Liftprops1':[0.4,0.5,-1.15,-0.1],
-                        'Liftprops2':[0.4,3,-1.15,-0.1],
-                        'Liftprops3':[0.4,0.5,1.15,-0.1],
-                        'Liftprops4':[0.4,3,1.15,-0.1],
-                        'Tailboom L':[7,2.65,-1.15,-0.1],
-                        'Tailboom R':[7,2.65,1.15,-0.1],
-                        'Hor Tail':[4,5.1,0,0.79],
-                        'Vert Tail 1':[1,5,-1.15,0.163333333],
-                        'Vert Tail 2':[1,5,1.15,0.163333333],
-                        'Fuel Pump 1':[0.07,1.215,-0.1,-0.12],
-                        'Fuel Pump 2':[0.07,1.0875,0.1,-0.12],
+                        'Combustion Engine':[35,x_ac_wing + c_wing_root/2 +l_engine/2,0,-0.165],
+                        'Alternator':[9,x_ac_wing + c_wing_root/2 + l_engine + l_alternator/2,0,-0.165],
+                        'Clutch':[1,x_ac_wing + c_wing_root/2 + l_engine + l_alternator + l_clutch/2,0,-0.165],
+                        'Push-prop':[0.6,x_ac_wing + c_wing_root/2 + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
+                        'ECU':[1,x_ac_wing + c_wing_root/2,0,-0.05],
+                        'Fuselage structure/Shell':[3,l_fus/2 + l_aeroboom,0,-0.17],
+                        'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
+                        'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
+                        'ESC3':[0.62,x_rot_front + 0.2,1.15,-0.06],
+                        'ESC4':[0.62,x_rot_rear - 0.2,1.15,-0.06],
+                        'Emotor1':[1.68,x_rot_front,-1.15,-0.1],
+                        'Emotor2':[1.68,x_rot_rear,-1.15,-0.1],
+                        'Emotor3':[1.68,x_rot_front,1.15,-0.1],
+                        'Emotor4':[1.68,x_rot_rear,1.15,-0.1],
+                        'Liftprops1':[0.4,x_rot_front,-1.15,-0.1],
+                        'Liftprops2':[0.4,x_rot_rear,-1.15,-0.1],
+                        'Liftprops3':[0.4,x_rot_front,1.15,-0.1],
+                        'Liftprops4':[0.4,3.x_rot_rear,1.15,-0.1],
+                        'Tailboom L':[7,(x_tail - x_rot_front)/2 + x_rot_front,-1.15,-0.1],
+                        'Tailboom R':[7,x_tail - x_rot_front)/2 + x_rot_front,1.15,-0.1],
+                        'Hor Tail':[4,x_tail,0,0.79],
+                        'Vert Tail 1':[1,x_tail,-1.15,0.163333333],
+                        'Vert Tail 2':[1,x_tail,1.15,0.163333333],
+                        'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
+                        'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
                         'Emergency Battery':[2,0.8,0,0],
                         'Payload_pd': [50,1.5,0,0.3],
                         'Payload_le': [20,1.5,0,0.3],
@@ -324,3 +337,37 @@ test2 = cg_per_mission(True, False, True, False, False)
 test3 = cg_per_mission(True, False, False, False, True)
 test4 = cg_per_mission(True, False, True, False, True)
 print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
+
+
+def avionics_data(components_dict=components_dict):
+    avionics_list = ['Air data boom', 'Iridium Antenna', 'Iridium Satellite communication module', 'GNSS Antenna 1',
+                     'GNSS Antenna 2', 'GNSS Antenna 3', 'ADSB Transponder', 'Landing Visual Sensor', 'Flight Computer + Short Range Transceiver', 'Polar IMU + Magnetometer + GNSS', 'Flight Data Recorder']
+
+    avionics_cg = cg_estimation(avionics_list, components_dict)
+    return avionics_cg
+
+
+engine_w, engine_xcg = np.array(components_dict['Combustion Engine'])[:2]
+generator_w, generator_xcg = np.array(components_dict['Alternator'])[:2]
+avionics_w, avionics_xcg = avionics_data()[0], avionics_data()[1][0]
+wingL_w, wingL_xcg = np.array(components_dict['WingL'])[:2]
+wingL_w, wingL_xcg = np.array(components_dict['WingR'])[:2]
+main_structure_fuselage_w, main_structure_fuselage_xcg = np.array(components_dict['Fuselage structure/Shell'])[:2]
+weight_fuselage = [engine_w, generator_w, avionics_w, wingL_w, wingR_w, main_structure_fuselage_w]
+xcg_fuselage = [engine_xcg, generator_xcg, avionics_xcg, wingL_xcg, wingR_xcg, main_structure_fuselage_xcg]
+fuselage_w = np.sum(weight_fuselage)
+fuselage_xcg = np.sum(weight_fuselage*xcg_fuselage)/fuselage_w
+horizontalTail_w, horizontalTail_xcg = np.array(components_dict['Hor Tail'])[:2]
+verticalTail1_w, verticalTail1_xcg = np.array(components_dict['Vert Tail 1'])[:2]
+verticalTail2_w, verticalTail2_xcg = np.array(components_dict['Vert Tail 2'])[:2]
+rotor_aft_1_w, rotor_aft_1_xcg = np.array(components_dict['Liftprops1'])[:2]
+rotor_aft_2_w, rotor_aft_2_xcg = np.array(components_dict['Liftprops2'])[:2]
+rotor_aft_3_w, rotor_aft_3_xcg = np.array(components_dict['Liftprops3'])[:2]
+rotor_aft_4_w, rotor_aft_4_xcg = np.array(components_dict['Liftprops4'])[:2]
+
+from DSE.structures import center_of_gravity as cg
+
+eng_w = cg.engine.w
+# fairings
+# structure
+#
