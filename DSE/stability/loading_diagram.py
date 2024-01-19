@@ -45,21 +45,6 @@ def loading_diagram_extremes():
         x_cg_bar_min.append(np.min(x_cg_bar))
         x_cg_bar_max.append(np.max(x_cg_bar))
 
-    # plt.plot(x_cg_fuel_pd_bar, mass_plus_fuel_pd, label = 'Fuel for PD mission')
-    # plt.plot(x_cg_fuel_le_bar, mass_plus_fuel_le, label = 'Fuel for LE mission')
-    # plt.plot(x_cg_payload_pd_bar, mass_plus_payload_pd, label = 'Payload for PD mission')
-    # plt.plot(x_cg_payload_le_bar, mass_plus_payload_le, label = 'Payload for LE mission')
-    # plt.xlabel('Xcg/MAC')
-    # plt.ylabel('Mass')
-    # plt.title('Scissor plot')
-    # plt.legend()
-    # plt.show()
-
-    # print('center of gravity', x_cg_fuel_le_bar, x_cg_fuel_pd_bar, x_cg_payload_pd_bar, x_cg_payload_le_bar)
-    # plt.plot(x_cg_bar_max, xlemac_lf, label ='xcg max')
-    # plt.plot(x_cg_bar_min, xlemac_lf, label ='xcg min')
-    # plt.legend()
-    # plt.show()
 
     slope = (x_cg_bar_min[0]-x_cg_bar_min[-1])/(xlemac_lf[0]-xlemac_lf[-1])
     return x_cg_bar_min, x_cg_bar_max, xlemac_lf, slope

@@ -62,7 +62,7 @@ e = 1.78*(1 - 0.045 * AR **0.68) - 0.64
 # winglet data
 tc_winglet = tc
 taper_winglet = taper
-sweep_ang_25_c_rad_winglet = 45 * const.deg2rad
+sweep_ang_25_c_rad_winglet = 15 * const.deg2rad
 S_winglet = 0.21
 b_winglet = 0.45
 c_root_winglet = 0.333

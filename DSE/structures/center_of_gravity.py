@@ -6,73 +6,122 @@ from DSE.stability import rotor_placement as rp
 
 
 
-x_tail = 4.14
+x_tail = 5.8
 x_lemac = const.xlemac
 mac = aero_constants.c_bar
 x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
 x_payload_pd = 2.0
 x_payload_le = 2.2
+x_nose = 0.3
 c_wing_root = aero_constants.c_root
 l_engine = 0.400
 l_alternator = 0.060
-l_clutch = 0.032
+l_clutch = 0.033
 l_prop = 0.18
-l_aeroboom = 0.5
-l_fus = x_lemac - l_aeroboom + l_alternator + c_wing_root + l_engine + l_clutch
+l_aeroboom = 0.47
+l_fus = x_lemac - x_nose + c_wing_root+0.2
+
 print('L_fus =', l_fus, 'm')
 
 
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
-                       'Air data boom':[0.142,0.23,0,0],
-                        'Iridium Antenna':[0.1,0.5225,-0.027,0],
-                        'Iridium Satellite communication module':[0.73,0.6875,0,0],
-                        'GNSS Antenna 1':[0.011,0.56,0.00925,0],
-                        'GNSS Antenna 2':[0.011,0.56,0.0185,0],
-                        'GNSS Antenna 3':[0.011,0.56,0.02775,0],
-                        'ADSB Transponder':[0.05,0.612,0.05,0],
-                        'Landing Visual Sensor':[0.0215,0.765,0.035,-0.0275],
-                        'Flight Computer + Short Range Transceiver':[0.1,0.74,-0.015,0.0425],
-                        'Polar IMU + Magnetometer + GNSS':[0.17,0.645,0,0.0575],
-                        'Flight Data Recorder':[0.07,0.735,0.029,0.056],
-                        'WingL':[9,x_ac_wing,-1.226,0.17],
-                        'WingR':[9,x_ac_wing,1.226,0.17],
-                        # 'WingL':[9,2.0828,-1.226,0.17],
-                        # 'WingR':[9,2.0828,1.226,0.17],
-                        'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
-                        'Emergency Battery':[2,0.8,0,0],
-                        'Combustion Engine':[35,x_lemac + c_wing_root + l_engine/2,0,-0.165],
-                        'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
-                        'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
-                        'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
-                        'ECU':[1,x_lemac + c_wing_root,0,-0.05],
-                        'Fuselage structure/Shell':[3,l_fus/2 + l_aeroboom,0,-0.17],
-                        'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
-                        'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
-                        'ESC3':[0.62,x_rot_front + 0.2,1.15,-0.06],
-                        'ESC4':[0.62,x_rot_rear - 0.2,1.15,-0.06],
-                        'Emotor1':[1.68,x_rot_front,-1.15,-0.1],
-                        'Emotor2':[1.68,x_rot_rear,-1.15,-0.1],
-                        'Emotor3':[1.68,x_rot_front,1.15,-0.1],
-                        'Emotor4':[1.68,x_rot_rear,1.15,-0.1],
-                        'Liftprops1':[0.4,x_rot_front,-1.15,-0.1],
-                        'Liftprops2':[0.4,x_rot_rear,-1.15,-0.1],
-                        'Liftprops3':[0.4,x_rot_front,1.15,-0.1],
-                        'Liftprops4':[0.4,x_rot_rear,1.15,-0.1],
-                        'Tailboom L':[7,(x_tail - x_rot_front)/2 + x_rot_front,-1.15,-0.1],
-                        'Tailboom R':[7,(x_tail - x_rot_front)/2 + x_rot_front,1.15,-0.1],
-                        'Hor Tail':[4,x_tail,0,0.79],
-                        'Vert Tail 1':[1,x_tail,-1.15,0.163333333],
-                        'Vert Tail 2':[1,x_tail,1.15,0.163333333],
-                        'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
-                        'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
-                        'Payload_pd': [50,x_payload_pd,0,0.3],
-                        'Payload_le': [20,x_payload_le,0,0.3],
-                        'Fuel_pd': [14,x_lemac + c_wing_root/2, 0, 0.3],
-                        'Fuel_le': [34,x_lemac + c_wing_root/2, 0, 0.3]
-                                      }
+                       'Air data boom':[0.142,x_nose - l_aeroboom/2,0,0],
+                       'Iridium Antenna':[0.1,x_nose + 0.5225 - l_aeroboom,-0.027,0],
+                       'Iridium Satellite communication module':[0.73, x_nose + 0.6875 - l_aeroboom,0,0],
+                       'GNSS Antenna 1':[0.011,x_nose + 0.56 - l_aeroboom,0.00925,0],
+                       'GNSS Antenna 2':[0.011,x_nose + 0.56 - l_aeroboom,0.0185,0],
+                       'GNSS Antenna 3':[0.011,x_nose + 0.56 - l_aeroboom,0.02775,0],
+                       'ADSB Transponder':[0.05,x_nose + 0.612 - l_aeroboom,0.05,0],
+                       'Landing Visual Sensor':[0.0215,x_nose + 0.765 - l_aeroboom,0.035,-0.0275],
+                       'Flight Computer + Short Range Transceiver':[0.1,x_nose + 0.74 -l_aeroboom,-0.015,0.0425],
+                       'Polar IMU + Magnetometer + GNSS':[0.17,x_nose + 0.645 - l_aeroboom,0,0.0575],
+                       'Flight Data Recorder':[0.07,x_nose + 0.735 - l_aeroboom,0.029,0.056],
+                       'WingL':[9,x_ac_wing,-1.226,0.17],
+                       'WingR':[9,x_ac_wing,1.226,0.17],
+                       # 'WingL':[9,2.0828,-1.226,0.17],
+                       # 'WingR':[9,2.0828,1.226,0.17],
+                       'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
+                       'Emergency Battery':[2,x_nose + 0.4,0,0],
+                       'Combustion Engine':[35,x_nose+0.5+0.2,0,-0.165],
+                       'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
+                       'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
+                       'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
+                       'ECU':[1,x_lemac + c_wing_root,0,-0.05],
+                       'Fuselage structure/Shell':[3,l_fus/2 + x_nose,0,-0.17],
+                       'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
+                       'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
+                       'ESC3':[0.62,x_rot_front + 0.2,1.15,-0.06],
+                       'ESC4':[0.62,x_rot_rear - 0.2,1.15,-0.06],
+                       'Emotor1':[1.68,x_rot_front,-1.15,-0.1],
+                       'Emotor2':[1.68,x_rot_rear,-1.15,-0.1],
+                       'Emotor3':[1.68,x_rot_front,1.15,-0.1],
+                       'Emotor4':[1.68,x_rot_rear,1.15,-0.1],
+                       'Liftprops1':[0.4,x_rot_front,-1.15,-0.1],
+                       'Liftprops2':[0.4,x_rot_rear,-1.15,-0.1],
+                       'Liftprops3':[0.4,x_rot_front,1.15,-0.1],
+                       'Liftprops4':[0.4,x_rot_rear,1.15,-0.1],
+                       'Tailboom L':[7,(x_tail - x_rot_front)/2 + x_rot_front,-1.15,-0.1],
+                       'Tailboom R':[7,(x_tail - x_rot_front)/2 + x_rot_front,1.15,-0.1],
+                       'Hor Tail':[4,x_tail,0,0.79],
+                       'Vert Tail 1':[1,x_tail,-1.15,0.163333333],
+                       'Vert Tail 2':[1,x_tail,1.15,0.163333333],
+                       'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
+                       'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
+                       'Payload_pd': [50,x_payload_pd,0,0.3],
+                       'Payload_le': [20,x_payload_le,0,0.3],
+                       'Fuel_pd': [14,x_lemac + c_wing_root/2, 0, 0.3],
+                       'Fuel_le': [34,x_lemac + c_wing_root/2, 0, 0.3]
+                                     }
 
-
+# components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
+#                         'Air data boom':[0.142,x_nose - l_aeroboom/2,0,0],
+#                         'Iridium Antenna':[0.1,x_lemac+ c_wing_root + 0.5225 - l_aeroboom,-0.027,0],
+#                         'Iridium Satellite communication module':[0.73, x_lemac + c_wing_root +0.6875 - l_aeroboom,0,0],
+#                         'GNSS Antenna 1':[0.011,x_lemac + c_wing_root + 0.56 - l_aeroboom,0.00925,0],
+#                         'GNSS Antenna 2':[0.011,x_lemac + c_wing_root + 0.56 - l_aeroboom,0.0185,0],
+#                         'GNSS Antenna 3':[0.011,x_lemac + c_wing_root + 0.56 - l_aeroboom,0.02775,0],
+#                         'ADSB Transponder':[0.05,x_lemac + c_wing_root + 0.612 - l_aeroboom,0.05,0],
+#                         'Landing Visual Sensor':[0.0215,x_lemac + c_wing_root + 0.765 - l_aeroboom,0.035,-0.0275],
+#                         'Flight Computer + Short Range Transceiver':[0.1,x_lemac + c_wing_root + 0.74 -l_aeroboom,-0.015,0.0425],
+#                         'Polar IMU + Magnetometer + GNSS':[0.17,x_lemac + c_wing_root + 0.645 - l_aeroboom,0,0.0575],
+#                         'Flight Data Recorder':[0.07,x_lemac + c_wing_root + 0.735 - l_aeroboom,0.029,0.056],
+#                         'WingL':[9,x_ac_wing,-1.226,0.17],
+#                         'WingR':[9,x_ac_wing,1.226,0.17],
+#                         # 'WingL':[9,2.0828,-1.226,0.17],
+#                         # 'WingR':[9,2.0828,1.226,0.17],
+#                         'Power Management module':[6,x_nose + l_prop + l_engine + l_clutch + l_alternator,0,-0.1],
+#                         'Emergency Battery':[2,x_lemac + c_wing_root + 0.4,0,0],
+#                         'Combustion Engine':[35,x_nose + l_prop + l_clutch + l_alternator + l_engine/2,0,-0.165],
+#                         'Alternator':[9,x_nose + l_clutch + l_prop + l_alternator/2,0,-0.165],
+#                         'Clutch':[1,x_nose + l_prop + l_clutch/2,0,-0.165],
+#                         'Push-prop':[0.6,x_nose + l_prop/2,0,-0.165],
+#                         'ECU':[1,x_nose + l_prop + l_clutch + l_alternator + l_engine,0,-0.05],
+#                         'Fuselage structure/Shell':[3,l_fus/2 + x_nose,0,-0.17],
+#                         'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
+#                         'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
+#                         'ESC3':[0.62,x_rot_front + 0.2,1.15,-0.06],
+#                         'ESC4':[0.62,x_rot_rear - 0.2,1.15,-0.06],
+#                         'Emotor1':[1.68,x_rot_front,-1.15,-0.1],
+#                         'Emotor2':[1.68,x_rot_rear,-1.15,-0.1],
+#                         'Emotor3':[1.68,x_rot_front,1.15,-0.1],
+#                         'Emotor4':[1.68,x_rot_rear,1.15,-0.1],
+#                         'Liftprops1':[0.4,x_rot_front,-1.15,-0.1],
+#                         'Liftprops2':[0.4,x_rot_rear,-1.15,-0.1],
+#                         'Liftprops3':[0.4,x_rot_front,1.15,-0.1],
+#                         'Liftprops4':[0.4,x_rot_rear,1.15,-0.1],
+#                         'Tailboom L':[7,(x_tail - x_rot_front)/2 + x_rot_front,-1.15,-0.1],
+#                         'Tailboom R':[7,(x_tail - x_rot_front)/2 + x_rot_front,1.15,-0.1],
+#                         'Hor Tail':[4,x_tail,0,0.79],
+#                         'Vert Tail 1':[1,x_tail,-1.15,0.163333333],
+#                         'Vert Tail 2':[1,x_tail,1.15,0.163333333],
+#                         'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
+#                         'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
+#                         'Payload_pd': [50,x_payload_pd,0,0.3],
+#                         'Payload_le': [20,x_payload_le,0,0.3],
+#                         'Fuel_pd': [14,x_lemac + c_wing_root/2, 0, 0.3],
+#                         'Fuel_le': [34,x_lemac + c_wing_root/2, 0, 0.3]
+#                                       }
 
 def OEW(oew = True):
 
@@ -199,3 +248,4 @@ rotor_aft_2_w, rotor_aft_2_xcg = np.array(components_dict['Liftprops2'])[:2]
 rotor_aft_3_w, rotor_aft_3_xcg = np.array(components_dict['Liftprops3'])[:2]
 rotor_aft_4_w, rotor_aft_4_xcg = np.array(components_dict['Liftprops4'])[:2]
 
+print('com', components_dict)
