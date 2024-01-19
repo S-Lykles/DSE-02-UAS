@@ -519,7 +519,7 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
 # rudder_surface_sizing()
 
 
-def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X_AreaCent = 2.136, rho = 1.225, V_max=53.0, C_L_alpha_v = aero_constants.Cl_alpha_v, S_v =vertical_tail()[0] , l_v =vertical_tail()[2]  , S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
+def fucking_rudder_sizing_2(V_cross = 23.15, V_trans = 42, S_fus_side = 2.411353, X_AreaCent = 1.866, rho = 1.225, V_max=53.0, C_L_alpha_v = aero_constants.Cl_alpha_v, S_v =vertical_tail()[0] , l_v =vertical_tail()[2]  , S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
@@ -537,7 +537,8 @@ def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X
     Cr_Cv = 0.14
     moment = F_crosswind * d_c
 
-    V_total = np.sqrt(V_trans**2 + V_cross**2)
+    V_total = V_trans
+    # V_total = np.sqrt(V_trans**2 + V_cross**2)
     q = 0.5 * rho * V_total ** 2
 
     delta_r = 40 * (np.pi / 180)
@@ -546,15 +547,12 @@ def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X
 
         Cr_Cv += 0.01
         tau_r = 1.129 * (Cr_Cv) ** 0.4044 - 0.1772
-        C_n_delta_r = -1 * C_L_alpha_v * ((l_v * S_v)/(b * S)) * eta_v * tau_r * br_bv
-        delta_r = moment / (-1 * q * S_v_total * C_n_delta_r)
+        C_n_delta_r = -1 * C_L_alpha_v * ((l_v * S_v_total)/(b * S)) * eta_v * tau_r * br_bv
+        delta_r = moment / (-1 * q * S * C_n_delta_r * b)
 
-        print("Useful values")
-        print(Cr_Cv)
-        print(delta_r * const.rad2deg)
-        print(-1 * q * S_v_total * C_n_delta_r)
+        force_per_rudder_surface = moment/(2 * l_v)
 
-    return(Cr_Cv, C_n_delta_r, delta_r)
+    return(Cr_Cv, C_n_delta_r, delta_r, force_per_rudder_surface)
 
 fucking_rudder_sizing_2()
 
