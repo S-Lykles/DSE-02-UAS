@@ -12,7 +12,7 @@ MAC = c_root * (2/3) * ((1+taper+taper**2)/(1+taper))
 y_mac = 0.5 * b * (1 + 2 * taper) / (3 + 3 * taper)
 
 #x_cg = 1.5 #wrt to datum of 6x6 launch and recovery footprint
-x_LEMAC = 2.0828
+x_LEMAC = 2.0828 #horizontal_tail-sizing()[
 x_wing_LE_rootchord = x_LEMAC - y_mac * np.tan(Lambda_LE)
 print(x_wing_LE_rootchord)
 

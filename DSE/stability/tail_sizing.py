@@ -220,11 +220,11 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     Sh = S*np.min(sr)
 
     print('AR', A_h)
-    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da,
+    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da, xlmac
 print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
-    a, b, c, d, e = horizontal_tail_sizing()
+    a, b, c, d, e, f = horizontal_tail_sizing()
     print('test 1', a)
     print('test 2', b)
     print('test 3', c)

@@ -342,12 +342,12 @@ engine_w, engine_xcg = np.array(components_dict['Combustion Engine'])[:2]
 generator_w, generator_xcg = np.array(components_dict['Alternator'])[:2]
 avionics_w, avionics_xcg = avionics_data()[0], avionics_data()[1][0]
 wingL_w, wingL_xcg = np.array(components_dict['WingL'])[:2]
-wingL_w, wingL_xcg = np.array(components_dict['WingR'])[:2]
+wingR_w, wingR_xcg = np.array(components_dict['WingR'])[:2]
 main_structure_fuselage_w, main_structure_fuselage_xcg = np.array(components_dict['Fuselage structure/Shell'])[:2]
 weight_fuselage = [engine_w, generator_w, avionics_w, wingL_w, wingR_w, main_structure_fuselage_w]
 xcg_fuselage = [engine_xcg, generator_xcg, avionics_xcg, wingL_xcg, wingR_xcg, main_structure_fuselage_xcg]
 fuselage_w = np.sum(weight_fuselage)
-fuselage_xcg = np.sum(weight_fuselage*xcg_fuselage)/fuselage_w
+fuselage_xcg = np.sum(np.array(weight_fuselage)*np.array(xcg_fuselage))/fuselage_w
 horizontalTail_w, horizontalTail_xcg = np.array(components_dict['Hor Tail'])[:2]
 verticalTail1_w, verticalTail1_xcg = np.array(components_dict['Vert Tail 1'])[:2]
 verticalTail2_w, verticalTail2_xcg = np.array(components_dict['Vert Tail 2'])[:2]
@@ -356,9 +356,9 @@ rotor_aft_2_w, rotor_aft_2_xcg = np.array(components_dict['Liftprops2'])[:2]
 rotor_aft_3_w, rotor_aft_3_xcg = np.array(components_dict['Liftprops3'])[:2]
 rotor_aft_4_w, rotor_aft_4_xcg = np.array(components_dict['Liftprops4'])[:2]
 
-#from DSE.structures import center_of gravity as cg
+# from DSE.structures import center_of gravity as cg
 
-#eng_w = cg.engine.w
+# eng_w = cg.engine.w
 # fairings
 # structure
 #
