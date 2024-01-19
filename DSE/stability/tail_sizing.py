@@ -413,6 +413,7 @@ def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=
 
 
 def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL_0=aero_constants.CL_0,CL_alpha=aero_constants.CL_alpha_wing,c_bar=aero_constants.c_bar,CL_l = 0.91,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
+    """I changed the c_alpha_h, it was completely wrong, now the required tau_el makes zero sense but oh well"""
     # speed range ( Stall <-> Max + safety margin)
     eta_h = 0.9
     delta = 25*np.pi/180  # Elevator deflection range ( -25 <-> 25 degrees)
@@ -427,9 +428,9 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
     print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check wiht "Jakob or Bas"')
     Ce_Ch = 0.25 #*Ch
     Se_Sh = Ce_Ch * (1/bh_be) #*Sh
-    C_L_delta_e = CL_alpha_h * 0.95 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_el[0] # This is the lift coefficient change due to elevator deflection
+    tau_a = -6.624 * (Se_Sh) ** 4 + 12.07 * (Se_Sh) ** 3 - 8.292 * (Se_Sh) ** 2 + 3.295 * Se_Sh + 0.004942
+    C_L_delta_e = aero_constants.CL_alpha_h * 0.90 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_a # This is the lift coefficient change due to elevator deflection
     return tau_el[0], Ce_Ch, Se_Sh, C_L_delta_e
-
 
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
