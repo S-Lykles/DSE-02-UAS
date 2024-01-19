@@ -365,8 +365,7 @@ def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=
     for q in range(len(taper_v)):
         for p in range(len(AR_v)):
             for j in range(len(sweep_v)):
-                Min_span = 0.6/np.cos(sweep_v[j]*deg2rad)
-                if Span[q][p][j] > Min_span:
+                if Span[q][p][j] > min_span:
                     if AR_v[p] > min_AR_v:
 
                         H_opt = weight_taper * (taper_v[q] * Norm_taper) + weight_root_cord * (
