@@ -11,6 +11,8 @@ x_lemac = 2.181
 mac = aero_constants.c_bar
 x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
+x_payload_pd = 2.0
+x_payload_le = 2.2
 c_wing_root = aero_constants.c_root
 l_engine = 0.400
 l_alternator = 0.060
@@ -64,10 +66,10 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                         'Vert Tail 2':[1,x_tail,1.15,0.163333333],
                         'Fuel Pump 1':[0.07,x_ac_wing,-0.1,-0.12],
                         'Fuel Pump 2':[0.07,x_ac_wing,0.1,-0.12],
-                        'Payload_pd': [50,1.5,0,0.3],
-                        'Payload_le': [20,1.5,0,0.3],
-                        'Fuel_pd': [14,1.5, 0, 0.3],
-                        'Fuel_le': [34,1.5, 0, 0.3]
+                        'Payload_pd': [50,x_payload_pd,0,0.3],
+                        'Payload_le': [20,x_payload_le,0,0.3],
+                        'Fuel_pd': [14,x_lemac + c_wing_root/2, 0, 0.3],
+                        'Fuel_le': [34,x_lemac + c_wing_root/2, 0, 0.3]
                                       }
 
 
