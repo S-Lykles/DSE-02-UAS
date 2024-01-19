@@ -95,10 +95,10 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         A_h = A_hh[i]
         if A_h == 6.8:
             PloT=True
-            print('tt',A_h)
+            # print('tt',A_h)
         else:
             PloT=False
-            print(i,A_h)
+            # print(i,A_h)
         # # A_h = 2/3*36/3.5
         # # Cl_alpha_h is taken as 2pi, but it should be an input from aero
         # # CL_alpha_h = 2*np.pi*A_h/(2+np.sqrt(4+(A_h*beta/eta)**2*(1+np.tan(sweep_ang_50_c_rad)**2/beta**2)))
@@ -194,7 +194,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         # print()
         xlemac_lf = [x-y_datum_shift for x in xlemac_lf]
         # xlemac_lf=xlemac_lf-1.57
-        # PloT = False
+        PloT = False
         if PloT == True:
             print(surface_ratio,'Surf.h',surface_ratio*S)
             plt.plot(x_cg_bar, Sh_S, label ='stab')
@@ -220,7 +220,6 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     print('AR', A_h)
     return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da,
-print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
     a, b, c, d, e = horizontal_tail_sizing()
@@ -605,7 +604,7 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
 
 
-testing = True
+testing = False
 if testing == True:
    # print(horizontal_tail_sizing())
     #print(elevator_surface_sizing())

@@ -173,7 +173,7 @@ else:
     Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
 
     CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
-    Cmq = -(CL_alpha_w * l_acw**2/c_bar**2 + CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2)
+    Cmq = CL_alpha_w * l_acw**2/c_bar**2 +-CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2
     # Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
     if PRInt == True:
         print('CZq = ', CZq,'Cmq = ',  Cmq)
@@ -198,11 +198,6 @@ else:
     # CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
     CMu = M0**2 / (1 - M0**2) * (CL_w * (l_acw/c_bar) - CL_h * ((l_h * S)/(c_bar * Sh)) - Cd0_w * (Zac/c_bar))
     CXq = 0
-    print("CD0",CD0)
-    print("CL0",CL0)
-    print("M0",M0)
-    print("CDm",CDM)
-    print("tehta0",Theta_0)
     CXdelt_e = 0
     CZdelt_e = -CL_alpha_h*0.95*Sh*l_h/S*c_bar* elevator_surface_sizing()[0] * (aero_constants.c_bar/l_h)
     CMdelt_e = -CL_alpha_h*0.95*Sh*l_h/S*c_bar* elevator_surface_sizing()[0]
@@ -258,9 +253,10 @@ if damping:
     A_cl = A_symm - B_symm @ K
     sys_cl = ss(A_cl,B_symm,C_symm,D_symm)
     damping_system = sys_cl.feedback(K)
-
+    K[0,0] = 0
+    print("K",K)
     # The time vector
-    tend = 50
+    tend = 100
     dt = 0.1
     t = np.arange(0,tend+dt, dt)
     #==============================================================================
@@ -281,10 +277,10 @@ if damping:
             u0[i] = u01[i],u02[i]
         y, time, x = lsim(damping_system, u0, t)
     if initial_condition:
-        x0 = np.array([[1],          # initial codnitions for u, alpha, theta and q respectively
-                       [1],
-                       [1],
-                       [0]])
+        x0 = np.array([[5],          # initial codnitions for u, alpha, theta and q respectively
+                       [np.pi/4],
+                       [0],
+                       [np.pi/2* aero_constants.c_bar / V]])
 
         y, time = initial(sys_cl, t, x0)
     plt.plot(t,y[:,0],label = "u")
@@ -301,9 +297,24 @@ if damping:
 
     poles = True
     if poles:
-        xxx = ss2tf(A_cl, B_symm, C_symm, D_symm)
-        # tf_function = tf(numerator, denominator)
-        print(xxx)
+        poles = pole(sys_cl)
+
+        # Compute transmission zeros
+        zeros = zero(sys_cl)
+
+        # Plot the pole-zero map
+        plt.scatter(np.real(poles), np.imag(poles), marker='x', label='Poles')
+        plt.scatter(np.real(zeros), np.imag(zeros), marker='o', label='Zeros')
+
+        plt.axhline(0, color='black', linewidth=0.5, linestyle='--')
+        plt.axvline(0, color='black', linewidth=0.5, linestyle='--')
+
+        plt.title('Pole-Zero Map')
+        plt.xlabel('Real')
+        plt.ylabel('Imaginary')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 # print("""t
 #           CXu, CZu, CMu,
