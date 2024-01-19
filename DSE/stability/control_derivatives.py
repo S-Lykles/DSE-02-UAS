@@ -243,7 +243,7 @@ else:
               [0 , 0],
               [0 , 0],
               [1 , 0]]
-
+    print(A_symm,B_symm,C_symm,D_symm)
 damping = True
 if damping:
     sys = ss(A_symm,B_symm,C_symm,D_symm)
