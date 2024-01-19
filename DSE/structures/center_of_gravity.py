@@ -319,6 +319,15 @@ def cg_per_mission(oew, fuel_supply, fuel_relay, payload_supply, payload_relay, 
     cal_cg = cg_estimation(component_list, components_dict)
 
     return cal_cg
+def extreme_cg_calc(cal_cg=cg_per_mission.cal_cg):
+    test1 = cg_per_mission(True, False, False, False, False)
+    test2 = cg_per_mission(True, False, True, False, False)
+    test3 = cg_per_mission(True, False, False, False, True)
+    test4 = cg_per_mission(True, False, True, False, True)
+    #print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
+    Xcg_max = max(test1, test2, test3, test4)
+    return Xcg_max
+
 
 test1 = cg_per_mission(True, False, False, False, False)
 test2 = cg_per_mission(True, False, True, False, False)
