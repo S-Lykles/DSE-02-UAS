@@ -13,40 +13,41 @@ x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
 x_payload_pd = 2.0
 x_payload_le = 2.2
+x_nose = 0.5
 c_wing_root = aero_constants.c_root
 l_engine = 0.400
 l_alternator = 0.060
 l_clutch = 0.032
 l_prop = 0.18
-l_aeroboom = 0.5
-l_fus = x_lemac - l_aeroboom + l_alternator + c_wing_root + l_engine + l_clutch
+l_aeroboom = 0.47
+l_fus = x_lemac - x_nose + l_alternator + c_wing_root + l_engine + l_clutch
 print('L_fus =', l_fus, 'm')
 
 
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
-                       'Air data boom':[0.142,0.23,0,0],
-                        'Iridium Antenna':[0.1,0.5225,-0.027,0],
-                        'Iridium Satellite communication module':[0.73,0.6875,0,0],
-                        'GNSS Antenna 1':[0.011,0.56,0.00925,0],
-                        'GNSS Antenna 2':[0.011,0.56,0.0185,0],
-                        'GNSS Antenna 3':[0.011,0.56,0.02775,0],
-                        'ADSB Transponder':[0.05,0.612,0.05,0],
-                        'Landing Visual Sensor':[0.0215,0.765,0.035,-0.0275],
-                        'Flight Computer + Short Range Transceiver':[0.1,0.74,-0.015,0.0425],
-                        'Polar IMU + Magnetometer + GNSS':[0.17,0.645,0,0.0575],
-                        'Flight Data Recorder':[0.07,0.735,0.029,0.056],
+                        'Air data boom':[0.142,x_nose - l_aeroboom/2,0,0],
+                        'Iridium Antenna':[0.1,x_nose + 0.5225 - l_aeroboom,-0.027,0],
+                        'Iridium Satellite communication module':[0.73, x_nose + 0.6875 - l_aeroboom,0,0],
+                        'GNSS Antenna 1':[0.011,x_nose + 0.56 - l_aeroboom,0.00925,0],
+                        'GNSS Antenna 2':[0.011,x_nose + 0.56 - l_aeroboom,0.0185,0],
+                        'GNSS Antenna 3':[0.011,x_nose + 0.56 - l_aeroboom,0.02775,0],
+                        'ADSB Transponder':[0.05,x_nose + 0.612 - l_aeroboom,0.05,0],
+                        'Landing Visual Sensor':[0.0215,x_nose + 0.765 - l_aeroboom,0.035,-0.0275],
+                        'Flight Computer + Short Range Transceiver':[0.1,x_nose + 0.74 -l_aeroboom,-0.015,0.0425],
+                        'Polar IMU + Magnetometer + GNSS':[0.17,x_nose + 0.645 - l_aeroboom,0,0.0575],
+                        'Flight Data Recorder':[0.07,x_nose + 0.735 - l_aeroboom,0.029,0.056],
                         'WingL':[9,x_ac_wing,-1.226,0.17],
                         'WingR':[9,x_ac_wing,1.226,0.17],
                         # 'WingL':[9,2.0828,-1.226,0.17],
                         # 'WingR':[9,2.0828,1.226,0.17],
                         'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
-                        'Emergency Battery':[2,0.8,0,0],
+                        'Emergency Battery':[2,x_nose + 0.4,0,0],
                         'Combustion Engine':[35,x_lemac + c_wing_root + l_engine/2,0,-0.165],
                         'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
                         'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
                         'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
                         'ECU':[1,x_lemac + c_wing_root,0,-0.05],
-                        'Fuselage structure/Shell':[3,l_fus/2 + l_aeroboom,0,-0.17],
+                        'Fuselage structure/Shell':[3,l_fus/2 + x_nose,0,-0.17],
                         'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
                         'ESC2':[0.62,x_rot_rear - 0.2,-1.15,-0.06],
                         'ESC3':[0.62,x_rot_front + 0.2,1.15,-0.06],
