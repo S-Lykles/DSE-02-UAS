@@ -427,7 +427,7 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
     print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check wiht "Jakob or Bas"')
     Ce_Ch = 0.25 #*Ch
     Se_Sh = Ce_Ch * (1/bh_be) #*Sh
-    C_L_delta_e = CL_alpha_h * 0.95 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_el[0]
+    C_L_delta_e = CL_alpha_h * 0.95 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_el[0] # This is the lift coefficient change due to elevator deflection
     return Tau_el[0], Ce_Ch, Se_Sh, C_L_delta_e
 
 
