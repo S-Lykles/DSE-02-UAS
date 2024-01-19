@@ -4,10 +4,20 @@ from DSE import const
 from DSE.aero import aero_constants
 from DSE.stability import rotor_placement as rp
 
+
+
+x_tail =
 x_lemac = 2.181
 mac = aero_constants.c_bar
-xac_w = x_lemac+0.25*mac
-Rotor_Front_X, Rotor_Rear_X = rp.Rotor_Front_X, rp.Rotor_Rear_X
+x_ac_wing = x_lemac+0.25*mac
+x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
+c_wing_root = aero_constants.c_root
+l_engine =
+l_alternator =
+l_clutch =
+l_prop =
+l_fus =
+l_aeroboom =
 
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                        'Air data boom':[0.142,0.23,0,0],
