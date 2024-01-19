@@ -6,6 +6,7 @@ from DSE.structures.center_of_gravity import class_two_cg_estimation
 from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
+from DSE.structures.center_of_gravity import extreme_cg_calc
 
 plot = False
 # default values
@@ -229,7 +230,7 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-def vertical_tail(Xcg=2.1547,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
+def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:

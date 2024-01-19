@@ -319,7 +319,7 @@ def cg_per_mission(oew, fuel_supply, fuel_relay, payload_supply, payload_relay, 
     cal_cg = cg_estimation(component_list, components_dict)
 
     return cal_cg
-def extreme_cg_calc(cal_cg=cg_per_mission.cal_cg):
+def extreme_cg_calc():
     test1 = cg_per_mission(True, False, False, False, False)
     test2 = cg_per_mission(True, False, True, False, False)
     test3 = cg_per_mission(True, False, False, False, True)
@@ -328,12 +328,6 @@ def extreme_cg_calc(cal_cg=cg_per_mission.cal_cg):
     Xcg_max = max(test1, test2, test3, test4)
     return Xcg_max
 
-
-test1 = cg_per_mission(True, False, False, False, False)
-test2 = cg_per_mission(True, False, True, False, False)
-test3 = cg_per_mission(True, False, False, False, True)
-test4 = cg_per_mission(True, False, True, False, True)
-print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
 
 
 def avionics_data(components_dict=components_dict):
@@ -362,9 +356,9 @@ rotor_aft_2_w, rotor_aft_2_xcg = np.array(components_dict['Liftprops2'])[:2]
 rotor_aft_3_w, rotor_aft_3_xcg = np.array(components_dict['Liftprops3'])[:2]
 rotor_aft_4_w, rotor_aft_4_xcg = np.array(components_dict['Liftprops4'])[:2]
 
-from DSE.structures import center_of gravity as cg
+#from DSE.structures import center_of gravity as cg
 
-eng_w = cg.engine.w
+#eng_w = cg.engine.w
 # fairings
 # structure
 #
