@@ -21,7 +21,7 @@ clearance = 0.2 # rotor clearance
 b_ht = D_vertical + D_vtol
 
 def rotor_locations(x_wing_LE_rootchord=x_wing_LE_rootchord, b_ht=b_ht, Lambda_LE=Lambda_LE, Lambda_TE=Lambda_TE, D_vtol=D_vtol, clearance=clearance):
-    x_PF = x_wing_LE_rootchord + 0.5*b_ht*np.tan(Lambda_LE) - (D_vtol/2 - clearance)/np.cos(Lambda_LE)
+    x_PF = x_wing_LE_rootchord + 0.5*b_ht*np.tan(Lambda_LE) - (D_vtol/2 + clearance)/np.cos(Lambda_LE)
     x_PR = x_wing_LE_rootchord + c_root + 0.5*b_ht*np.tan(Lambda_TE) + (D_vtol/2 + clearance)/np.cos(Lambda_TE)
     return x_PF, x_PR
 

@@ -6,6 +6,7 @@ from DSE.stability.Loaddiag import load_diagram_plot
 from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
+from DSE.structures import center_of_gravity as cg
 from DSE.structures.center_of_gravity import extreme_cg_calc
 
 plot = False
@@ -62,7 +63,7 @@ def find_intersection(x1, y1, x2, y2):
 
     return x_intersect, y_intersect
 
-def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
+def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = cg.l_fus, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = cg.x_lemac-cg.x_nose, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
     #print('lift rate',Cl_alpha_h)
@@ -171,6 +172,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
             xlmac = xlemac_lf[0] + m * (x2 - x_cg_bar_max[0])
 
+            print('xlemax', xlmac * 6 <= const.xlemac)
 
             print('xlemac_lf',xlmac*6)
         # PloT = False
@@ -218,8 +220,8 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     # Sh = S*surface_ratio
     Sh = S*np.min(sr)
-
-    print('AR', A_h)
+    print('edge', cg.x_rot_rear+0.5, cg.x_tail)
+    print('AR', A_h,Sh/2.5,Sh/2.3)
     return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da, xlmac
 
 test_print = False
@@ -230,7 +232,7 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
+def vertical_tail(Xcg=extreme_cg_calc(), l_boom=5.75, l_fus=cg.l_fus, eta=0.95, b_max=0.8, b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
