@@ -61,6 +61,7 @@ c_bar = aero_constants.c_bar
 Cd = aero_constants.CD_cruise[0] # placeholder, input from aerodyamics
 CL_w = aero_constants.CL_cruise
 CL0 = aero_constants.CL_0
+CD0 = aero_constants.CD_0
 sweep_ang_25_c = aero_constants.sweep_ang_25_c_rad
 CL_alpha_w = aero_constants.CL_alpha_wing
 Cd_alpha = aero_constants.CD_alpha_wing
@@ -133,7 +134,6 @@ Z_m = -9999
 
 
 zv = -9999
-CD0 = -9999
 
 vtol=False
 if vtol:
@@ -248,10 +248,10 @@ else:
               [0 , 0],
               [0 , 0],
               [1 , 0]]
-    
+
 damping = True
 if damping:
-    sys = ss(A_symm,B_symm,C_symm,D_symm)    
+    sys = ss(A_symm,B_symm,C_symm,D_symm)
     state_matrix = np.eye(4)
     input_matrix = np.eye(2)
     K, S, E = lqr(sys, state_matrix, input_matrix)
@@ -267,7 +267,7 @@ if damping:
     # Step input or initial condition?
     step_input = False
     initial_condition = True
-    if step_input:    
+    if step_input:
         # The input vector.
         ttussen = 1  # ttussen is the time that 1 should be present.
         u01 = np.zeros(len(t))
@@ -285,8 +285,8 @@ if damping:
                        [1],
                        [1],
                        [0]])
-        
-        y, time = initial(sys_cl, t, x0)                  
+
+        y, time = initial(sys_cl, t, x0)
     plt.plot(t,y[:,0],label = "u")
     plt.plot(t,y[:,1],label = "alpha")
     plt.plot(t,y[:,2],label = "theta")
@@ -296,10 +296,14 @@ if damping:
     plt.ylabel('y')
     plt.legend()
     plt.show()
-    print(y[0],y[1])
-    print(pole(sys_cl))
-    
 
+    print(pole(sys_cl))
+
+    poles = True
+    if poles:
+        xxx = ss2tf(A_cl, B_symm, C_symm, D_symm)
+        # tf_function = tf(numerator, denominator)
+        print(xxx)
 
 # print("""t
 #           CXu, CZu, CMu,

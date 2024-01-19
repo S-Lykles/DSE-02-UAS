@@ -1,6 +1,6 @@
 import numpy as np
 from DSE import const
-from DSE.structures.center_of_gravity import class_two_cg_estimation
+# from DSE.structures.center_of_gravity import class_two_cg_estimation
 import matplotlib.pyplot as plt
 # from DSE import plot_setting
 

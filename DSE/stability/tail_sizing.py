@@ -6,7 +6,9 @@ from DSE.structures.center_of_gravity import class_two_cg_estimation
 from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
+from DSE.structures.center_of_gravity import extreme_cg_calc
 
+plot = False
 # default values
 T = const.T0
 gamma = const.gamma
@@ -218,17 +220,17 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     Sh = S*np.min(sr)
 
     print('AR', A_h)
-    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da,
+    return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da, xlmac
 print("hoi",horizontal_tail_sizing()[4])
 test_print = False
 if test_print ==True:
-    a, b, c, d, e = horizontal_tail_sizing()
+    a, b, c, d, e, f = horizontal_tail_sizing()
     print('test 1', a)
     print('test 2', b)
     print('test 3', c)
     print('test 4', d)
 
-def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
+def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
@@ -242,8 +244,8 @@ def vertical_tail(Xcg=1.94,l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constant
     number_vertical_tail = 2
     PRINT = False # Printing the optimal values
     # Constraints
-    min_span = 0.6
     min_AR_v = 1.0
+    min_span = 0.6
 
     # Resolution
     iteration = 100
@@ -603,10 +605,10 @@ def aileron_surface_sizing(V_trans, roll_rate = 0.2618, span_wise_outer = 2.9, a
 
 
 
-testing = False
+testing = True
 if testing == True:
-    print(horizontal_tail_sizing())
-    print(elevator_surface_sizing())
+   # print(horizontal_tail_sizing())
+    #print(elevator_surface_sizing())
     print(vertical_tail())
-    print(rudder_surface_sizing())
-    print(aileron_surface_sizing())
+    #print(rudder_surface_sizing())
+    #print(aileron_surface_sizing())
