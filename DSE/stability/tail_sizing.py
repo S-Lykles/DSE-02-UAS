@@ -2,7 +2,7 @@ import numpy as np
 from DSE import const
 from DSE.Locations import locations
 from DSE.stability.Loaddiag import load_diagram_plot
-from DSE.structures.center_of_gravity import class_two_cg_estimation
+# from DSE.structures.center_of_gravity import class_two_cg_estimation
 from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt

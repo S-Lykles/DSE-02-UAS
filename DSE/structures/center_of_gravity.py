@@ -163,11 +163,11 @@ def extreme_cg_calc():
     test3 = cg_per_mission(True, False, False, False, True)
     test4 = cg_per_mission(True, False, True, False, True)
     #print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
-    Xcg_max = max(test1, test2, test3, test4)
+    Xcg_max = max(test1[1][0], test2[1][0], test3[1][0], test4[1][0])
     return Xcg_max
 
 
-print('extreme',extreme_cg_calc())
+print('extreme',extreme_cg_calc(), x_lemac)
 def avionics_data(components_dict=components_dict):
     avionics_list = ['Air data boom', 'Iridium Antenna', 'Iridium Satellite communication module', 'GNSS Antenna 1',
                      'GNSS Antenna 2', 'GNSS Antenna 3', 'ADSB Transponder', 'Landing Visual Sensor', 'Flight Computer + Short Range Transceiver', 'Polar IMU + Magnetometer + GNSS', 'Flight Data Recorder']
