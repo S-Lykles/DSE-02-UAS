@@ -1,4 +1,5 @@
 import numpy as np
+from DSE import const
 from DSE.aero.aero_constants import *
 # from DSE.structures.center_of_gravity import *
 
@@ -12,11 +13,11 @@ taper = c_tip/c_root
 MAC = c_bar
 y_mac = 0.5 * b * (1 + 2 * taper) / (3 + 3 * taper)
 
-x_LEMAC = 2.18
+x_LEMAC = const.xlemac
 x_wing_LE_rootchord = x_LEMAC - y_mac * np.tan(Lambda_LE)
 print(x_wing_LE_rootchord)
 
-clearance = 0.15 # rotor clearance
+clearance = 0.2 # rotor clearance
 b_ht = D_vertical + D_vtol
 
 def rotor_locations(x_wing_LE_rootchord=x_wing_LE_rootchord, b_ht=b_ht, Lambda_LE=Lambda_LE, Lambda_TE=Lambda_TE, D_vtol=D_vtol, clearance=clearance):

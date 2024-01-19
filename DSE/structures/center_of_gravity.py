@@ -7,7 +7,7 @@ from DSE.stability import rotor_placement as rp
 
 
 x_tail = 4.14
-x_lemac = 2.181
+x_lemac = const.xlemac
 mac = aero_constants.c_bar
 x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
@@ -160,12 +160,15 @@ def cg_per_mission(oew, fuel_supply, fuel_relay, payload_supply, payload_relay, 
 
     return cal_cg
 def extreme_cg_calc():
-    test1 = cg_per_mission(True, False, False, False, False)
-    test2 = cg_per_mission(True, False, True, False, False)
-    test3 = cg_per_mission(True, False, False, False, True)
-    test4 = cg_per_mission(True, False, True, False, True)
+    OEW = cg_per_mission(True, False, False, False, False)
+    OEW_CR_f = cg_per_mission(True, False, True, False, False)
+    # OEW_CR_p = cg_per_mission(True, False, False, False, True)
+    OEW_CR_f_p = cg_per_mission(True, False, True, False, True)
+    OEW_PD_f = cg_per_mission(True, True, False, False, False)
+    # OEW_PD_p = cg_per_mission(True, False, False, True, False)
+    OEW_PD_f_p = cg_per_mission(True, True, False, True, False)
     #print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
-    Xcg_max = max(test1[1][0], test2[1][0], test3[1][0], test4[1][0])
+    Xcg_max = max(OEW[1][0], OEW_CR_f[1][0], OEW_CR_f_p[1][0], OEW_PD_f[1][0],  OEW_PD_f_p[1][0])
     return Xcg_max
 
 
