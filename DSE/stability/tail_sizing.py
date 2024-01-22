@@ -6,6 +6,7 @@ from DSE.stability.Loaddiag import load_diagram_plot
 from DSE.aero import aero_constants
 from loading_diagram import loading_diagram_extremes
 import matplotlib.pyplot as plt
+from DSE.structures import center_of_gravity as cg
 from DSE.structures.center_of_gravity import extreme_cg_calc
 
 plot = False
@@ -62,7 +63,7 @@ def find_intersection(x1, y1, x2, y2):
 
     return x_intersect, y_intersect
 
-def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = 2, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = 0.7, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
+def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = const.gamma, T = const.T0, S  = aero_constants.S, b = aero_constants.b, c_bar = aero_constants.c_bar, Cl_alpha_h = aero_constants.Cl_alpha_h,  CL_max = aero_constants.S, l_f = cg.l_fus, CL_0 = aero_constants.CL_0, sweep_ang_rad = aero_constants.sweep_ang_rad, Cm_0_airfoil = aero_constants.Cm_0_airfoil, b_f = 0.8, hf_max = 0.8, l_fn = cg.x_lemac-cg.x_nose, CL_alpha_w = aero_constants.CL_alpha_wing, sweep_ang_25_c_rad = aero_constants.sweep_ang_25_c_rad, sweep_ang_50_c_rad = aero_constants.sweep_ang_50_c_rad, c_root = aero_constants.c_root, c_tip = aero_constants.c_tip):
     l_h  = locations()[3]
     dz_h = locations()[7]
     #print('lift rate',Cl_alpha_h)
@@ -171,6 +172,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
             xlmac = xlemac_lf[0] + m * (x2 - x_cg_bar_max[0])
 
+            print('xlemax', xlmac * 6 <= const.xlemac)
 
             print('xlemac_lf',xlmac*6)
         # PloT = False
@@ -218,8 +220,8 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
     # Sh = S*surface_ratio
     Sh = S*np.min(sr)
-
-    print('AR', A_h)
+    print('edge', cg.x_rot_rear+0.5, cg.x_tail)
+    print('AR', A_h,Sh/2.5,Sh/2.3)
     return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da, xlmac
 
 test_print = False
@@ -230,7 +232,7 @@ if test_print ==True:
     print('test 3', c)
     print('test 4', d)
 
-def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
+def vertical_tail(Xcg=extreme_cg_calc(), l_boom=5.75, l_fus=cg.l_fus, eta=0.95, b_max=0.8, b=aero_constants.b,S=aero_constants.S,CL=[aero_constants.CL_max,aero_constants.CL_cruise],Cl_alpha_v=aero_constants.Cl_alpha_v,deg2rad=const.deg2rad):
     """Sv_bv is still the coupled ratio of vertical tail span and surface area of the both sections.
      Sv1_bv1 is the coupled ratio of the vertical tail and span of one of the the vertical tail sections.
      Assumptions made during these calculations:
@@ -413,23 +415,24 @@ def vertical_tail(Xcg=extreme_cg_calc(),l_boom=4.3,l_fus=2,eta=0.95,b_max=0.7,b=
 
 
 def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL_0=aero_constants.CL_0,CL_alpha=aero_constants.CL_alpha_wing,c_bar=aero_constants.c_bar,CL_l = 0.91,Cm_0=aero_constants.Cm_0_airfoil,Cm_alpha=aero_constants.Cm_alpha,alpha=0,alpha_0=aero_constants.alpha_0,CL_alpha_h= 0.12,bh_be=1):
+    """I changed the c_alpha_h, it was completely wrong, now the required tau_el makes zero sense but oh well"""
     # speed range ( Stall <-> Max + safety margin)
     eta_h = 0.9
     delta = 25*np.pi/180  # Elevator deflection range ( -25 <-> 25 degrees)
 
     Vh_vol = (Sh*l_h) / (S*c_bar)
 
-    Tau_el = (Cm_0 *CL_alpha + (CL_l - CL_0)*Cm_alpha ) / ( delta*eta_h* ( -CL_alpha*CL_alpha_h*Vh_vol*(1/bh_be) - Cm_alpha* CL_alpha_h * Sh/S*(1/bh_be)))
+    tau_el = (Cm_0 *CL_alpha + (CL_l - CL_0)*Cm_alpha ) / ( delta*eta_h* ( -CL_alpha*CL_alpha_h*Vh_vol*(1/bh_be) - Cm_alpha* CL_alpha_h * Sh/S*(1/bh_be)))
 
     S_a_S = np.linspace(0.0, 0.7, 100)
-    tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - Tau_el
+    tau_a = -6.624 * (S_a_S) ** 4 + 12.07 * (S_a_S) ** 3 - 8.292 * (S_a_S) ** 2 + 3.295 * S_a_S + 0.004942 - tau_el[0]
 
     print('The Chord-to-Chord and Surface-to-Surface ratio are determined for Tau_el = 0.46, if Tau_el is different check wiht "Jakob or Bas"')
     Ce_Ch = 0.25 #*Ch
     Se_Sh = Ce_Ch * (1/bh_be) #*Sh
-    C_L_delta_e = CL_alpha_h * 0.95 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_el[0] # This is the lift coefficient change due to elevator deflection
-    return Tau_el[0], Ce_Ch, Se_Sh, C_L_delta_e
-
+    tau_a = -6.624 * (Se_Sh) ** 4 + 12.07 * (Se_Sh) ** 3 - 8.292 * (Se_Sh) ** 2 + 3.295 * Se_Sh + 0.004942
+    C_L_delta_e = aero_constants.CL_alpha_h * 0.90 * (horizontal_tail_sizing()[0] / aero_constants.S) * tau_a # This is the lift coefficient change due to elevator deflection
+    return tau_el[0], Ce_Ch, Se_Sh, C_L_delta_e
 
 
 #def rudder_surface_sizing(S_v, l_v, S, b, V_cross, V_trans, S_fus_side, X_AreaCent_fus, rho, C_L_v_alpha = 0.1, C_d_y = 0.8):
@@ -519,7 +522,7 @@ def elevator_surface_sizing(l_h=locations()[3],Sh=horizontal_tail_sizing()[0],CL
 # rudder_surface_sizing()
 
 
-def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X_AreaCent = 2.136, rho = 1.225, V_max=53.0, C_L_alpha_v = aero_constants.Cl_alpha_v, S_v =vertical_tail()[0] , l_v =vertical_tail()[2]  , S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
+def fucking_rudder_sizing_2(V_cross = 23.15, V_trans = 42, S_fus_side = 2.411353, X_AreaCent = 1.866, rho = 1.225, V_max=53.0, C_L_alpha_v = aero_constants.Cl_alpha_v, S_v =vertical_tail()[0] , l_v =vertical_tail()[2]  , S = aero_constants.S, b = aero_constants.b, C_d_y = 0.8, dsigma_dbeta = 0.0, eta_v = 0.95):
     """Function to determine minimum rudder chord based on desired crosswind to correct for.
 
     !!!Currently the vertical tail span that is fitted with a rudder is assumed to be 90% of the total span, when an elevator chord is determined, it must be made sure that elevator and rudder do not collide at maximum deflection!!!"""
@@ -537,7 +540,8 @@ def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X
     Cr_Cv = 0.14
     moment = F_crosswind * d_c
 
-    V_total = np.sqrt(V_trans**2 + V_cross**2)
+    V_total = V_trans
+    # V_total = np.sqrt(V_trans**2 + V_cross**2)
     q = 0.5 * rho * V_total ** 2
 
     delta_r = 40 * (np.pi / 180)
@@ -546,15 +550,12 @@ def fucking_rudder_sizing_2(V_cross = 18, V_trans = 42, S_fus_side = 2.411353, X
 
         Cr_Cv += 0.01
         tau_r = 1.129 * (Cr_Cv) ** 0.4044 - 0.1772
-        C_n_delta_r = -1 * C_L_alpha_v * ((l_v * S_v)/(b * S)) * eta_v * tau_r * br_bv
-        delta_r = moment / (-1 * q * S_v_total * C_n_delta_r)
+        C_n_delta_r = -1 * C_L_alpha_v * ((l_v * S_v_total)/(b * S)) * eta_v * tau_r * br_bv
+        delta_r = moment / (-1 * q * S * C_n_delta_r * b)
 
-        print("Useful values")
-        print(Cr_Cv)
-        print(delta_r * const.rad2deg)
-        print(-1 * q * S_v_total * C_n_delta_r)
+        force_per_rudder_surface = moment/(2 * l_v)
 
-    return(Cr_Cv, C_n_delta_r, delta_r)
+    return(Cr_Cv, C_n_delta_r, delta_r, force_per_rudder_surface)
 
 fucking_rudder_sizing_2()
 

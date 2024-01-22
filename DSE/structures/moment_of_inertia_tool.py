@@ -300,6 +300,25 @@ def number_of_stringers_computation(K_c, s, t, E, t_c): #, mu):
     print(N_req, "Nreq")
     # return N_stringers
 
+def number_of_stringers_computation_horizontal_tail(K_c, s, t, E, t_c): #, mu):
+    E = E * 0.000145037738
+    t = t * 39.3700787
+    h = 0.109 * t_c * 39.3700787
+    M = momentdistributionz[round(s*100)] * 8.85074579
+
+    N = np.arange(1, 5, 1)
+    L = 0.5 * 0.109 * 39.3700787 / N
+    print(N, 'N')
+
+    # Compute the maximum compressive force acting on the wing box section
+    Fmax = M / h
+    sigma_cr = Fmax / (t * L)
+    L_check = t / np.sqrt(sigma_cr / (K_c * E))
+    #L_check = t / np.sqrt(12 * sigma_cr * (1 - mu**2)/(K_c * E * np.pi**2))
+    # Compute the maximum spacing between stringers
+    N_req = L/L_check
+    print(N_req, "Nreq")
+    # return N_stringers
 
 
 def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
@@ -321,28 +340,38 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
     print(N_req, "Nreq")
     # return N_stringers
 
+# Main wing stringer computations:
+# print("Compute number of stringers required at s = 0:", number_of_stringers_computation(3.62, 0, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
+# print("Compute number of stringers required at s = 0.273:", number_of_stringers_computation(3.62, 0.273, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
+# print("Compute number of stringers required at s = 0.836:", number_of_stringers_computation(3.62, 0.836, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
+# print("Compute number of stringers required at s = 1.15:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
+# print("Compute number of stringers required at s = 2.25:", number_of_stringers_computation(3.62, 2.25, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
+# print("Compute number of stringers required at s = 2.9:", number_of_stringers_computation(3.62, 2.9, 0.001, 71*10**9,
+#                                                                                         0.12))#, 0.3))
 
-print("Compute number of stringers required at s = 0:", number_of_stringers_computation(3.62, 0, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
-print("Compute number of stringers required at s = 0.273:", number_of_stringers_computation(3.62, 0.273, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
-print("Compute number of stringers required at s = 0.836:", number_of_stringers_computation(3.62, 0.836, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
-print("Compute number of stringers required at s = 1.15:", number_of_stringers_computation(3.62, 1.15, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
-print("Compute number of stringers required at s = 2.25:", number_of_stringers_computation(3.62, 2.25, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
-print("Compute number of stringers required at s = 2.9:", number_of_stringers_computation(3.62, 2.9, 0.001, 71*10**9,
-                                                                                        0.12))#, 0.3))
+# Stringer computations for the horizontal tail:
+print("Compute the number of stringers required for the horizontal tail at s= 0:",
+      number_of_stringers_computation_horizontal_tail(3.62, 0, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 0.4:",
+      number_of_stringers_computation_horizontal_tail(3.62, 0.4, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 1.0:",
+      number_of_stringers_computation_horizontal_tail(3.62, 1.0, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 1.3:",
+      number_of_stringers_computation_horizontal_tail(3.62, 1.3, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 1.9:",
+      number_of_stringers_computation_horizontal_tail(3.62, 1.9, 0.001, 71*10**9, 0.12))
+
+
+
+# Check for valid moment of inertia of the wing box for the horizontal tail
 # print("The sizing of the moment of inertia for the horizontal tail wing is:"
 #       , I_xx_wing_box(0.01, 0.002,0.004,0.008,0.01,0.002,
 #                       0.004,0.008,0,0,0,0,0.001,
-#                       0.234*0.5, 0.001, 0.234*0.5, 2))
-# print("Compute number of stringers required:", number_of_stringers_computation(3.62, 0.833*0.52, 0.001, 71*10**9,
-#                                                                                4000, 0.833*0.12))
-# print("Compute number of ribs required "
-#       "span wise to handle the torsion:", I_xx_wing_box(0.06, 0.006,0.004, 0.05,0.05,
-#                                                         0.004 ,0.004,0.05 , 0.04, 0.005,
-#                                                         0.004, 0.05, 0.001, 2,0.001,2,
-#                                                         3))
-#
+#                       0.109*0.5, 0.001, 0.109*0.5, 2))
+
+# Horizontal tail wing stringers computations:

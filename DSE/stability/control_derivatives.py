@@ -13,33 +13,33 @@ PRInt = False
 
 V = 42 # placeholder
 Vh = V
-d_dt = 99999 # placeholder time step
+d_dt = 0.5 # placeholder time step
 T = 288.15 - 0.0065 * 500
 
 ##   !!! Imported Values !!!
 ##  !! still undifend and not placed !!
 Theta_0 = 2*np.pi/180 # placeholder
-CL_alpha_cruise = 9999 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
-CL_alpha_CL_0 = 9999 # placeholder, input from aerodynamics CL_alpha at CL=0
-Cd0_h = 9999 # placeholder, input from aerodynamics
+CL_alpha_cruise = aero_constants.CL_alpha_wing * 1.2 # placeholder, input from aerodynamics CL_alpaha at CL cruise.
+CL_alpha_CL_0 = CL_alpha_cruise # placeholder, input from aerodynamics CL_alpha at CL=0
+Cd0_h = 0.01 # placeholder, input from aerodynamics
 
 # Base
 rho = const.rho0
 m = const.total_mass
 M =0.12
 
-# Propulsion
-C_t = 9999 # placeholder, input from propulsion
+# # Propulsion
+# C_t = 0.01 # placeholder, input from propulsion
 CT_alpha = 0 # placeholder, input from propulsion
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
-CY_alpha_p = -9999
-J = -9999
-sigma = -9999
+# T1 = 500 # placeholder, input from propulsion
+# T2 = -9999 # placeholder, input from propulsion
+# T3 = -9999 # placeholder, input from propulsion
+# T4 = -9999 # placeholder, input from propulsion
+Tp = 280 # placeholder, input from propulsion
+Lw = 1500 # placeholder, input from propulsion
+# CY_alpha_p = -9999
+# J = -9999
+# sigma = -9999
 ks = 1.14
 ka = 0.4
 # T_C = C_t/J**2
@@ -48,8 +48,8 @@ ka = 0.4
 mo = 0.95*2*np.pi
 # I = 3/4*mo*integral_blade_c
 # CY_alpha_p = ks*fa*sigma*I1/(1+ka*sigma*I1)
-lp = -9999
-Vp = -9999
+# lp = -9999
+# Vp = -9999
 
 
 # Wing properties
@@ -93,7 +93,6 @@ sweep_v = 11
 eta_v = 0.90    # assumption
 Cl_alpha_v = aero_constants.Cl_alpha_v
 Vv = V
-lv = -9999
 #CL_alpha_v1 = aero_constants.CL_alpha_v
 #CL_alpha_v2 = CL_alpha_v1
 
@@ -102,13 +101,11 @@ M0 = V/(np.sqrt(1.4*287.15*T))
 CDM = Cd * M0 / (1-M0**2)
 beta = np.sqrt(1-M**2)
 eta = 0.95
-CT = 0.01
-CT_alpha = 0
 
 CD_alpha_w = aero_constants.CL_alpha_wing * 2 * CL_w / (np.pi * b*b/S*aero_constants.e)
-Ixx = -9999 # placeholder, input from structures
-Iyy = -9999 # placeholder, input from structures
-Ixz = -9999 # placeholder, input from structures
+Ixx = 1000 # placeholder, input from structures
+Iyy = 3037.7 # placeholder, input from structures
+Ixz = 1000 # placeholder, input from structures
 # Kxz = -9999
 Jxy = Ixz/(m*b**2)
 Ky_2 = Iyy/(m*c_bar**2)
@@ -117,23 +114,15 @@ mu_b = m/(rho*S*b)
 Kx_2 = Ixx/(m*b**2)
 Dc = c_bar/V * d_dt
 Db = b/V * d_dt
-Lh = 0.8*Lw
 
-T1 = -9999 # placeholder, input from propulsion
-T2 = -9999 # placeholder, input from propulsion
-T3 = -9999 # placeholder, input from propulsion
-T4 = -9999 # placeholder, input from propulsion
-Tp = -9999 # placeholder, input from propulsion
-Lw = -9999 # placeholder, input from propulsion
-Lh = -9999 # placeholder, input from propulsion
-q_rad= -9999 # placeholder, input for control
+# q_rad= -9999 # placeholder, input for control
 
 l_fr, l_aft, l_acw,l_h,h_p,h_acw,h_h,z_h,X_lemac, Xcg, Zac, Zh = locations()
-Z_m = -9999
+# Z_m = -9999
 
 
 
-zv = -9999
+# zv = -9999
 
 vtol=False
 if vtol:
@@ -171,10 +160,13 @@ else:
     CXalphadott = 0
     CZalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h / S / aero_constants.c_bar
     Cmalphadott = - Cl_alpha_h * (V_h/V)**2 * de_da * aero_constants.S_h * l_h**2 / S / aero_constants.c_bar/ aero_constants.c_bar
+    CZq = -2 * CL_alpha_h * l_h / aero_constants.c_bar * (V_h/V)**2 * Sh / S
+    Cmq = -1.1 * CL_alpha_h * l_h**2/ aero_constants.c_bar**2 * (V_h/V)**2 * Sh / S
 
-    CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
-    Cmq = CL_alpha_w * l_acw**2/c_bar**2 +-CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2
+    # CZq = -CL_alpha_w - CL_alpha_h*l_h*Sh/(c_bar*S)*(Vh/V)**2
+    # Cmq = CL_alpha_w * l_acw**2/c_bar**2 +-CL_alpha_h*l_h*Sh/(S*c_bar)*(Vh/V)**2
     # Cmq = CL_alpha_w * l_acw**2/c_bar**2 - CL_alpha_h
+    PRint = True
     if PRInt == True:
         print('CZq = ', CZq,'Cmq = ',  Cmq)
         print('CXalpha = ', CXalpha, 'CZalpha = ', CZalpha, 'Cmalpha = ', Cmalpha)
@@ -210,17 +202,20 @@ if vtol:
     b = b
 
 else:
-    P_symm =np.matrix( [[-2 * mu_c * c_bar / V, 0, 0, 0],
+    P_symm =np.matrix( [
+         [-2 * mu_c * c_bar / V, 0, 0, 0],
          [0, (CZalphadott - 2 * mu_c) * c_bar / V, 0, 0],
          [0, 0, -c_bar / V, 0],
          [0, Cmalphadott * c_bar / V, 0, - 2 * mu_c * Ky_2 * c_bar / V]])
 
-    Q_symm = np.matrix([[-CXu, -CXalpha, -CZ0, 0],
+    Q_symm = np.matrix([
+         [-CXu, -CXalpha, -CZ0, 0],
          [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
          [0, 0, 0, -1],
          [-CMu, -Cmalpha, 0, -Cmq]])
 
-    R_symm = np.matrix([[-CXdelt_e,CXdelt_t],
+    R_symm = np.matrix([
+         [-CXdelt_e,CXdelt_t],
          [-CZdelt_e,CYdelt_t],
          [0,0],
          [-CMdelt_e, CMdelt_t]])
@@ -241,22 +236,29 @@ else:
 
     D_symm = [[0 , 0],
               [0 , 0],
-              [0 , 0],
-              [1 , 0]]
-
+              [1 , 0],
+              [0 , 0]]
+print("A",A_symm)
+print("Czq",CZq)
+print("czalphadott",CZalphadott)
+print("muc",mu_c)
+print(A_symm[1,3])
 damping = True
 if damping:
     sys = ss(A_symm,B_symm,C_symm,D_symm)
     state_matrix = np.eye(4)
     input_matrix = np.eye(2)
-    K, S, E = lqr(sys, state_matrix, input_matrix)
+    weight_matrix = np.matrix([[1,0,0,0],
+                               [0,1,0,0],
+                               [0,0,1,0],
+                               [0,0,0,10]])
+    K, S, E = lqr(A_symm, B_symm, weight_matrix, input_matrix)
     A_cl = A_symm - B_symm @ K
     sys_cl = ss(A_cl,B_symm,C_symm,D_symm)
-    damping_system = sys_cl.feedback(K)
-    K[0,0] = 0
+    K[0,0] = 1
     print("K",K)
     # The time vector
-    tend = 100
+    tend = 30
     dt = 0.1
     t = np.arange(0,tend+dt, dt)
     #==============================================================================
@@ -275,11 +277,11 @@ if damping:
         u0 = np.zeros(s)
         for i in range(len(t)):
             u0[i] = u01[i],u02[i]
-        y, time, x = lsim(damping_system, u0, t)
+        y, time, x = lsim(sys_cl, u0, t)
     if initial_condition:
         x0 = np.array([[5],          # initial codnitions for u, alpha, theta and q respectively
                        [np.pi/4],
-                       [0],
+                       [np.pi/4],
                        [np.pi/2* aero_constants.c_bar / V]])
 
         y, time = initial(sys_cl, t, x0)
@@ -294,8 +296,8 @@ if damping:
     plt.show()
 
     print(pole(sys_cl))
-
-    poles = True
+    # print(tf(sys))
+    poles = False
     if poles:
         poles = pole(sys_cl)
 
