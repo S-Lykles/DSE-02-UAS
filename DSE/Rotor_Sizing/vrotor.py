@@ -58,7 +58,10 @@ def rotor_perf_T(T, v, alpha, max_iter=100, tol=1e-4):
     U, Vc = np.cos(alpha) * v, -np.sin(alpha) * v
     T_func = lambda throttle: rotor_perf(throttle, U, Vc)[0] - T
     x0, x1 = 0.1, 1.1
-    x, ret = brentq(T_func, x0, x1, xtol=1e-3, rtol=1e-3, full_output=True)
+    try:
+        x, ret = brentq(T_func, x0, x1, xtol=1e-3, rtol=1e-3, full_output=True)
+    except ValueError:
+        return np.inf
     # print(ret.function_calls)
     return rotor_perf(x, U, Vc)[1]
 
@@ -77,8 +80,9 @@ def plot_throttle_curve(U=0, Vc=0):
     T, P, Q = np.array([rotor_perf(t, U, Vc) for t in throttle]).T
     fig, ax = plt.subplots(2, 1)
     o = OMEGA * throttle
+    A = np.pi * R**2
     Vtip = R * o
-    ax[0].plot(throttle*o, T)
+    ax[0].plot(throttle*o, T/(Vtip**2*A))
     ax[0].set_ylabel("Thrust [N]")
     ax[1].plot(throttle*o, P)
     ax[1].set_ylabel("Power [W]")
@@ -144,7 +148,7 @@ def plot_rotor_2d(r, omega, chord, theta, N, U, Vc, z='inflow', highlight_crit=T
 
 if __name__ == "__main__":
 
-    U = 1
+    U = 12
     Vc = 0
     
     OMEGA = OMEGA * 1
@@ -161,7 +165,8 @@ if __name__ == "__main__":
 
     print(f"Ta = {Ta:.3f} N")
 
-    # plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='inflow', highlight_crit=True)
+    plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='inflow', highlight_crit=True)
     # plot_throttle_curve()
+    
 
 
