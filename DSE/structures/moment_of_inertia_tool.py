@@ -312,11 +312,11 @@ def number_of_stringers_computation(K_c, s, t, E, t_c): #, mu):
 def number_of_stringers_computation_horizontal_tail(K_c, s, t, E, t_c): #, mu):
     E = E * 0.000145037738
     t = t * 39.3700787
-    h = 0.109 * t_c * 39.3700787
+    h = 0.118 * t_c * 39.3700787
     M = momentdistributionz[round(s*100)] * 8.85074579
 
     N = np.arange(1, 5, 1)
-    L = 0.5 * 0.109 * 39.3700787 / N
+    L = 0.5 * 0.118 * 39.3700787 / N
     print(N, 'N')
 
     # Compute the maximum compressive force acting on the wing box section
@@ -382,13 +382,16 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
 #                                                                                         0.12))#, 0.3))
 
 # Stringer computations for the horizontal tail:
-
-# print("Compute the number of stringers required for the horizontal tail at s= 0:",
-#       number_of_stringers_computation_horizontal_tail(3.62, 0, 0.001, 71*10**9, 0.12))
-# print("Compute the number of stringers required for the horizontal tail at s= 0.4:",
-#       number_of_stringers_computation_horizontal_tail(3.62, 0.4, 0.001, 71*10**9, 0.12))
-# print("Compute the number of stringers required for the horizontal tail at s= 1.0:",
-#       number_of_stringers_computation_horizontal_tail(3.62, 1.0, 0.001, 71*10**9, 0.12))
+# print("The moment of inertia of the wing box for the horizontal tail is:",
+#       I_xx_wing_box(0.008, 0.003, 0.002,0.004,0.008,0.002,
+#                     0.004,0.008,0,0,0,0,
+#                     0.001,0.5*0.118,0.001,0.5*0.118, 2))
+print("Compute the number of stringers required for the horizontal tail at s= 0:",
+      number_of_stringers_computation_horizontal_tail(3.62, 0, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 0.4:",
+      number_of_stringers_computation_horizontal_tail(3.62, 0.5625, 0.001, 71*10**9, 0.12))
+print("Compute the number of stringers required for the horizontal tail at s= 1.0:",
+      number_of_stringers_computation_horizontal_tail(3.62, 1.15, 0.001, 71*10**9, 0.12))
 # print("Compute the number of stringers required for the horizontal tail at s= 1.3:",
 #       number_of_stringers_computation_horizontal_tail(3.62, 1.3, 0.001, 71*10**9, 0.12))
 # print("Compute the number of stringers required for the horizontal tail at s= 1.9:",
@@ -398,10 +401,10 @@ def number_of_ribs_buckling_computation(K_c, s, t, E, T, t_c):
 # print("The moment of inertia of the wing box for the vertical tails is:",
 #       I_xx_wing_box(0.035*0.75,0.005*0.75,0.007*0.75,0.01*0.75,0.035*0.75,0.005*0.75,0.007*0.75,0.01*0.75,
 #                      0,0,0,0,0.001,0.2*0.75,0.001,0.2*0.75,2))
-print("Compute the number of stringers required for the vertical tails at s = 0:",
-      number_of_stringers_computation_vertical_tails(3.62, 0, 0.001, 70* 10**9, 0.12, 0.00103))
-print("Compute the number of stringers required for the vertical tails at s = 0.44:",
-      number_of_stringers_computation_vertical_tails(3.62, 0.44, 0.001, 70* 10**9, 0.12, 0.000654375))
+# print("Compute the number of stringers required for the vertical tails at s = 0:",
+#       number_of_stringers_computation_vertical_tails(3.62, 0, 0.001, 70* 10**9, 0.12, 0.00103))
+# print("Compute the number of stringers required for the vertical tails at s = 0.44:",
+#       number_of_stringers_computation_vertical_tails(3.62, 0.44, 0.001, 70* 10**9, 0.12, 0.000654375))
 
 
 # Check for valid moment of inertia of the wing box for the horizontal tail

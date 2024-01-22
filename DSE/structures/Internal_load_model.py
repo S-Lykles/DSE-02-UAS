@@ -11,9 +11,9 @@ def aero_data_to_numpy(file_name):
     data = np.transpose(data)
     y = data[0] #+ 1.15
     chord = data[1]
-    cl = data[3] * 0.5
-    cd = (data[4] + data[5]) * 0.5
-    cm_geom = data[6] *0.5
+    cl = data[3] #* 0.5
+    cd = (data[4] + data[5]) #* 0.5
+    cm_geom = data[6] #*0.5
     return y, chord, cl, cd, cm_geom
 
 
@@ -92,18 +92,18 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
     # reac_torque = load_distribution(0.2, Boom_from_centerline, step, -1700/step, -1700/step, 'linear', point_range)
     # reac_torque_aileron = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
-    # elevator_torque = load_distribution(1.15, 2.3, step, -0.5* 0.109 * 240.55 / step, 0, 'linear', point_range)
-    # elevator_torque_2 = load_distribution(0, 1.15, step, 0, -0.5 * 0.109 * 240.55 / step, 'linear', point_range)
+    # elevator_torque = load_distribution(1.15, 2.3, step, -0.5 * 0.118 * 263.429 / step, 0, 'linear', point_range)
+    # elevator_torque_2 = load_distribution(0, 1.15, step, 0, -0.5 * 0.118 * 263.429 / step, 'linear', point_range)
     #vertical_tail_moment = point_load(0.88, 3.8 * 109.722 / 2 * 1.15 / step, point_range)
-    torque_from_horizontal_tail = load_distribution(0, 0.88, step, -3.8 * 5 / 2 * 1.15 / step, -3.8 * 5 / 2 * 1.15 / step, 'linear', point_range)
+    #torque_from_horizontal_tail = load_distribution(0, 0.88, step, -3.8 * 5 / 2 * 1.15 / step, -3.8 * 5 / 2 * 1.15 / step, 'linear', point_range)
     #reac_force = load_distribution(0, Boom_from_centerline, step, 800, 800, 'linear', point_range)
     if VTOL:
         loading_distribution = Upwards_pointload
         loading_distributionx = 0
     else:
-        load_factor_manouvre = 3.8
+        load_factor_manouvre = 1.5
         loading_distributionz =  load_factor_manouvre * lift_distribution #+ vertical_tail_moment#+ reac_force
-        torque_distribution = 3.8*torque_distribution + torque_from_horizontal_tail #+ elevator_torque + elevator_torque_2 + reac_torque + reac_torque_aileron
+        torque_distribution =  3.8*torque_distribution #+ elevator_torque + elevator_torque_2 #+ torque_from_horizontal_tail  + reac_torque + reac_torque_aileron
         loading_distributionx = load_factor_manouvre * drag_distribution
     # ax = plt.axes(projection='3d')
     # ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
@@ -119,7 +119,7 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     return loading_distributionx, loading_distributionz, torque_distribution, point_range, max_th
 
 
-loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 0.88, 1/128, False)
+loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 1.15, 1/128, False)
 
 
 def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step):
@@ -137,7 +137,7 @@ def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_r
                    #+ load_distribution(0, 0.88, step, 3.8 * 109.722 / 2 * 1.15 / step, 3.8 * 109.722 / 2 * 1.15 / step, "linear", point_range)
         #print(momentx, momentz)
         momentx_distribution = np.append(momentx_distribution, momentx/step)
-        momentz_distribution = np.append(momentz_distribution, momentz/ step) + point_load(0.87, 3.8 * 109.722 / 2 * 1.15, point_range)
+        momentz_distribution = np.append(momentz_distribution, momentz/ step) #+ point_load(0.87, 3.8 * 109.722 / 2 * 1.15, point_range)
     #print(momentx_distribution[0], momentz_distribution[0])
     ax = plt.axes(projection='3d')
     ax.plot3D(point_range, momentx_distribution, zeros, 'blue')
@@ -149,8 +149,8 @@ def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_r
     return momentx_distribution, momentz_distribution, point_range
 
 
-def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step, A):
-    Ixxreq = abs(moment_distribution)*max_th/ (sigmacrit - 109.722/ 2 / A)
+def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step): #, A):
+    Ixxreq = abs(moment_distribution)*max_th/ (sigmacrit) #- 109.722/ 2 / A)
     tskinreq = Ixxreq/ (2*(0.9*max_th/2)**2 * 0.5* max_th/0.12)
     intcomp = moment_distribution/maxth
     req_spar_space = tskinreq/np.sqrt(intcomp/(e_mod*0.9))
@@ -179,10 +179,10 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step,
 
 
 moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
-#print(Ixxreq(moment_distributionx, point_range, 0.001, 300*10**6, 71*10**9, 2800, 0.01, 0.000448))
+#print(Ixxreq(moment_distributionx, point_range, 0.001, 300*10**6, 71*10**9, 2800, 0.01)) #, 0.000448))
 
 
-print("The maximum moment experienced is:", momentdistributionz[0])
+#print("The maximum moment experienced is:", momentdistributionz[0])
 
 
 #Ixxreq(moment_distribution, point_range, max_th, 300.1*(10 ** 6), 20.1*(10**9),2800, 0.01)
