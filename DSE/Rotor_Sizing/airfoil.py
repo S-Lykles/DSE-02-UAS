@@ -2,10 +2,11 @@ import numpy as np
 from pathlib import Path
 import re
 from DSE import const
+from DSE.Rotor_Sizing.profile import twist_dist, P_twist_bounds
 from scipy.interpolate import SmoothBivariateSpline
 from matplotlib import pyplot as plt
 import matplotlib as mpl
-from DSE.plot_setting import report_tex, set_size
+from DSE.plot_setting import report_tex, set_size, textwidth
 
 plt.rcParams.update(report_tex)
 
@@ -68,9 +69,16 @@ if __name__ == "__main__":
                                                     (0.5 - epsilon, color_below_zero), 
                                                     (0.5 + epsilon, color_above_zero), 
                                                     (1, color_above_zero)])
-    fig, ax = plt.subplots(figsize=set_size())
+    fig, ax = plt.subplots(figsize=set_size(width=0.5*textwidth))
     plt.xlim(0.1, 0.7)
     plt.ylim(-3, 15)
+
+    r = np.linspace(0.0, 0.5, 100)
+    P_twist_up = list(zip(*P_twist_bounds))[1]
+    twist = twist_dist(r, P_twist_up)
+    omega = 4000 / 60 * 2*np.pi
+    Mr = omega*r/const.a
+    plt.plot(Mr, np.rad2deg(twist), label="$\\alpha$ upper bound")
 
     alpha = np.linspace(-3, 15, 100)
     M_grid = np.linspace(0.1, 0.7, 50)
@@ -86,10 +94,10 @@ if __name__ == "__main__":
     plt.scatter(*list(zip(*alpha_max)))
     ax.grid(False)
     CS = ax.contourf(M_grid, alpha, cp-Cp_crit, cmap=cmap, levels=1, vmin=-.5, vmax=.5)
-    CS = ax.contour(M_grid, alpha, cp, colors='k', linestyles='-')
+    CS = ax.contour(M_grid, alpha, cl/cd, colors='k', linestyles='-')
     ax.clabel(CS, inline=1, fontsize=10)
     ax.set_xlabel("$M$")
     ax.set_ylabel(r"$\alpha$")
-    plt.savefig(Path(__file__).parent/'clarky_cp.pdf', bbox_inches='tight')
+    plt.savefig(Path(__file__).parent/'clarky_max_alpha.pdf', bbox_inches='tight')
     # ax.set_title("Clark Y")
     plt.show()

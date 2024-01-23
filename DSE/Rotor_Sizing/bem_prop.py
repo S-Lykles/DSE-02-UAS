@@ -4,6 +4,7 @@ from scipy.optimize import least_squares, brentq, minimize, root, dual_annealing
 from DSE import const
 from DSE.Rotor_Sizing.airfoil import Cl_func_clarky, Cd_func_clarky, Cp_func_clarky
 from DSE.Rotor_Sizing.profile import chord_dist, twist_dist
+from pathlib import Path
 import pandas as pd
 
 def dT_be(a, b, V_inf, r, omega, chord, twist, rho=const.rho0, Cl_func=Cl_func_clarky, Cd_func=Cd_func_clarky):
@@ -141,7 +142,6 @@ if __name__ == "__main__":
     RPM = 3000
     omega = RPM * 2 * np.pi / 60
 
-
     nchord = 5
     ntwist = 5
     T_cruise = 270
@@ -208,9 +208,18 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(2, 1)
     ax[0].plot(r, chord)
     ax[0].set_ylabel('chord [m]')
+    ax[0].minorticks_on()
+    ax[0].grid(which='major', color='#DDDDDD', linewidth=0.8)
+    ax[0].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    ax[0].set_ylim(bottom=0)
     ax[1].plot(r, np.rad2deg(twist))
     ax[1].set_ylabel('twist [deg]')
+    ax[1].set_ylim(bottom=0)
     ax[1].set_xlabel('r [m]')
+    ax[1].minorticks_on()
+    ax[1].grid(which='major', color='#DDDDDD', linewidth=0.8)
+    ax[1].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    plt.savefig(Path(__file__).parent/'propeller.pdf', bbox_inches='tight')
     plt.show()
     data = pd.DataFrame({'r': r, 'chord': chord, 'twist': np.rad2deg(twist)})
     data.to_csv('propeller.csv', index=False)
