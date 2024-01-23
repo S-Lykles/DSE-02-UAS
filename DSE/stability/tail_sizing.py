@@ -114,7 +114,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
         lambd = c_tip/c_root
         x_ac_bar_fc2 =  0.273/(1+lambd) * b_f*c_g*(b-b_f)/(c_bar**2*(b+2.15*b_f))*np.tan(sweep_ang_25_c_rad)
         x_ac_bar_w = 0.25  #PLACEHOLDER,. the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
-        # x_ac_bar_w = 0.3+l_fn/c_bar  #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
+        # x_ac_bar_w = 0.3+l_fn/c_bar z #PLACEHOLDER, the value shall be taken from graph E-10, lecture 7 (can be set as input from graph according to wing design)
         x_ac_bar = x_ac_bar_w + x_ac_bar_fc1 + x_ac_bar_fc2
 
         Sh_S = np.arange(0, 0.8, 0.1)
@@ -196,7 +196,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
 
         # print()
         xlemac_lf = [x-y_datum_shift for x in xlemac_lf]
-        # xlemac_lf=xlemac_lf-1.57
+
         PloT = False
         if PloT == True:
             print(surface_ratio,'Surf.h',surface_ratio*S)
@@ -207,8 +207,6 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
             plt.plot(x_cg_bar_min, xlemac_lf, label ='xcg min')
             plt.plot(x_cg_bar_min, surface_ratio*np.ones(np.shape(x_cg_bar_min)), label ='xcg  optimum')
             plt.plot(x_cg_bar_min, np.minimum(y1,y2)*np.ones(np.shape(x_cg_bar_min)), label ='xcg  minoptimum')
-            # plt.xlim(0,1)
-            # plt.ylim(0,0.1)
             plt.ylabel('Sh/S')
             plt.xlabel('% Xcg of MAC')
             plt.title('Horizontal tail [AR=6.8]')
@@ -221,7 +219,7 @@ def horizontal_tail_sizing(eta = 0.95, V = const.v_cruise, R = const.R, gamma = 
     # Sh = S*surface_ratio
     Sh = S*np.min(sr)
     print('edge', cg.x_rot_rear+0.5, cg.x_tail)
-    print('AR', A_h,Sh/2.5,Sh/2.3)
+    print('AR', A_h,Sh/2.5,Sh/2.3, Sh)
     return Sh, x_cg_bar, x_cg_bar_c, surface_ratio,de_da, xlmac
 
 test_print = False

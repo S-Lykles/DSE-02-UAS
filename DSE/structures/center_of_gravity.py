@@ -6,24 +6,26 @@ from DSE.stability import rotor_placement as rp
 
 
 
-x_tail = 5.8
 x_lemac = const.xlemac
 mac = aero_constants.c_bar
 x_ac_wing = x_lemac+0.25*mac
 x_rot_front, x_rot_rear = rp.Rotor_Front_X, rp.Rotor_Rear_X
-x_payload_pd = 2.0
-x_payload_le = 2.2
-x_nose = 0.3
+print('rotor,',(x_rot_rear+x_rot_front)/2,x_ac_wing)
+x_nose = 0.7
 c_wing_root = aero_constants.c_root
 l_engine = 0.400
 l_alternator = 0.060
 l_clutch = 0.033
 l_prop = 0.18
 l_aeroboom = 0.47
-l_fus = x_lemac - x_nose + c_wing_root+0.2
-
+# l_fus = x_lemac - x_nose + c_wing_root+0.2
+l_fus = 2.8# - x_nose + c_wing_root+0.2
+x_payload_pd = x_nose+l_fus/2
+x_payload_le = x_nose+l_fus/2
 print('L_fus =', l_fus, 'm')
+print('wing-fus =', x_lemac+mac, x_nose+l_fus)
 
+x_tail = x_rot_rear+0.5+0.2+0.1
 
 components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                        'Air data boom':[0.142,x_nose - l_aeroboom/2,0,0],
@@ -39,14 +41,16 @@ components_dict = {'component name': '[W, x_cg, y_cg, z_cg]',
                        'Flight Data Recorder':[0.07,x_nose + 0.735 - l_aeroboom,0.029,0.056],
                        'WingL':[9,x_ac_wing,-1.226,0.17],
                        'WingR':[9,x_ac_wing,1.226,0.17],
-                       # 'WingL':[9,2.0828,-1.226,0.17],
-                       # 'WingR':[9,2.0828,1.226,0.17],
-                       'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
                        'Emergency Battery':[2,x_nose + 0.4,0,0],
-                       'Combustion Engine':[35,x_nose+0.5+0.2,0,-0.165],
-                       'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
-                       'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
-                       'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
+                       'Combustion Engine':[35,x_nose+0.5+l_engine/2,0,-0.165],
+                       # 'Power Management module':[6,x_lemac + c_wing_root,0,-0.1],
+                       # 'Alternator':[9,x_lemac + c_wing_root + l_engine + l_alternator/2,0,-0.165],
+                       'Alternator':[9,x_nose+0.5 + l_engine + l_alternator/2,0,-0.165],
+                       'Power Management module':[6,x_nose+0.5 + l_engine + l_alternator + l_clutch/2,0,-0.1],
+                       'Clutch':[1,x_nose+0.5 + l_engine + l_alternator + l_clutch/2,0,-0.165],
+                       # 'Clutch':[1,x_lemac + c_wing_root + l_engine + l_alternator + l_clutch/2,0,-0.165],
+                       # 'Push-prop':[0.6,x_lemac+ c_wing_root + l_engine + l_alternator + l_clutch + l_prop/2,0,-0.165],
+                       'Push-prop':[0.6,x_nose+l_fus+ l_prop/2,0,-0.165],
                        'ECU':[1,x_lemac + c_wing_root,0,-0.05],
                        'Fuselage structure/Shell':[3,l_fus/2 + x_nose,0,-0.17],
                        'ESC1':[0.62,x_rot_front + 0.2 ,-1.15,-0.06],
@@ -218,6 +222,7 @@ def extreme_cg_calc():
     OEW_PD_f_p = cg_per_mission(True, True, False, True, False)
     #print('cg results',test1[1][0],test2[1][0],test3[1][0],test4[1][0])
     Xcg_max = max(OEW[1][0], OEW_CR_f[1][0], OEW_CR_f_p[1][0], OEW_PD_f[1][0],  OEW_PD_f_p[1][0])
+    # print('cg location', OEW[1][0], OEW_CR_f[1][0], OEW_CR_f_p[1][0], OEW_PD_f[1][0],  OEW_PD_f_p[1][0])
     return Xcg_max
 
 
