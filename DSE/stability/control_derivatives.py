@@ -5,7 +5,9 @@ from DSE.aero import aero_constants
 from DSE.stability.tail_sizing import horizontal_tail_sizing, elevator_surface_sizing
 from control.matlab import *
 from matplotlib import pyplot as plt
+from DSE.plot_setting import report_tex, set_size, report_fast
 
+report_tex = report_fast
 print('File control_derivatives.py needs to be revisted and use the inputs from other files, instead of using the actual values.')
 PRInt = False
 
@@ -187,7 +189,7 @@ else:
     Cnp = -lv / b * CYp - 1 / 8 * (CL_w + CL_h * Sh / S * bh / b)
     CXu = -3 * CD0 - 3 * CL0 * np.tan(Theta_0) - M0 * CDM # Caughey, D. A., Introduction to Aircraft Stability and Control Course Notes for AE5070, 2011
     CZu = -M0**2 / (1 - M0**2)  * (CL_w + CL_h * (Sh/S))
-    # CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) * ((2 * Z_m)/(V * c_bar))
+    # CMu = (2/c_bar) * (CL_w * l_acw - CL_h * l_h - Cd0_w * Zac + C_t * Z_m) + ((2 * Z_m)/(V * c_bar))
     CMu = M0**2 / (1 - M0**2) * (CL_w * (l_acw/c_bar) - CL_h * ((l_h * S)/(c_bar * Sh)) - Cd0_w * (Zac/c_bar))
     CXq = 0
     CXdelt_e = 0
@@ -213,12 +215,15 @@ else:
          [-CZu, -CZalpha, CX0, -1*(CZq + 2*mu_c)],
          [0, 0, 0, -1],
          [-CMu, -Cmalpha, 0, -Cmq]])
-
     R_symm = np.matrix([
          [-CXdelt_e,CXdelt_t],
          [-CZdelt_e,CYdelt_t],
          [0,0],
          [-CMdelt_e, CMdelt_t]])
+    print("Q is wow",Q_symm)
+    print("P is wow",P_symm)
+    print("R is wow",R_symm)
+    print("czalphadot",CZalphadott)
 
     #P_inv = np.linalg.inv(P_symm)
     #A = np.matmul(P_inv,Q_symm)
@@ -236,14 +241,10 @@ else:
 
     D_symm = [[0 , 0],
               [0 , 0],
-              [1 , 0],
-              [0 , 0]]
-print("A",A_symm)
-print("Czq",CZq)
-print("czalphadott",CZalphadott)
-print("muc",mu_c)
-print(A_symm[1,3])
-damping = True
+              [0 , 0],
+              [1 , 0]]
+
+damping = False
 if damping:
     sys = ss(A_symm,B_symm,C_symm,D_symm)
     state_matrix = np.eye(4)
@@ -251,14 +252,13 @@ if damping:
     weight_matrix = np.matrix([[1,0,0,0],
                                [0,1,0,0],
                                [0,0,1,0],
-                               [0,0,0,10]])
+                               [0,0,0,1]])
     K, S, E = lqr(A_symm, B_symm, weight_matrix, input_matrix)
     A_cl = A_symm - B_symm @ K
     sys_cl = ss(A_cl,B_symm,C_symm,D_symm)
-    K[0,0] = 1
     print("K",K)
     # The time vector
-    tend = 30
+    tend = 50
     dt = 0.1
     t = np.arange(0,tend+dt, dt)
     #==============================================================================
@@ -285,19 +285,24 @@ if damping:
                        [np.pi/2* aero_constants.c_bar / V]])
 
         y, time = initial(sys_cl, t, x0)
+    plt.rcParams.update(report_tex)
     plt.plot(t,y[:,0],label = "u")
     plt.plot(t,y[:,1],label = "alpha")
     plt.plot(t,y[:,2],label = "theta")
     plt.plot(t,y[:,3],label = "q")
-    plt.title('Initial')
-    plt.xlabel('t')
-    plt.ylabel('y')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Output')
+    plt.gca().grid(which='major', color='#DDDDDD', linewidth=0.8)
+    plt.gca().grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    plt.minorticks_on()
+    plt.tight_layout()
+    plt.legend()
     plt.legend()
     plt.show()
 
-    print(pole(sys_cl))
+    print(pole(sys))
     # print(tf(sys))
-    poles = False
+    poles = True
     if poles:
         poles = pole(sys_cl)
 
@@ -311,9 +316,12 @@ if damping:
         plt.axhline(0, color='black', linewidth=0.5, linestyle='--')
         plt.axvline(0, color='black', linewidth=0.5, linestyle='--')
 
-        plt.title('Pole-Zero Map')
         plt.xlabel('Real')
         plt.ylabel('Imaginary')
+        plt.gca().grid(which='major', color='#DDDDDD', linewidth=0.8)
+        plt.gca().grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+        plt.minorticks_on()
+        plt.tight_layout()
         plt.legend()
         plt.grid(True)
         plt.show()
