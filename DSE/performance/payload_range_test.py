@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from DSE import const
 from DSE.performance.payload_range import *
+# from DSE.aero.drag_polar_final import dragpolar_dual
 from DSE.aero.Old.cl_cd import dragpolar_dual
 from DSE import plot_setting
 
@@ -114,18 +115,21 @@ def run_Wf_payload():
     plt.show()
 
 def run_Wf_endurance():
-    eta = 0.75
+    eta_cruise = 0.840
+    eta_loiter = 0.7583
     S = 3.763
-    b = 6
+    # b = 6
     SFC = 320 / (1e3 * 1e3 * 3600)
-    CL, CD = dragpolar_dual(b, S, CL_start=0.1, CL_end=1.2, CL_step=int(1e4))
+    CL = np.linspace(0.1, 1.7, 1000)
+    CD = dragpolar_dual(CL)
+    # CL, CD = dragpolar_dual(b, S, CL_start=0.1, CL_end=1.2, CL_step=int(1e4))
     P_max = 40e3
-    P_aux = 1000
+    P_aux = 50
     OEW = 100 * const.g0
     Payload = 20 * const.g0
     Wf_max = const.MTOW - OEW - Payload
 
-    R, t, W = T_endurance_mission(Wf_max, CL, CD, S, eta, SFC, P_max, P_aux)
+    R, t, W = T_endurance_mission(Wf_max, CL, CD, S, eta_cruise, eta_loiter, SFC, P_max, P_aux)
     ix_req = np.argmin(np.abs(R-const.R_cruise))
     iy_req = np.argmin(np.abs(t-const.T_loiter_end))
     Wf_req = W[iy_req, ix_req]
@@ -146,17 +150,19 @@ def run_Wf_endurance():
     plt.show()
 
 def run_payload_range_diagram():
-    eta = 0.75
+    eta_cruise = 0.840
+    eta_loiter = 0.7583
     S = 3.763
-    b = 6
+    # b = 6
     SFC = 320 / (1e3 * 1e3 * 3600)
-    CL, CD = dragpolar_dual(b, S, CL_start=0.1, CL_end=1.2, CL_step=int(1e4))
+    CL = np.linspace(0.1, 1.7, 1000)
+    CD = dragpolar_dual(CL)
     P_max = 40e3
-    P_aux = 1000
+    P_aux = 50
     Wf_max = 20 * const.g0
     Payload_max = 70 * const.g0
     OEW = 100 * const.g0
-    payload_range_diagram(OEW, Wf_max, Payload_max, CL, CD, S, eta, SFC, P_max, P_aux)
+    payload_range_diagram(OEW, Wf_max, Payload_max, CL, CD, S, eta_cruise, eta_loiter, SFC, P_max, P_aux, h_cruise1=1500)
 
 
 def power_req(CL, CD, S, h_cruise=500, v_cruise=const.v_cruise):

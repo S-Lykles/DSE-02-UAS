@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from DSE.Rotor_Sizing.airfoil import M_alpha
+# from DSE.Rotor_Sizing.airfoil import M_alpha
 from DSE import const
 
 # Function to calculate binomial coefficient
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     omega = 4000 * 2 * np.pi / 60
     R = 0.5
     r = np.linspace(0, R, 100)
-    M, alpha = M_alpha.T
+    # M, alpha = M_alpha.T
     c = chord_dist(r)
     print(np.mean(c))
     a = alpha_dist(r)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     ax[1].scatter(np.linspace(0, R, len(P_twist_bounds)),list(zip(*P_twist_bounds))[0])
     ax[1].scatter(np.linspace(0, R, len(P_twist_bounds)),list(zip(*P_twist_bounds))[1])
     ax[1].plot(r, np.rad2deg(a))
-    ax[1].plot(M*const.a/omega, alpha)
+    # ax[1].plot(M*const.a/omega, alpha)
     ax[1].set_xlim(0, 0.5)
 
     plt.show()

@@ -34,10 +34,10 @@ def geo_to_cart(geom):
     return x, y, z
 
 step = 1/128
-semispan = 2.3
+semispan = 0.67
 
 
-geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.109, 1, semispan, 0, step)
+geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.36, 0.4, semispan, 0, step)
 loadsx, loadsz, torqueyy, point_range, max_th = ilm.combined_loading(0, semispan, step, False)
 moment_distributionx, moment_distributionz, point_range = ilm.moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
 
