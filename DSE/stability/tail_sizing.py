@@ -242,14 +242,15 @@ def vertical_tail(CL_h=aero_constants.Cl_cruise_h,AR_h=6.8,bh=2.3,Xcg=extreme_cg
      The sweep angle was keep constant allong the cord of the tail for now, there is a option to change this within the code. (sweep_05_cord_v)"""
     # GO END PLAY WITH THESE OPTIMIZATION WEIGHTS. !!!!!!!!!
     weight_surf = 1.2
-    weight_AR = 0.7
+    weight_AR = 1.1
     weight_span = -0.2
     weight_root_cord = 1.9
-    weight_taper = 1
+    weight_taper = 1.6
+    weight_sweep_v = 0.6
 
     # CL_h = Cl_cruise_h from aero_constants is this the airfoil or wing ?
     # Constraints
-    Dis = 0.8
+    Dis = 1.98
     min_height = 0.6
     min_AR_v = 1.0
     number_vertical_tail = 2  # FIXT IMPORT
@@ -259,14 +260,12 @@ def vertical_tail(CL_h=aero_constants.Cl_cruise_h,AR_h=6.8,bh=2.3,Xcg=extreme_cg
     M = 0.12  # FIXT IMPORTS
     Beta = np.sqrt(1 - M ** 2)
     # Resolution
-    accuracy = 2
-    steps = 100
-    iteration = 100
+    iteration = 50
     # intergration space
-    dx = 0.01
-    AR_v = np.arange(0.5, 3, 0.1)
+    dx = 0.1
+    AR_v = np.arange(1, 3, 0.1)
     sweep_v = np.arange(0, 45, 1)
-    taper_v = np.arange(0.4, 1.1, 0.1)
+    taper_v = np.arange(0.6, 1.1, 0.1)
     A = np.arange(0, Dis+dx, dx)
     # initial starting values
     tail_volume = 0.035 / number_vertical_tail  # FIXT IMPORTS
@@ -280,7 +279,6 @@ def vertical_tail(CL_h=aero_constants.Cl_cruise_h,AR_h=6.8,bh=2.3,Xcg=extreme_cg
     num = 0
 
     # C_eta_beta
-
     C_eta_beta_w = CL ** 2 / (4 * np.pi * AR_w) + CL_h ** 2 / (4 * np.pi * AR_h) * (Sh * bh) / (S * b)
     fuse_volume = 4 / 3 * np.pi * l_fus / 2 * (b_max / 2) ** 2
     C_eta_beta_fuse = -2 / (S * b) * fuse_volume
@@ -363,6 +361,7 @@ def vertical_tail(CL_h=aero_constants.Cl_cruise_h,AR_h=6.8,bh=2.3,Xcg=extreme_cg
     Norm_AR = 1 / max(AR_v)
     Norm_root_cord = 1 / (max(max(max(max(root_cord)))))
     Norm_taper = 1 / max(taper_v)
+    Norm_sweep = 1 /max(sweep_v)
 
     for i in range(len(AR_v)):
         for j in range(len(sweep_v)):
@@ -372,10 +371,9 @@ def vertical_tail(CL_h=aero_constants.Cl_cruise_h,AR_h=6.8,bh=2.3,Xcg=extreme_cg
                         if AR_v[i] > min_AR_v:
                             if MAX[i][j][p][r] <= max(A):
 
-                                H_opt = weight_taper * (taper_v[p] * Norm_taper) + weight_root_cord * (
+                                H_opt = weight_sweep_v *(sweep_v[j]*Norm_sweep) + weight_taper * (taper_v[p] * Norm_taper) + weight_root_cord * (
                                             root_cord[i][j][p][r] * Norm_root_cord) + weight_surf * Surface[i][j][p][
-                                            r] * Norm_Surface + weight_AR * AR_v[i] * Norm_AR + weight_span * \
-                                        Span[i][j][p][r] * Norm_Span
+                                            r] * Norm_Surface + weight_AR * AR_v[i] * Norm_AR + weight_span * Span[i][j][p][r] * Norm_Span
                                 if H_opt <= H:
                                     tel = tel + 1
                                     H = H_opt
