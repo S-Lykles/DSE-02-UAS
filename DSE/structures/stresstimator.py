@@ -34,10 +34,10 @@ def geo_to_cart(geom):
     return x, y, z
 
 step = 1/128
-semispan = 3
+semispan = 0.67
 
 
-geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.833, 0.4, semispan, 0, step)
+geom, chords, spans = wgg.wing_geometry('external files/lednicerdatfile.dat', 0.36, 0.4, semispan, 0, step)
 loadsx, loadsz, torqueyy, point_range, max_th = ilm.combined_loading(0, semispan, step, False)
 moment_distributionx, moment_distributionz, point_range = ilm.moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
 
@@ -75,7 +75,7 @@ for shear in shear_flow:
 plt.plot(np.resize(point_range, len(shear_flow)), shear_flow)
 plt.xlabel('semi-spanwise location (m)')
 plt.ylabel('spanwise shear flow distirbution (N/m)')
-plt.show
+plt.show()
 
 #print(volume, mass)
 
@@ -92,3 +92,4 @@ ax.axes.set_ylim3d(bottom=0, top=3)
 ax.axes.set_zlim3d(bottom=0, top=3)
 plt.show()
 
+#print(max(moment_distributionz))

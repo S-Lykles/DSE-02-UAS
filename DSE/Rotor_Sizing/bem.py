@@ -5,10 +5,12 @@ from matplotlib import pyplot as plt
 from scipy.optimize import minimize
 from DSE.Rotor_Sizing.profile import chord_dist, twist_dist, P_chord_bounds, P0_chord, P0_twist, P_twist_bounds
 from DSE.Rotor_Sizing.airfoil import Cl_func_clarky, Cd_func_clarky, Cp_func_clarky
+from DSE.plot_setting import report_tex, set_size, textwidth
 import pickle
 
 file_dir = Path(__file__).parent
 
+plt.rcParams.update(report_tex)
 
 def solidity(R, r, chord, N):
     return N * np.trapz(chord, r) / (np.pi * R**2)
@@ -229,11 +231,16 @@ if __name__ == "__main__":
                                                     (0.5 - epsilon, color_below_zero), 
                                                     (0.5 + epsilon, color_above_zero), 
                                                     (1, color_above_zero)])
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=set_size())
+    plt.grid(False)
     plt.xlim(0.1, 0.7)
     plt.ylim(-3, 15)
 
-    plt.plot(M, np.rad2deg(alpha))
+    plt.plot(M, np.rad2deg(alpha), label='optimized $\\alpha$ distribution')
+    P_twist_up = list(zip(*P_twist_bounds))[1]
+    alpha_max = twist_dist(r, P_twist_up)
+    plt.plot(M, np.rad2deg(alpha_max), '--', color='k', label='$\\alpha$ upper bound')
+    plt.legend()
 
     alpha_range = np.linspace(-2, 15, 100)
     M_grid = np.linspace(0.1, 0.7, 50)
@@ -252,5 +259,6 @@ if __name__ == "__main__":
     ax.clabel(CS, inline=1, fontsize=10)
     ax.set_xlabel("M")
     ax.set_ylabel(r"$\alpha$")
-    ax.set_title("Clark Y $C_L / C_D$")
+    # ax.set_title("Clark Y $C_L / C_D$")
+    plt.savefig(file_dir/'clarky_alpha_optim.pdf', bbox_inches='tight')
     plt.show()

@@ -1,7 +1,7 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-# from DSE.plot_setting import report_tex, set_size, report_fast
+from DSE.plot_setting import report_tex, set_size, report_fast
 from DSE import const
 
 # report_tex = report_fast

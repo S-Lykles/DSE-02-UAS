@@ -9,6 +9,9 @@ from pathlib import Path
 from matplotlib import pyplot as plt
 from scipy.optimize import brentq
 import pandas as pd
+from DSE.plot_setting import report_tex, set_size, textwidth
+
+plt.rcParams.update(report_tex)
 
 
 file_dir = Path(__file__).parent
@@ -58,7 +61,10 @@ def rotor_perf_T(T, v, alpha, max_iter=100, tol=1e-4):
     U, Vc = np.cos(alpha) * v, -np.sin(alpha) * v
     T_func = lambda throttle: rotor_perf(throttle, U, Vc)[0] - T
     x0, x1 = 0.1, 1.1
-    x, ret = brentq(T_func, x0, x1, xtol=1e-3, rtol=1e-3, full_output=True)
+    try:
+        x, ret = brentq(T_func, x0, x1, xtol=1e-3, rtol=1e-3, full_output=True)
+    except ValueError:
+        return np.inf
     # print(ret.function_calls)
     return rotor_perf(x, U, Vc)[1]
 
@@ -73,18 +79,31 @@ def plot_throttle_curve(U=0, Vc=0):
     Vc : float, optional
         Vertical climb velocity [m/s], by default 0
     """
-    throttle = np.linspace(0.5, 1.05, 10)
-    T, P, Q = np.array([rotor_perf(t, U, Vc) for t in throttle]).T
     fig, ax = plt.subplots(2, 1)
-    o = OMEGA * throttle
-    Vtip = R * o
-    ax[0].plot(throttle*o, T)
-    ax[0].set_ylabel("Thrust [N]")
-    ax[1].plot(throttle*o, P)
-    ax[1].set_ylabel("Power [W]")
-    # ax[2].plot(throttle*o, Q)
+    throttle = np.linspace(0.5, 1.05, 10)
+    
+    for u in [0, 5, 10]:
+        T, P, Q = np.array([rotor_perf(t, u, Vc) for t in throttle]).T
+        o = OMEGA * throttle * 60 / (2*np.pi)
+        A = np.pi * R**2
+        Vtip = R * o
+        ax[0].plot(o, T, label=f"$U={u}$ m/s")
+        ax[0].set_ylabel("Thrust [N]")
+        ax[0].minorticks_on()
+        ax[0].grid(which='major', color='#DDDDDD', linewidth=0.8)
+        ax[0].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+        ax[1].plot(o, P)
+        ax[1].set_ylabel("Power [W]")
+        ax[1].set_xlabel("Rotor speed [RPM]")
+        ax[1].minorticks_on()
+        ax[1].grid(which='major', color='#DDDDDD', linewidth=0.8)
+        ax[1].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+        # ax[2].plot(throttle*o, Q)
     # ax[2].set_ylabel("Torque [Nm]")
     # [ax.legend() for ax in ax]
+    ax[0].legend()
+    plt.tight_layout()
+    plt.savefig(file_dir/"throttle_curve.pdf")
     plt.show()
 
 
@@ -144,8 +163,29 @@ def plot_rotor_2d(r, omega, chord, theta, N, U, Vc, z='inflow', highlight_crit=T
 
 if __name__ == "__main__":
 
-    U = 1
+    U = 10
     Vc = 0
+    
+    # fig, ax = plt.subplots(2, 1, figsize=set_size(textwidth, 0.5*textwidth))
+    # ax[0].plot(r_ROTOR, CHORD)
+    # ax[0].set_xlabel("r [m]")
+    # ax[0].set_ylabel("chord [m]")
+    # # ax[0].set_ylim(0,
+    # ax[0].minorticks_on()
+    # ax[0].grid(which='major', color='#DDDDDD', linewidth=0.8)
+    # ax[0].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    # ax[0].set_aspect('equal', adjustable='box')
+    # ax[1].plot(r_ROTOR, np.rad2deg(THETA))
+    # ax[1].set_xlabel("r [m]")
+    # ax[1].set_ylabel("$\\theta$ [deg]")
+    # ax[1].set_ylim(bottom=0)
+    # ax[1].minorticks_on()
+    # ax[1].grid(which='major', color='#DDDDDD', linewidth=0.8)
+    # ax[1].grid(which='minor', color='#EEEEEE', linestyle='-', linewidth=0.5)
+    
+    # plt.tight_layout()
+    # plt.savefig(file_dir/"rotor_params.pdf")
+    # plt.show()
     
     OMEGA = OMEGA * 1
     # dT, dQ = solve_dT_dr(r_ROTOR, OMEGA, CHORD, THETA, N, which='theta')
@@ -161,7 +201,8 @@ if __name__ == "__main__":
 
     print(f"Ta = {Ta:.3f} N")
 
-    # plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='inflow', highlight_crit=True)
-    # plot_throttle_curve()
+    # plot_rotor_2d(r_ROTOR, OMEGA, CHORD, THETA, N, U, Vc, z='dT_dr', highlight_crit=True)
+    plot_throttle_curve()
+    
 
 

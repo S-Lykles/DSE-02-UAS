@@ -1,17 +1,20 @@
 from aero_constants import *
 from DSE import const
 import itertools
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
 #atmospheric constants
 rho = const.m2rho(500)
-print(rho)
+
 mu = 1.81*10**(-5)
 M = const.V_min / (const.R*const.T0*const.gamma)**0.5
 
 #wing constants
 C_L = np.linspace(0,1.5,1000)
 AR = b**2 / S
+print(AR, e)
 S_ref = S
 S_wet_wing = S*2
 xc_m_wing = 0.298 # maximum thickness location on the wing chord
@@ -22,20 +25,23 @@ tc_h = 0.12
 tc_v = 0.12
 xc_m_h = 0.3
 xc_m_v = 0.3
-taper_h = 1 # placeholder! change when stab&control have sizing done
-taper_v = 1 # placeholder! change when stab&control have sizing done
-S_h = 0.539
+taper_h = 1
+taper_v = 0.5
+S_h = 0.2781
 S_wet_h = S_h * 2
-c_root_h = 0.234
-S_v = 0.37933 # for a single vertical tail
+c_root_h = 0.1209
+S_v = 0.17 # for a single vertical tail
 S_wet_v = S_v * 4
-c_root_v = 0.4468
+c_root_v = 0.36
 c_bar_h = c_root_h * (2/3) * ((1+taper_h+taper_h**2)/(1+taper_h))
+print('c_bar_h', c_bar_h)
 c_bar_v = c_root_v * (2/3) * ((1+taper_v+taper_v**2)/(1+taper_v))
+print('c_bar_v', c_bar_v)
 sweep_ang_50_c_rad_h = 0 # placeholder! change when stab&control have sizing done
-sweep_ang_50_c_rad_v = 22 * const.deg2rad # placeholder! change when stab&control have sizing done
+sweep_ang_50_c_rad_v = 6 * const.deg2rad # placeholder! change when stab&control have sizing done
 Lambda_m_h = np.arctan(np.tan(sweep_ang_50_c_rad_h)-(4 / AR) * ((xc_m_h - 0.5)*((1-taper_h)/(1+taper_h))))
 Lambda_m_v = np.arctan(np.tan(sweep_ang_50_c_rad_v)-(4 / AR) * ((xc_m_v - 0.5)*((1-taper_v)/(1+taper_v))))
+print('lambda', Lambda_m_v, Lambda_m_h)
 
 #winglet constants
 xc_m_winglet = xc_m_wing
@@ -43,11 +49,13 @@ S_wet_winglet = S_winglet * 2
 AR_winglet = b_winglet**2 / (S_winglet / 2)
 Lambda_m_winglet = np.arctan(np.tan(sweep_ang_25_c_rad_winglet)-(4 / AR) * ((xc_m_winglet - 0.25)*((1-taper_winglet)/(1+taper_winglet))))
 c_bar_winglet = c_root_winglet * (2/3) * ((1+taper_winglet+taper_winglet**2)/(1+taper_winglet))
-
+print(c_bar_winglet)
 #fuselage constants
-l_fus = 2.0
+l_fus = 2.8
 d_fus = 0.8
-S_wet_fus = pi * d_fus * 2 * l_fus
+
+S_wet_fus = 6.266
+
 
 #other drag components
 CD_misc_prop = 0.02
@@ -69,6 +77,7 @@ def Reynolds_per_component():
     R_winglet = Reynolds(rho, const.V_min, c_bar_winglet, mu)
     return [R_wing, R_fus, R_h, R_v, R_winglet]
 
+print('R', Reynolds_per_component())
 
 def C_f_laminar(R):
     return 1.328/(R**0.5)
@@ -100,9 +109,14 @@ def CD0(Cf_list, FF_list, Q_list, Swet_list, Sref, CD_misc, frac_CD_LP):
     for Cf, FF, Q, Swet in itertools.zip_longest(Cf_list, FF_list, Q_list, Swet_list):
         CD_list.append(Cf*FF*Q*Swet/Sref)
         sm += Cf*FF*Q*Swet
+
+    print(sm / Sref)
+    CD_LP = ((frac_CD_LP)/(1-frac_CD_LP))* (sm / Sref + CD_misc)
+    CD0 = sm / Sref + CD_misc + CD_LP
+    CD_list.append(CD_misc)
+    CD_list.append(CD_LP)
     print('CD', CD_list)
-    CD0 = sm / Sref + CD_misc + ((frac_CD_LP)/(1-frac_CD_LP))* (sm / Sref + CD_misc)
-    return CD0
+    return CD0, CD_list
 
 def drag_polar(CL, AR, e, CD0):
     CDi = CL**2 / (pi * AR * e)
@@ -133,8 +147,19 @@ print('FF', FF_list)
 print('Q', Q_list)
 print('S_wet', S_wet_list)
 
-CD0 = CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)
-print(CD0)
-CD = drag_polar(C_L, AR, e, CD0)
+CD0, CDlist = CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)[0], CD0(C_f_list, FF_list, Q_list, S_wet_list, S_ref, CD_misc, frac_CD_LP)[1]
+y = np.array(CDlist)
+mylabels = ["Wing", "Fuselage", "Horizontal tail", "Vertical tail", "Winglets", "Miscellaneous drag", "Leakages and proturberances"]
 
+def my_autopct(pct):
+    return ('%.2f' % pct) if pct > 0.5 else ''
+plt.pie(y, autopct=my_autopct, pctdistance=1.4)
+plt.legend(title = "Parasite drag contributions in percentages", labels = mylabels, loc="center left", bbox_to_anchor=(1.2, 0, 0.5, 1))
+plt.show()
+
+CD = drag_polar(C_L, AR, e, CD0)
+plt.plot(CD, C_L)
+plt.xlabel('$C_D$')
+plt.ylabel('$C_L$')
+plt.show()
 
