@@ -91,22 +91,22 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     Upwards_load = (load_factor_vtol * const.MTOW) / 2
     Upwards_pointload = point_load(Boom_from_centerline, Upwards_load, point_range)
     # reac_torque = load_distribution(0.2, Boom_from_centerline, step, -1700/step, -1700/step, 'linear', point_range)
-    #reac_torque_aileron_2 = load_distribution(2.61, 2.9, step, -22.25 / step, 0, 'linear', point_range)
-    #reac_torque_aileron = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
+    # reac_torque_aileron_2 = load_distribution(2.61, 2.9, step, -22.25 / step, 0, 'linear', point_range)
+    # reac_torque_aileron = load_distribution(0.2, 2.61, step, -22.25 / step, -22.25 / step, 'linear', point_range)
     # elevator_torque = load_distribution(1.15, 2.3, step, -0.5 * 0.118 * 263.429 / step, 0, 'linear', point_range)
     # elevator_torque_2 = load_distribution(0, 1.15, step, 0, -0.5 * 0.118 * 263.429 / step, 'linear', point_range)
     # vertical_tail_moment = load_distribution(0,0.67, step, 263.429*1.15/2*3.8, 263.429*1.15/2*3.8, 'linear', point_range)
     torque_from_horizontal_tail = load_distribution(0, 0.67, step, -3.8 * 5 / 2 * 1.15 / step, -3.8 * 5 / 2 * 1.15 / step, 'linear', point_range)
     torque_rudder = load_distribution(0,0.67,step, -3.8 * 172.62 * 0.6 * 0.288 / step, 0, 'linear', point_range)
     #torque_rudder_2 = load_distribution(0.335, 0.67, step, -3.8 * 172.62/ * 0.6 * 0.288 / step, 0, 'linear', point_range)
-    #reac_force = load_distribution(0, Boom_from_centerline, step, 800, 800, 'linear', point_range)
+    # reac_force = load_distribution(0.2, Boom_from_centerline, step, 800, 800, 'linear', point_range)
     if VTOL:
         loading_distribution = Upwards_pointload
         loading_distributionx = 0
     else:
         load_factor_manouvre = 3.8
         loading_distributionz = load_factor_manouvre * lift_distribution #+ reac_force
-        torque_distribution = 3.8*torque_distribution + torque_rudder + torque_from_horizontal_tail #+ torque_rudder_2  + torque_from_horizontal_tail #+ elevator_torque + elevator_torque_2 #+ reac_torque_aileron + reac_torque_aileron_2 #+ torque_rudder + torque_rudder_2  #+ torque_from_horizontal_tail reac_torque +
+        torque_distribution = 3.8*torque_distribution + torque_rudder + torque_from_horizontal_tail #+ reac_torque + reac_torque_aileron + reac_torque_aileron_2 #+ elevator_torque + elevator_torque_2  #+ torque_rudder_2  + torque_from_horizontal_tail  # + torque_rudder_2  #+ torque_from_horizontal_tail
         loading_distributionx = load_factor_manouvre * drag_distribution
     # ax = plt.axes(projection='3d')
     # ax.plot3D(point_range, loading_distributionx/step, zeros, 'blue')
@@ -117,7 +117,7 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     # plt.show()
     plt.figure(figsize=(10, 6))
     plt.plot(point_range, torque_distribution)
-    plt.xlabel('semi-spanwise location (m)')
+    plt.xlabel('Spanwise location (m)')
     plt.ylabel('Internal torque (Nm)')
     plt.title("Internal Torque Diagram for PterUAS: horizontal tail wing for n=3.8 with full elevator deflection")
     plt.grid()
@@ -161,24 +161,26 @@ def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_r
     plt.plot(point_range, load_distributionz/step)
     plt.xlabel('Semi-spanwise location (m)')
     plt.ylabel('Internal shear force on wing (N)')
-    plt.title('Shear Force Diagram for PterUAS: horizontal tail wing for n = 3.8')
+    plt.title('Shear Force Diagram for PterUAS: vertical tail wings for n = 3.8')
     plt.grid()
 
     plt.subplot(3, 1, 2)
     plt.plot(point_range, momentz_distribution)
     plt.xlabel('Semi-spanwise location (m)')
     plt.ylabel('Internal moment (z) on wing (Nm)')
-    plt.title('Moment Diagram (z) for PterUAS: horizontal tail wing for n = 3.8')
+    plt.title('Moment Diagram (z) for PterUAS: vertical tail wings for n = 3.8')
     plt.grid()
+
 
     plt.subplot(3, 1, 3)
     plt.plot(point_range, torque_distribution)
     plt.xlabel('semi-spanwise location (m)')
     plt.ylabel('Internal torque (Nm)')
-    plt.title("Internal Torque Diagram for PterUAS: horizontal tail wing for n=3.8 with full elevator deflection")
+    plt.title("Internal Torque Diagram for PterUAS: vertical tail wings for n=3.8")
     plt.grid()
     plt.tight_layout()
     plt.show()
+
     return momentx_distribution, momentz_distribution, point_range
 
 
