@@ -115,10 +115,13 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
     # ax.set_ylabel('internal force (drag) (N)')
     # ax.set_zlabel('internal force (lift) (N)')
     # plt.show()
+    plt.figure(figsize=(10, 6))
     plt.plot(point_range, torque_distribution)
     plt.xlabel('semi-spanwise location (m)')
     plt.ylabel('Internal torque (Nm)')
     plt.title("Internal Torque Diagram for PterUAS: horizontal tail wing for n=3.8 with full elevator deflection")
+    plt.grid()
+    plt.tight_layout()
     plt.show()
     return loading_distributionx, loading_distributionz, torque_distribution, point_range, max_th
 
@@ -126,7 +129,7 @@ def combined_loading(beam_start, beam_stop, step, VTOL):
 loadsx, loadsz, torqueyy, point_range, max_th = combined_loading(0, 0.67, 1/128, False)
 
 
-def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step):
+def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_range, step, torque_distribution):
     momentx_distribution = np.array([])
     momentz_distribution = np.array([])
     zeros = np.zeros(len(point_range))
@@ -152,15 +155,29 @@ def moment_distr_from_load_distr(load_distributionx, load_distributionz, point_r
     # plt.show()
 
     # Plotting of the bending moment around the z-axis:
-    plt.plot(point_range, momentz_distribution)
-    plt.xlabel('Semi-spanwise location (m)')
-    plt.ylabel('Internal moment (z) on wing (Nm)')
-    plt.title('Moment Diagram (z) for PterUAS: horizontal tail wing for n = 3.8')
-    plt.show()
+    plt.figure(figsize=(10, 6))
+
+    plt.subplot(3, 1, 1)
     plt.plot(point_range, load_distributionz/step)
     plt.xlabel('Semi-spanwise location (m)')
     plt.ylabel('Internal shear force on wing (N)')
     plt.title('Shear Force Diagram for PterUAS: horizontal tail wing for n = 3.8')
+    plt.grid()
+
+    plt.subplot(3, 1, 2)
+    plt.plot(point_range, momentz_distribution)
+    plt.xlabel('Semi-spanwise location (m)')
+    plt.ylabel('Internal moment (z) on wing (Nm)')
+    plt.title('Moment Diagram (z) for PterUAS: horizontal tail wing for n = 3.8')
+    plt.grid()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(point_range, torque_distribution)
+    plt.xlabel('semi-spanwise location (m)')
+    plt.ylabel('Internal torque (Nm)')
+    plt.title("Internal Torque Diagram for PterUAS: horizontal tail wing for n=3.8 with full elevator deflection")
+    plt.grid()
+    plt.tight_layout()
     plt.show()
     return momentx_distribution, momentz_distribution, point_range
 
@@ -194,7 +211,7 @@ def Ixxreq(moment_distribution, point_range, maxth, sigmacrit, e_mod, rho, step)
     # print(mbox)
 
 
-moment_distributionx, momentdistributionz, point_range = moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128)
+moment_distributionx, momentdistributionz, point_range, torque_distribution_1 = moment_distr_from_load_distr(loadsx, loadsz, point_range, 1/128, torqueyy)
 #print(Ixxreq(moment_distributionx, point_range, 0.001, 300*10**6, 600*10**6, 2800, 0.01)) #, 0.000336))
 
 
